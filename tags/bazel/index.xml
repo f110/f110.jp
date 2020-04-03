@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Bazel on f110&#39;s weblog</title>
+    <link>https://f110.jp/tags/bazel/</link>
+    <description>Recent content in Bazel on f110&#39;s weblog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
+    <lastBuildDate>Tue, 31 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://f110.jp/tags/bazel/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>依存ライブラリは常にvendoringする</title>
+      <link>https://f110.jp/posts/vendoring-dependent-libraries/</link>
+      <pubDate>Tue, 31 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/posts/vendoring-dependent-libraries/</guid>
+      <description>BazelでGoの依存ライブラリを管理する方法は2つあります。 go.mod からWORKSPACEファイルを生成する vendorディレクトリを使う 以前は</description>
+    </item>
+    
+    <item>
+      <title>Bazelとgrpc-goを仲良くさせる</title>
+      <link>https://f110.jp/posts/bazel-with-grpc-go/</link>
+      <pubDate>Mon, 23 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/posts/bazel-with-grpc-go/</guid>
+      <description>Bazel をGoのプロジェクトで使っている際に多くの人が悩むのがProtocol Buffersの扱い。 gRPCを使っているリポジトリでBazelとg</description>
+    </item>
+    
+    <item>
+      <title>Bazelでインテグレーションテストをする</title>
+      <link>https://f110.jp/posts/integration-test-with-bazel/</link>
+      <pubDate>Sun, 22 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/posts/integration-test-with-bazel/</guid>
+      <description>GoのプロジェクトをビルドするツールとしてGNU MakeではなくBazelを利用し、インテグレーションテストを実現する方法について紹介します</description>
+    </item>
+    
+    <item>
+      <title>GoとBazel</title>
+      <link>https://f110.jp/posts/go-and-bazel/</link>
+      <pubDate>Wed, 23 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/posts/go-and-bazel/</guid>
+      <description>本エントリは オリジナル のコピーです。 以前、 モノレポ構成にしてビルドツールとしてBazelを利用している ことを紹介しました。 そのBazelは1</description>
+    </item>
+    
+    <item>
+      <title>Bazelの使い方詰め合わせ</title>
+      <link>https://f110.jp/posts/tips-on-bazel/</link>
+      <pubDate>Mon, 13 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/posts/tips-on-bazel/</guid>
+      <description>本エントリは オリジナル の一部を再編集して掲載しています。 (2020/03/31) 前の記事 ではBazelについて簡単に紹介しました。 ここでは更に1歩、Bazelの使</description>
+    </item>
+    
+    <item>
+      <title>Bazelとモノレポ</title>
+      <link>https://f110.jp/posts/monorepo-with-bazel/</link>
+      <pubDate>Tue, 07 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/posts/monorepo-with-bazel/</guid>
+      <description>本エントリは オリジナル の一部を再編集して掲載しています。（2020/03/31） 1&amp;nbsp;&amp;nbsp;&amp;nbsp;モノレポのメリット 2&amp;</description>
+    </item>
+    
+  </channel>
+</rss>

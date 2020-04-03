@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>gRPC on f110&#39;s weblog</title>
+    <link>https://f110.jp/tags/grpc/</link>
+    <description>Recent content in gRPC on f110&#39;s weblog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
+    <lastBuildDate>Mon, 23 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://f110.jp/tags/grpc/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Bazelとgrpc-goを仲良くさせる</title>
+      <link>https://f110.jp/posts/bazel-with-grpc-go/</link>
+      <pubDate>Mon, 23 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/posts/bazel-with-grpc-go/</guid>
+      <description>Bazel をGoのプロジェクトで使っている際に多くの人が悩むのがProtocol Buffersの扱い。 gRPCを使っているリポジトリでBazelとg</description>
+    </item>
+    
+  </channel>
+</rss>

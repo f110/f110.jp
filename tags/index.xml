@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on f110&#39;s weblog</title>
+    <link>https://f110.jp/tags/</link>
+    <description>Recent content in Tags on f110&#39;s weblog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
+    <lastBuildDate>Thu, 02 Apr 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>homecluster</title>
+      <link>https://f110.jp/tags/homecluster/</link>
+      <pubDate>Thu, 02 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/tags/homecluster/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Kubernetes</title>
+      <link>https://f110.jp/tags/kubernetes/</link>
+      <pubDate>Thu, 02 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/tags/kubernetes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>containerd</title>
+      <link>https://f110.jp/tags/containerd/</link>
+      <pubDate>Wed, 01 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/tags/containerd/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Docker</title>
+      <link>https://f110.jp/tags/docker/</link>
+      <pubDate>Wed, 01 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/tags/docker/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Bazel</title>
+      <link>https://f110.jp/tags/bazel/</link>
+      <pubDate>Tue, 31 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/tags/bazel/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Go</title>
+      <link>https://f110.jp/tags/go/</link>
+      <pubDate>Tue, 31 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/tags/go/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>gRPC</title>
+      <link>https://f110.jp/tags/grpc/</link>
+      <pubDate>Mon, 23 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/tags/grpc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Monorepo</title>
+      <link>https://f110.jp/tags/monorepo/</link>
+      <pubDate>Tue, 07 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/tags/monorepo/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

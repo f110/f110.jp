@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Docker on f110&#39;s weblog</title>
+    <link>https://f110.jp/tags/docker/</link>
+    <description>Recent content in Docker on f110&#39;s weblog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
+    <lastBuildDate>Wed, 01 Apr 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://f110.jp/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Dockerを避ける</title>
+      <link>https://f110.jp/posts/avoid-docker/</link>
+      <pubDate>Wed, 01 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/posts/avoid-docker/</guid>
+      <description>皆さんはdockerを使っていますか？使っていますよね？ でもその使い方、本当にdockerじゃないとダメですか？ 自分のdockerの使い方 ほ</description>
+    </item>
+    
+  </channel>
+</rss>
