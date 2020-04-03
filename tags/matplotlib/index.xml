@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>matplotlib on f110&#39;s weblog</title>
+    <link>https://f110.jp/tags/matplotlib/</link>
+    <description>Recent content in matplotlib on f110&#39;s weblog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
+    <lastBuildDate>Fri, 03 Apr 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://f110.jp/tags/matplotlib/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Prometheusにあるメトリクスでグラフを描く</title>
+      <link>https://f110.jp/posts/visualize-metrics-from-prometheus/</link>
+      <pubDate>Fri, 03 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/posts/visualize-metrics-from-prometheus/</guid>
+      <description>Prometheusが収集しているメトリクスから少しだけまともなグラフの画像を生成する方法です。 大まかに次のステップで画像を生成します。 グラ</description>
+    </item>
+    
+  </channel>
+</rss>

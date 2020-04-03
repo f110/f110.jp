@@ -4,7 +4,32 @@
   
   <url>
     <loc>https://f110.jp/</loc>
-    <lastmod>2020-04-02T00:00:00+00:00</lastmod>
+    <lastmod>2020-04-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/matplotlib/</loc>
+    <lastmod>2020-04-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/posts/</loc>
+    <lastmod>2020-04-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/prometheus/</loc>
+    <lastmod>2020-04-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/posts/visualize-metrics-from-prometheus/</loc>
+    <lastmod>2020-04-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/</loc>
+    <lastmod>2020-04-03T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -19,16 +44,6 @@
   
   <url>
     <loc>https://f110.jp/tags/kubernetes/</loc>
-    <lastmod>2020-04-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/posts/</loc>
-    <lastmod>2020-04-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/</loc>
     <lastmod>2020-04-02T00:00:00+00:00</lastmod>
   </url>
   
