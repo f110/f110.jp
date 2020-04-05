@@ -134,7 +134,7 @@ Bazelとは別に <tt class="docutils literal">protoc</tt> や <tt class="docuti
         <span class="n">template</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_template</span><span class="p">,</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">out</span><span class="p">,</span>
         <span class="n">substitutions</span> <span class="o">=</span> <span class="n">substitutions</span><span class="p">,</span>
-        <span class="n">is_executable</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="n">is_executable</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">runfiles</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">runfiles</span><span class="p">(</span><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">generated</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
     <span class="k">return</span> <span class="p">[</span>
@@ -146,13 +146,13 @@ Bazelとは別に <tt class="docutils literal">protoc</tt> や <tt class="docuti
 
 <span class="n">_proto_gen</span> <span class="o">=</span> <span class="n">rule</span><span class="p">(</span>
     <span class="n">implementation</span> <span class="o">=</span> <span class="n">_proto_gen_impl</span><span class="p">,</span>
-    <span class="n">executable</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+    <span class="n">executable</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;dir&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">string</span><span class="p">(),</span>
         <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">label</span><span class="p">(),</span>
         <span class="s2">&quot;_template&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">label</span><span class="p">(</span>
             <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;//build/rules/go:move-into-workspace.bash&quot;</span><span class="p">,</span>
-            <span class="n">allow_single_file</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+            <span class="n">allow_single_file</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="p">),</span>
     <span class="p">},</span>
 <span class="p">)</span>
