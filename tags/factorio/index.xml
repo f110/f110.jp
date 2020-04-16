@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Kubernetes on f110&#39;s weblog</title>
-    <link>https://f110.jp/tags/kubernetes/</link>
-    <description>Recent content in Kubernetes on f110&#39;s weblog</description>
+    <title>Factorio on f110&#39;s weblog</title>
+    <link>https://f110.jp/tags/factorio/</link>
+    <description>Recent content in Factorio on f110&#39;s weblog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
     <lastBuildDate>Thu, 16 Apr 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://f110.jp/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://f110.jp/tags/factorio/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -19,15 +19,6 @@
       
       <guid>https://f110.jp/posts/factorio-headless/</guid>
       <description>最近Factorioにすごいハマってて毎日プレイしてる。 やりすぎて1週間で仕事をしてる時間よりFactorioをプレイしてる時間の方が長いこ</description>
-    </item>
-    
-    <item>
-      <title>Homecluster basic</title>
-      <link>https://f110.jp/posts/homecluster/</link>
-      <pubDate>Thu, 02 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://f110.jp/posts/homecluster/</guid>
-      <description>自宅の Kubernetes クラスタをどうやって構成するかという話。 自宅クラスタ関連は タグ で一覧できるようにしています。 1&amp;nbsp;&amp;nbsp;&amp;nbsp;m</description>
     </item>
     
   </channel>
