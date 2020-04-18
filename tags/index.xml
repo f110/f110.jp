@@ -7,10 +7,28 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 16 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 18 Apr 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Home Network</title>
+      <link>https://f110.jp/tags/home-network/</link>
+      <pubDate>Sat, 18 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/tags/home-network/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>WireGuard</title>
+      <link>https://f110.jp/tags/wireguard/</link>
+      <pubDate>Sat, 18 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/tags/wireguard/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Factorio</title>

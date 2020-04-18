@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <title>Factorio Headless</title>
-  <meta property="og:title" content="Factorio Headless" />
-  <meta name="twitter:title" content="Factorio Headless" />
+  <title>VPNをWireGuardにした</title>
+  <meta property="og:title" content="VPNをWireGuardにした" />
+  <meta name="twitter:title" content="VPNをWireGuardにした" />
 
   <meta name="author" content="Fumihiro Ito"/>
   <meta property="og:site_name" content="f110&#39;s weblog" />
-  <meta property="og:url" content="https://f110.jp/posts/factorio-headless/" />
+  <meta property="og:url" content="https://f110.jp/posts/vpn-with-wireguard/" />
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
@@ -40,18 +40,18 @@
 
 <article class="p-article">
   <header>
-    <h1>Factorio Headless</h1>
+    <h1>VPNをWireGuardにした</h1>
     <div>
       <div class="c-time">
         Posted on
-        <time datetime="2020-04-16T00:00:00Z">
-          Apr 16, 2020
+        <time datetime="2020-04-18T00:00:00Z">
+          Apr 18, 2020
         </time>
       </div>
       
-      <a href="https://f110.jp/tags/kubernetes" class="c-tag">Kubernetes</a>
+      <a href="https://f110.jp/tags/wireguard" class="c-tag">WireGuard</a>
       
-      <a href="https://f110.jp/tags/factorio" class="c-tag">Factorio</a>
+      <a href="https://f110.jp/tags/home-network" class="c-tag">Home Network</a>
       
     </div>
   </header>
@@ -60,64 +60,157 @@
     <div class="document">
 
 
-<p>最近Factorioにすごいハマってて毎日プレイしてる。
-やりすぎて1週間で仕事をしてる時間よりFactorioをプレイしてる時間の方が長いこともあるくらい。</p>
-<p>Factorioは公式がマルチプレイ用のサーバーを提供してくれていて、自分でマルチプレイのサーバーを用意することができます。
-一人で遊んでても面白くてずっとプレイできるんだけどゲームというのは誰かと一緒にプレイするともっと面白いのでマルチプレイのサーバーを動かしてプレイしてる。</p>
-<p>幸いうちにはk8sクラスタがあってこれが24時間稼働しているのとFactorioのコミュニティがdockerコンテナをメンテしてくれているのでk8sで動かしています。</p>
+<p>自宅には信用できない経路を使わざるおえない時用にVPNを張れるようにしています。
+今まではUniFi Security Gatewayが持っているVPN機能（L2TP over IPSec）を使っていたのですが、これを <a class="reference external" href="https://www.wireguard.com/">WireGuard</a> も使えるようにしました。</p>
 <div class="section" id="id1">
-<h2>マニフェスト</h2>
-<p><a class="reference external" href="https://github.com/helm/charts/tree/master/stable/factorio">Helm Chart</a> はあえて使っていなくて自分でマニフェストを書いています。</p>
-<pre class="code literal-block">
-factorio
-├── base
-│&nbsp;&nbsp; ├── kustomization.yaml
-│&nbsp;&nbsp; ├── service.yaml
-│&nbsp;&nbsp; └── statefulset.yaml
-└── map-name
-    ├── kustomization.yaml
-    ├── server-adminlist.json
-    └── server-settings.json
-</pre>
-<p>複数のマップデータを持てるようにする（マップごとに別のプロセスを起動しないといけない）ためにbaseとそれぞれのマップでディレクトリを分けていて
-kustomizeでマニフェストをビルドするようにしています。</p>
-<p>ServiceとStatefulSetだけで動く単純なアプリケーションで何かが起きると一時的に不通になることはあり得る構成。
-ただこれはゲームサーバーが分散する仕組みを持っていないので許容するしかないという現状です。</p>
-<p>不特定多数にマップを供用してるわけではなくごく少数で遊んでいるだけなのでたまに落ちてもいいくらいの気持ちで運用しています。</p>
-<p>グローバルからのアクセスはUDPだけ通していて今のところは直接到達出来るようになっています。
-これだとFactorioのプロセスに脆弱性があった場合に侵入を許しやすくなってしまうので将来的には認証の仕組みを入れる予定です。
-この認証の仕組みはFactorioのゲームパスワードとは違って、そもそもプレイする人以外（信頼したユーザー以外）のパケットを受け取らないようにします。</p>
-</div>
+<h2>前提</h2>
 <div class="section" id="id2">
-<h2>マップの永続化</h2>
-<p>マップデータは当然永続化しないといけなくてゲームサーバーの再起動などで失われることがあるととても悲しくなります。</p>
-<p>我が家のk8sクラスターはPersistentVolumeが使えるのでそれで永続化されておりブロックストレージも3つの複製があります。
-この複製は全て自宅の中にあるので全ノードを消失するような事故が起きるとデータを失いますが、1ノードくらいの消失であればまったく問題ありません。
-1台くらい壊れても残りのマシンでサービスが継続できます。</p>
+<h3>使ってるハードウェア</h3>
+<ul class="simple">
+<li>UniFi Security Gateway</li>
+<li>UniFi nanoHD</li>
+<li>UniFi Switch 8 60W</li>
+</ul>
 </div>
 <div class="section" id="id3">
-<h2>パフォーマンス</h2>
-<p>Factorioのマルチプレイのサーバーは必要なリソースが少なくてまったくCPUもメモリも使いません。
-おそらくRaspberry Piのような計算資源が潤沢ではないノードだったとしても問題なくプレイできるでしょう。
-うちのクラスターは最大2コアのマシンしかありませんが全く問題ありません。
-一応2コアでLimitをかけていますが1コア（1000m）でも全く問題ないです。
-メモリも512MBあれば十分です。</p>
-<div class="figure">
-<object data="cpu.svg" style="width: 100%;" type="image/svg+xml">
-cpu.svg</object>
+<h3>やりたいこと</h3>
+<ul class="simple">
+<li><strong>全てのトラフィックを</strong> VPN経由にする</li>
+<li>内部ネットワークと通信できる</li>
+<li>Guestネットワークとは通信できない</li>
+</ul>
 </div>
-<pre class="code literal-block">
-avg(irate(container_cpu_usage_seconds_total{namespace=&quot;factorio&quot;,container=&quot;factorio&quot;}[5m])) by (container)
-</pre>
-<div class="figure">
-<object data="mem.svg" style="width: 100%;" type="image/svg+xml">
-mem.svg</object>
+<div class="section" id="id4">
+<h3>仕様</h3>
+<ul class="simple">
+<li>クライアントのレンジは <tt class="docutils literal">192.168.12.0/24</tt></li>
+<li>通信するポートは 51820</li>
+</ul>
 </div>
-<pre class="code literal-block">
-max(container_memory_usage_bytes{namespace=&quot;factorio&quot;,container=&quot;factorio&quot;}) by (container)
+</div>
+<div class="section" id="id5">
+<h2>インストール</h2>
+<p>EdgeRoute向けのパッケージをビルドしてくれている人がいるのでそれをありがたく使います。 <a class="reference external" href="https://github.com/Lochnair/vyatta-wireguard">github.com/Lochnair/vyatta-wireguard</a></p>
+<p>最新版をUniFi Security Gateay（以下USG）まで持っていってインストールします。</p>
+<pre class="code console literal-block">
+<span class="go">usg$ sudo dpkg -i wireguard-ugw3-0.0.20191219-2.deb</span>
 </pre>
-<p>非常にエコなゲームサーバーでとても良くできています。</p>
-<p>なお上記のグラフを作成したスクリプトはそれぞれGitHubにPushしてあります。 <a class="reference external" href="https://github.com/f110/site/blob/master/content/posts/factorio-headless/cpu.py">CPU</a> / <a class="reference external" href="https://github.com/f110/site/blob/master/content/posts/factorio-headless/mem.py">Mem</a></p>
+</div>
+<div class="section" id="id6">
+<h2>設定</h2>
+<div class="section" id="id7">
+<h3>秘密鍵と公開鍵の生成</h3>
+<pre class="code console literal-block">
+<span class="go">usg$ wg genkey | tee /config/auth/wg.key | wg pubkey &gt; /config/auth/wg.public</span>
+</pre>
+</div>
+<div class="section" id="id8">
+<h3>インターフェースの設定</h3>
+<p>WireGuardのPeer（クライアント）は <tt class="docutils literal">192.168.12.0/24</tt> のレンジを使うことにします。</p>
+<pre class="code console literal-block">
+<span class="go">usg$ configure
+usg$ set interfaces wireguard wg0 address 192.168.12.1/24
+usg$ set interfaces wireguard wg0 listen-port 51820
+usg$ set interfaces wireguard wg0 route-allowed-ips true
+usg$ set interfaces wireguard wg0 private-key /config/auth/wg.key</span>
+</pre>
+</div>
+<div class="section" id="peer">
+<span id="configure-peer"></span><h3>Peer（クライアント）の設定</h3>
+<p>ここではまずクライアント側で秘密鍵と公開鍵を生成してそれを設定します。</p>
+<pre class="code console literal-block">
+<span class="go">usg$ set interfaces wireguard wg0 peer bwqE81/MNgb/D6klMd+AFGGB3FXBVRv1RC+p8JTk6wE= endpoint [your vpn host or ip]:51820
+usg$ set interfaces wireguard wg0 peer bwqE81/MNgb/D6klMd+AFGGB3FXBVRv1RC+p8JTk6wE= allowed-ips 1921.168.12.2/32</span>
+</pre>
+</div>
+<div class="section" id="firewall">
+<h3>firewallの設定</h3>
+<p>USGの外からUDP/5120に届いたパケットを許可する。</p>
+<pre class="code console literal-block">
+<span class="go">usg$ set firewall name WAN_LOCAL rule 20 action accept
+usg$ set firewall name WAN_LOCAL rule 20 protocol udp
+usg$ set firewall name WAN_LOCAL rule 20 description 'WireGuard'
+usg$ set firewall name WAN_LOCAL rule 20 destination port 51820</span>
+</pre>
+<p>SNATする。インターネットに出れるようにするために必要です。</p>
+<pre class="code console literal-block">
+<span class="go">usg$ set firewall group network-group wireguard_network description &quot;Remote WireGuard (VPN) subnets&quot;
+usg$ set firewall group network-group wireguard_network network 192.168.12.0/24
+usg$ set service nat rule 5001 description &quot;MASQ wireguard_network to WAN&quot;
+usg$ set service nat rule 5001 log disable
+usg$ set service nat rule 5001 outbound-interface eth0
+usg$ set service nat rule 5001 protocol all
+usg$ set service nat rule 5001 source group network-group wireguard_network
+usg$ set service nat rule 5001 type masquerade</span>
+</pre>
+<p>Guestネットワークと通信できないようにする。</p>
+<pre class="code console literal-block">
+<span class="go">usg$ set firewall name GUEST_IN rule 20 description &quot;drop packet to wireguard network&quot;
+usg$ set firewall name GUEST_IN rule 20 action drop
+usg$ set firewall name GUEST_IN rule 20 destination group network-group wireguard_network</span>
+</pre>
+</div>
+<div class="section" id="id9">
+<h3>保存</h3>
+<pre class="code console literal-block">
+<span class="go">usg$ commit
+usg$ save
+usg$ exit</span>
+</pre>
+</div>
+</div>
+<div class="section" id="id10">
+<h2>クライアント側の設定</h2>
+<div class="section" id="macos">
+<h3>macOS</h3>
+<p><a class="reference external" href="https://apps.apple.com/us/app/wireguard/id1451685025">Mac App Store の WireGuardクライアント</a> を入れます。</p>
+<p>新しいTunnelを追加して以下を書いてSaveします。</p>
+<p>この時、サーバーのPublicKeyが必要になるのでUSGから手に入れておきます。 <tt class="docutils literal">usg$ cat /config/auth/wg.public</tt></p>
+<pre class="code literal-block" id="peer-conf">
+[Interface]
+PrivateKey = &lt;Generated private key&gt;
+Address = 192.168.12.2/32
+DNS = 192.168.12.1
+
+[Peer]
+PublicKey = &lt;Server's Public key&gt;
+AllowedIPs = 0.0.0.0/0
+Endpoint = [your vpn host or ip]:51820
+</pre>
+<p><tt class="docutils literal">AllowedIPs</tt> を <tt class="docutils literal">0.0.0.0/0</tt> とすることで全てのトラフィックがVPNに流れます。</p>
+</div>
+<div class="section" id="id11">
+<h3>モバイル</h3>
+<p>iOS、Androidともに公式のストアからWireGuardのアプリをインストールすることが出来ます。</p>
+<p>モバイルでも上記のような設定をすることにはなるのですが、これを手書きするのは大変なので代替手段が用意されています。
+もちろん手書きでも設定はできるので最初の疎通テストなどは手書きで頑張ってもいいでしょう。実際頑張りました。</p>
+<p>手書きをする場合は双方のPublic Keyを交換する必要があるので何らかの手段で交換してください。
+自分はDropboxにテキストファイルを置いて交換しました。</p>
+<p>他のデバイスではこの方法は面倒なのでQRコードを使って設定します。</p>
+<pre class="code console literal-block">
+<span class="go">usg$ wg genkey | tee peer-privatekey | wg pubkey &gt; peer-publickey</span>
+</pre>
+<p><tt class="docutils literal"><span class="pre">peer-publickey</span></tt> を使って Peer の設定をUSG側で行います。 <a class="reference external" href="#configure-peer">Peerの設定</a></p>
+<p>Private KeyとPublic Keyを適当なマシンに持ってきて <a class="reference external" href="#peer-conf">設定ファイル</a> を書きます。</p>
+<pre class="code console literal-block">
+<span class="gp">$</span> sudo apt install -y qrencode
+<span class="gp">$</span> qrencode -t ansiutf8 &lt; peer.conf
+</pre>
+<p>で表示されたQRコードをクライアントアプリで読み取れば設定が完了します。</p>
+</div>
+</div>
+<div class="section" id="id14">
+<h2>最後に</h2>
+<p>これで快適なVPN生活になることを期待しています。</p>
+<p>今はFree WiFiを使う機会がないのでVPNも不要なのですが。</p>
+</div>
+<div class="section" id="id15">
+<h2>参考</h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/Lochnair/vyatta-wireguard">https://github.com/Lochnair/vyatta-wireguard</a></li>
+<li><a class="reference external" href="https://wiki.archlinux.org/index.php/WireGuard">https://wiki.archlinux.org/index.php/WireGuard</a></li>
+<li><a class="reference external" href="https://grh.am/2018/wireguard-setup-guide-for-ios/">https://grh.am/2018/wireguard-setup-guide-for-ios/</a></li>
+</ul>
 </div>
 </div>
   </section>
@@ -127,12 +220,11 @@ max(container_memory_usage_bytes{namespace=&quot;factorio&quot;,container=&quot;
       <div class="c-pagination__ctrl">
         <div class="c-pagination__newer">
           
-          <a href="https://f110.jp/posts/vpn-with-wireguard/">Newer</a>
           
         </div>
         <div class="c-pagination__older">
           
-          <a href="https://f110.jp/posts/visualize-metrics-from-prometheus/">Older</a>
+          <a href="https://f110.jp/posts/factorio-headless/">Older</a>
           
         </div>
       </div>
