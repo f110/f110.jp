@@ -53,6 +53,8 @@
       
       <a href="https://f110.jp/tags/home-network" class="c-tag">Home Network</a>
       
+      <a href="https://f110.jp/tags/unifi" class="c-tag">UniFi</a>
+      
     </div>
   </header>
   
@@ -60,11 +62,15 @@
     <div class="document">
 
 
-<p>自宅には信用できない経路を使わざるおえない時用にVPNを張れるようにしています。
+<p><strong>追記(2020/04/21)</strong></p>
+<p>下記の手順ではUniFi Controllerでプロビジョニングを設定すると多くの設定が消えます。</p>
+<p>UniFi Controllerと共存を目指す場合は <a class="reference external" href="../wireguard-and-unifi-controller">次のポスト</a> も参照してください。</p>
+<p><strong>追記ここまで</strong></p>
+<p>自宅には信用できない経路を使わざる負えない時用にVPNを張れるようにしています。
 今まではUniFi Security Gatewayが持っているVPN機能（L2TP over IPSec）を使っていたのですが、これを <a class="reference external" href="https://www.wireguard.com/">WireGuard</a> も使えるようにしました。</p>
-<div class="section" id="id1">
-<h2>前提</h2>
 <div class="section" id="id2">
+<h2>前提</h2>
+<div class="section" id="id3">
 <h3>使ってるハードウェア</h3>
 <ul class="simple">
 <li>UniFi Security Gateway</li>
@@ -72,7 +78,7 @@
 <li>UniFi Switch 8 60W</li>
 </ul>
 </div>
-<div class="section" id="id3">
+<div class="section" id="id4">
 <h3>やりたいこと</h3>
 <ul class="simple">
 <li><strong>全てのトラフィックを</strong> VPN経由にする</li>
@@ -80,7 +86,7 @@
 <li>Guestネットワークとは通信できない</li>
 </ul>
 </div>
-<div class="section" id="id4">
+<div class="section" id="id5">
 <h3>仕様</h3>
 <ul class="simple">
 <li>クライアントのレンジは <tt class="docutils literal">192.168.12.0/24</tt></li>
@@ -88,7 +94,7 @@
 </ul>
 </div>
 </div>
-<div class="section" id="id5">
+<div class="section" id="id6">
 <h2>インストール</h2>
 <p>EdgeRoute向けのパッケージをビルドしてくれている人がいるのでそれをありがたく使います。 <a class="reference external" href="https://github.com/Lochnair/vyatta-wireguard">github.com/Lochnair/vyatta-wireguard</a></p>
 <p>最新版をUniFi Security Gateay（以下USG）まで持っていってインストールします。</p>
@@ -96,15 +102,15 @@
 <span class="go">usg$ sudo dpkg -i wireguard-ugw3-0.0.20191219-2.deb</span>
 </pre>
 </div>
-<div class="section" id="id6">
-<h2>設定</h2>
 <div class="section" id="id7">
+<h2>設定</h2>
+<div class="section" id="id8">
 <h3>秘密鍵と公開鍵の生成</h3>
 <pre class="code console literal-block">
 <span class="go">usg$ wg genkey | tee /config/auth/wg.key | wg pubkey &gt; /config/auth/wg.public</span>
 </pre>
 </div>
-<div class="section" id="id8">
+<div class="section" id="id9">
 <h3>インターフェースの設定</h3>
 <p>WireGuardのPeer（クライアント）は <tt class="docutils literal">192.168.12.0/24</tt> のレンジを使うことにします。</p>
 <pre class="code console literal-block">
@@ -150,7 +156,7 @@ usg$ set firewall name GUEST_IN rule 20 action drop
 usg$ set firewall name GUEST_IN rule 20 destination group network-group wireguard_network</span>
 </pre>
 </div>
-<div class="section" id="id9">
+<div class="section" id="id10">
 <h3>保存</h3>
 <pre class="code console literal-block">
 <span class="go">usg$ commit
@@ -159,7 +165,7 @@ usg$ exit</span>
 </pre>
 </div>
 </div>
-<div class="section" id="id10">
+<div class="section" id="id11">
 <h2>クライアント側の設定</h2>
 <div class="section" id="macos">
 <h3>macOS</h3>
@@ -179,7 +185,7 @@ Endpoint = [your vpn host or ip]:51820
 </pre>
 <p><tt class="docutils literal">AllowedIPs</tt> を <tt class="docutils literal">0.0.0.0/0</tt> とすることで全てのトラフィックがVPNに流れます。</p>
 </div>
-<div class="section" id="id11">
+<div class="section" id="id12">
 <h3>モバイル</h3>
 <p>iOS、Androidともに公式のストアからWireGuardのアプリをインストールすることが出来ます。</p>
 <p>モバイルでも上記のような設定をすることにはなるのですが、これを手書きするのは大変なので代替手段が用意されています。
@@ -199,12 +205,12 @@ Endpoint = [your vpn host or ip]:51820
 <p>で表示されたQRコードをクライアントアプリで読み取れば設定が完了します。</p>
 </div>
 </div>
-<div class="section" id="id14">
+<div class="section" id="id15">
 <h2>最後に</h2>
 <p>これで快適なVPN生活になることを期待しています。</p>
 <p>今はFree WiFiを使う機会がないのでVPNも不要なのですが。</p>
 </div>
-<div class="section" id="id15">
+<div class="section" id="id16">
 <h2>参考</h2>
 <ul class="simple">
 <li><a class="reference external" href="https://github.com/Lochnair/vyatta-wireguard">https://github.com/Lochnair/vyatta-wireguard</a></li>

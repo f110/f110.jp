@@ -18,7 +18,7 @@
       <pubDate>Sat, 18 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://f110.jp/posts/vpn-with-wireguard/</guid>
-      <description>自宅には信用できない経路を使わざるおえない時用にVPNを張れるようにしています。 今まではUniFi Security Gatewayが持っているVPN機能（L</description>
+      <description>追記(2020/04/21) 下記の手順ではUniFi Controllerでプロビジョニングを設定すると多くの設定が消えます。 UniFi Control</description>
     </item>
     
     <item>
