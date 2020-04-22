@@ -208,9 +208,9 @@ $ swapoff
 </div>
 <div class="section" id="calico">
 <h3><a class="toc-backref" href="#id18">4.4&nbsp;&nbsp;&nbsp;Calicoのインストール</a></h3>
-<p>ネットワークプラグインには Calico を利用しますが配布されているマニフェストはIPIPモードになっています。
-特にこだわりがなければIPIPモードのまま動かすのがいいでしょう。</p>
-<p>ただ、BGPモードで動かすだけであればそれほど難しいことはないのとせっかくなのでBGPモードで動かします。</p>
+<p>ネットワークプラグインには Calico を利用しますが配布されているマニフェストはIPIPが有効になっています。
+特にこだわりがなければそのまま動かすのがいいでしょう。</p>
+<p>自宅クラスタではIPIPは不要なのでoffにしておきます。</p>
 <p>マニフェストをダウンロードし編集します。</p>
 <pre class="code literal-block">
 $ curl -O https://docs.projectcalico.org/manifests/calico.yaml
@@ -218,7 +218,7 @@ $ curl -O https://docs.projectcalico.org/manifests/calico.yaml
 <p>ここで行う編集は3つ。</p>
 <ol class="arabic simple">
 <li>PodのIPレンジを決める</li>
-<li>IPIPモードを切る</li>
+<li>IPIPを切る</li>
 <li>XDPをdisableにする</li>
 </ol>
 <pre class="code diff literal-block">
@@ -240,7 +240,7 @@ $ curl -O https://docs.projectcalico.org/manifests/calico.yaml
 <span class="gd">-             - name: CALICO_IPV4POOL_CIDR
 -               value: &quot;192.168.0.0/16&quot;
 </span><span class="gi">+            - name: CALICO_IPV4POOL_CIDR
-+              value: &quot;192.168.0.0/16&quot;
++              value: &quot;192.168.0.1/16&quot;
 </span>             # Disable file logging so `kubectl logs` works.
              - name: CALICO_DISABLE_FILE_LOGGING
                value: &quot;true&quot;
