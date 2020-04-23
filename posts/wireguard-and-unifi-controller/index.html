@@ -169,9 +169,11 @@
 このchartには <tt class="docutils literal">config.gateway.json</tt> を差し込む方法が用意されていないのでchartを修正する必要があります。</p>
 <div class="section" id="chart">
 <h3>chartの修正</h3>
-<p>1. ConfigMapで <tt class="docutils literal">config.gateway.json</tt> を保持する
-1. Deploymentで <tt class="docutils literal"><span class="pre">/unifi/data/sites/&lt;site_id&gt;/config.gateway.json</span></tt> にマウントする
-1. DeploymentのPodTemplateにjsonファイルのハッシュ値を書き込んでおいて変更されたらPodを再作成するようにする</p>
+<ol class="arabic simple">
+<li>ConfigMapで <tt class="docutils literal">config.gateway.json</tt> を保持する</li>
+<li>Deploymentで <tt class="docutils literal"><span class="pre">/unifi/data/sites/&lt;site_id&gt;/config.gateway.json</span></tt> にマウントする</li>
+<li>DeploymentのPodTemplateにjsonファイルのハッシュ値を書き込んでおいて変更されたらPodを再作成するようにする</li>
+</ol>
 <p>という変更を加えます。</p>
 <p>helmでファイルを差し込むには現状chartをまるごと持ってくるしかないので自分のリポジトリにすべてコピーしてきましょう。</p>
 <p>実際に加えた変更はプライベートリポジトリなのでここではcommitをお見せすることは出来ません。
