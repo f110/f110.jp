@@ -8,7 +8,7 @@
   </url>
   
   <url>
-    <loc>https://f110.jp/tags/homeclaster/</loc>
+    <loc>https://f110.jp/tags/homecluster/</loc>
     <lastmod>2020-04-23T00:00:00+00:00</lastmod>
   </url>
   
@@ -33,12 +33,12 @@
   </url>
   
   <url>
-    <loc>https://f110.jp/tags/home-network/</loc>
-    <lastmod>2020-04-21T00:00:00+00:00</lastmod>
+    <loc>https://f110.jp/tags/unifi/</loc>
+    <lastmod>2020-04-23T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://f110.jp/tags/unifi/</loc>
+    <loc>https://f110.jp/tags/home-network/</loc>
     <lastmod>2020-04-21T00:00:00+00:00</lastmod>
   </url>
   
@@ -80,11 +80,6 @@
   <url>
     <loc>https://f110.jp/posts/visualize-metrics-from-prometheus/</loc>
     <lastmod>2020-04-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/homecluster/</loc>
-    <lastmod>2020-04-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>

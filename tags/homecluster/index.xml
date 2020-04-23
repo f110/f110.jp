@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 02 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 23 Apr 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://f110.jp/tags/homecluster/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>MetalLBからBGPで広報する</title>
+      <link>https://f110.jp/posts/advertise-external-ip-by-bgp-from-metallb/</link>
+      <pubDate>Thu, 23 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/posts/advertise-external-ip-by-bgp-from-metallb/</guid>
+      <description>自宅のKubernetesクラスタはLoadBalancerとしてMetalLBを使っていてExternalIPはARPを使って広報していま</description>
+    </item>
     
     <item>
       <title>Homecluster basic</title>

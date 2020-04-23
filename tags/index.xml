@@ -13,11 +13,11 @@
     
     
     <item>
-      <title>homeclaster</title>
-      <link>https://f110.jp/tags/homeclaster/</link>
+      <title>homecluster</title>
+      <link>https://f110.jp/tags/homecluster/</link>
       <pubDate>Thu, 23 Apr 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://f110.jp/tags/homeclaster/</guid>
+      <guid>https://f110.jp/tags/homecluster/</guid>
       <description></description>
     </item>
     
@@ -31,20 +31,20 @@
     </item>
     
     <item>
+      <title>UniFi</title>
+      <link>https://f110.jp/tags/unifi/</link>
+      <pubDate>Thu, 23 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://f110.jp/tags/unifi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Home Network</title>
       <link>https://f110.jp/tags/home-network/</link>
       <pubDate>Tue, 21 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://f110.jp/tags/home-network/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>UniFi</title>
-      <link>https://f110.jp/tags/unifi/</link>
-      <pubDate>Tue, 21 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://f110.jp/tags/unifi/</guid>
       <description></description>
     </item>
     
@@ -81,15 +81,6 @@
       <pubDate>Fri, 03 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://f110.jp/tags/prometheus/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>homecluster</title>
-      <link>https://f110.jp/tags/homecluster/</link>
-      <pubDate>Thu, 02 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://f110.jp/tags/homecluster/</guid>
       <description></description>
     </item>
     
