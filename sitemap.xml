@@ -4,21 +4,36 @@
   
   <url>
     <loc>https://f110.jp/</loc>
-    <lastmod>2020-04-21T00:00:00+00:00</lastmod>
+    <lastmod>2020-04-23T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://f110.jp/tags/home-network/</loc>
-    <lastmod>2020-04-21T00:00:00+00:00</lastmod>
+    <loc>https://f110.jp/tags/homeclaster/</loc>
+    <lastmod>2020-04-23T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/kubernetes/</loc>
+    <lastmod>2020-04-23T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/posts/advertise-external-ip-by-bgp-from-metallb/</loc>
+    <lastmod>2020-04-23T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/posts/</loc>
-    <lastmod>2020-04-21T00:00:00+00:00</lastmod>
+    <lastmod>2020-04-23T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/tags/</loc>
+    <lastmod>2020-04-23T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/home-network/</loc>
     <lastmod>2020-04-21T00:00:00+00:00</lastmod>
   </url>
   
@@ -49,11 +64,6 @@
   
   <url>
     <loc>https://f110.jp/posts/factorio-headless/</loc>
-    <lastmod>2020-04-16T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/kubernetes/</loc>
     <lastmod>2020-04-16T00:00:00+00:00</lastmod>
   </url>
   
