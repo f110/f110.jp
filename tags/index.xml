@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 23 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 04 May 2020 03:10:36 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Ubuntu</title>
+      <link>https://f110.jp/tags/ubuntu/</link>
+      <pubDate>Mon, 04 May 2020 03:10:36 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/ubuntu/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>homecluster</title>
