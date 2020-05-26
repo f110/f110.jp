@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 23 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 26 May 2020 23:35:29 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/tags/unifi/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>自宅用のssh loginを簡単にするツールを作った</title>
+      <link>https://f110.jp/posts/ssh-tool/</link>
+      <pubDate>Tue, 26 May 2020 23:35:29 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/ssh-tool/</guid>
+      <description>新しい環境やインフラを触り始めると早い段階で簡単にsshできるツールを作っています。 大体どんなインフラでもやることは一緒で ホストをリストアッ</description>
+    </item>
     
     <item>
       <title>MetalLBからBGPで広報する</title>

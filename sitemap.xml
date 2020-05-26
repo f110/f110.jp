@@ -4,17 +4,27 @@
   
   <url>
     <loc>https://f110.jp/</loc>
-    <lastmod>2020-05-04T03:10:36+09:00</lastmod>
+    <lastmod>2020-05-26T23:35:29+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/posts/</loc>
-    <lastmod>2020-05-04T03:10:36+09:00</lastmod>
+    <lastmod>2020-05-26T23:35:29+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/tags/</loc>
-    <lastmod>2020-05-04T03:10:36+09:00</lastmod>
+    <lastmod>2020-05-26T23:35:29+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/unifi/</loc>
+    <lastmod>2020-05-26T23:35:29+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/posts/ssh-tool/</loc>
+    <lastmod>2020-05-26T23:35:29+09:00</lastmod>
   </url>
   
   <url>
@@ -39,11 +49,6 @@
   
   <url>
     <loc>https://f110.jp/posts/advertise-external-ip-by-bgp-from-metallb/</loc>
-    <lastmod>2020-04-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/unifi/</loc>
     <lastmod>2020-04-23T00:00:00+00:00</lastmod>
   </url>
   
