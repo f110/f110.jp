@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Tue, 26 May 2020 23:35:29 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 24 Jul 2020 18:51:14 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>CIツールを自作してる</title>
+      <link>https://f110.jp/posts/made-ci-tool/</link>
+      <pubDate>Fri, 24 Jul 2020 18:51:14 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/made-ci-tool/</guid>
+      <description>これまでにいろいろなCIツールを試し・使い、自分でも運用してきましたが満足できるツールはありませんでした。 これまでに試したり使ったツールは Jenkins</description>
+    </item>
     
     <item>
       <title>自宅用のssh loginを簡単にするツールを作った</title>

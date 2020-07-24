@@ -7,10 +7,37 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Tue, 26 May 2020 23:35:29 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 24 Jul 2020 18:51:14 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Bazel</title>
+      <link>https://f110.jp/tags/bazel/</link>
+      <pubDate>Fri, 24 Jul 2020 18:51:14 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/bazel/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>homecluster</title>
+      <link>https://f110.jp/tags/homecluster/</link>
+      <pubDate>Fri, 24 Jul 2020 18:51:14 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/homecluster/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Kubernetes</title>
+      <link>https://f110.jp/tags/kubernetes/</link>
+      <pubDate>Fri, 24 Jul 2020 18:51:14 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/kubernetes/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>UniFi</title>
@@ -27,24 +54,6 @@
       <pubDate>Mon, 04 May 2020 03:10:36 +0900</pubDate>
       
       <guid>https://f110.jp/tags/ubuntu/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>homecluster</title>
-      <link>https://f110.jp/tags/homecluster/</link>
-      <pubDate>Thu, 23 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://f110.jp/tags/homecluster/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Kubernetes</title>
-      <link>https://f110.jp/tags/kubernetes/</link>
-      <pubDate>Thu, 23 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://f110.jp/tags/kubernetes/</guid>
       <description></description>
     </item>
     
@@ -108,15 +117,6 @@
       <pubDate>Wed, 01 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://f110.jp/tags/docker/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Bazel</title>
-      <link>https://f110.jp/tags/bazel/</link>
-      <pubDate>Tue, 31 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://f110.jp/tags/bazel/</guid>
       <description></description>
     </item>
     
