@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <title>自宅での仕事環境を改善する</title>
-  <meta property="og:title" content="自宅での仕事環境を改善する" />
-  <meta name="twitter:title" content="自宅での仕事環境を改善する" />
+  <title>Loadbalancer for kube-apiserver</title>
+  <meta property="og:title" content="Loadbalancer for kube-apiserver" />
+  <meta name="twitter:title" content="Loadbalancer for kube-apiserver" />
 
   <meta name="author" content="Fumihiro Ito"/>
   <meta property="og:site_name" content="f110&#39;s weblog" />
-  <meta property="og:url" content="https://f110.jp/posts/improve-working-env-at-home/" />
+  <meta property="og:url" content="https://f110.jp/posts/loadbalancer-for-kube-apiserver/" />
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
@@ -40,16 +40,18 @@
 
 <article class="p-article">
   <header>
-    <h1>自宅での仕事環境を改善する</h1>
+    <h1>Loadbalancer for kube-apiserver</h1>
     <div>
       <div class="c-time">
         Posted on
-        <time datetime="2020-07-26T13:04:05&#43;09:00">
-          Jul 26, 2020
+        <time datetime="2020-08-18T00:33:16&#43;09:00">
+          Aug 18, 2020
         </time>
       </div>
       
-      <a href="https://f110.jp/tags/wfh" class="c-tag">WFH</a>
+      <a href="https://f110.jp/tags/kubernetes" class="c-tag">Kubernetes</a>
+      
+      <a href="https://f110.jp/tags/homecluster" class="c-tag">Homecluster</a>
       
     </div>
   </header>
@@ -58,108 +60,233 @@
     <div class="document">
 
 
-<p>ここ3年くらいは会社でも家でも仕事をするようになっていたので最近のフルリモートでも基本的には困りませんでした。</p>
-<p>ですがフルリモート生活が長くなる中で買い足したものがあり、それを踏まえて家で仕事をする環境が整ったのでそれを紹介します。</p>
-<p>自分がソフトウェアエンジニアなのでそれ以外の人は当てはまらない可能性が高いです。
-ただ、元々パソコンを長時間触るような仕事をしていた人は上位はあるといいかもしれません。</p>
+<p>元々masterサーバーを1台で構築したKubernetesクラスターをHA構成に変更しようとしたので、作業のメモ。
+この記事ではetcdを1台構成のままkube-apiserverを複数台構成にしてロードバランサーの下に入れることを目指す。</p>
+<p>変更前は以下のようなシンプルな構成です。</p>
+<div class="figure">
+<object data="before.svg" style="width: 70%;" type="image/svg+xml">
+before.svg</object>
+</div>
+<p>これを以下のように構成することで kube-apiserver を冗長構成にします。</p>
+<div class="figure">
+<object data="after.svg" style="width: 100%;" type="image/svg+xml">
+after.svg</object>
+</div>
 <div class="section" id="id1">
-<h2>必須</h2>
+<h2>1&nbsp;&nbsp;&nbsp;前提</h2>
+<p>自分のクラスタを前提としています。したがって以下のようなクラスタです。</p>
 <ul class="simple">
-<li>椅子<ul>
-<li>めちゃくちゃいいやつ。絶対に妥協してはいけない。例：アーロンチェア・コンテッサ</li>
-<li>今使っているのはオカムラのバロンチェア（これは前に会社でクルーズ&amp;アトラスを使っていた経験から）</li>
-<li>しかしどんないい椅子でも1日中座りっぱなしは良くないのでたまに姿勢を変えることは意識したほうがいい。</li>
-</ul>
-</li>
-<li>机<ul>
-<li>特に奥行きにこだわる。奥行きが狭いと足が壁に当たるなどもするしキーボードも近くなってしまう。</li>
-<li>自分の机は 150cm x 80cm のオーダー品。</li>
-<li>流行り（？）の昇降デスクを買うつもりは一切ない。なぜなら昇降デスクで自分の求める剛性があるものがないから。机の足がI字になっているやつは天板の強度だけではなく机全体の剛性不足なのは間違いない。
-アームで吊り下げたディスプレイがキーボードを叩く振動で揺れてしまう。</li>
-</ul>
-</li>
+<li>kubeadm で構築したシングルmasterなクラスタ</li>
+<li>masterサーバーにはIPアドレスでアクセスしてる</li>
+<li>kube-apiserverは6443をListenしている</li>
 </ul>
 </div>
 <div class="section" id="id2">
-<h2>あると便利</h2>
+<h2>2&nbsp;&nbsp;&nbsp;ゴール</h2>
 <ul class="simple">
-<li>ディスプレイ<ul>
-<li>仕事で使うことを考えると4Kディスプレイの方が良い。PCがUSB-Cで給電できるのであればUSB PDが使えるディスプレイを選ぶとケーブル1本で接続できるので便利。</li>
-</ul>
-</li>
-<li>ディスプレイアーム<ul>
-<li>アームがあるとディスプレイの位置の自由度がすごく高まる。</li>
-<li>自由度と強度に応じて種類はいろいろあるので必要なものを買う。</li>
-<li>使っているのはErgotron LX。</li>
-</ul>
-</li>
-<li>キーボード<ul>
-<li>オフィスで使っていたのであれば同じやつを。</li>
-<li>今はHHKB HYBRID Type-Sを使用。</li>
-</ul>
-</li>
-<li>マイク<ul>
-<li>オンラインでコミュニケーションを取ることが増えるので音質にもこだわる。PC内蔵や無線のマイクはダメ。</li>
-</ul>
-</li>
-<li>コーヒーを入れる道具<ul>
-<li>直接的な仕事の道具ではないが、業務中でも休憩でPCの前を離れる時間を作るためにあると良い。</li>
-</ul>
-</li>
+<li>任意のホスト名でkube-apiserverにアクセスできるようになっている</li>
+<li>kube-apiserverを別のノードで起動した場合もサーバー側の設定ファイルの変更だけで利用できる状態になる</li>
+<li>複数台構成にした場合そのうち1台が落ちてもAPIにはアクセスできるようにする</li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h2>その他自分が使っているもの</h2>
+<div class="section" id="ip">
+<h2>3&nbsp;&nbsp;&nbsp;IPアドレスとホスト名を決める</h2>
+<p>まずはロードバランサーするIPアドレスを決めます。
+ここでは <tt class="docutils literal">192.168.0.2</tt> をそのIPアドレスとします。</p>
+<p>このIPアドレスはホストに直接割り当てたりはしません。
+keepalived がヘルスチェックをし、適切にARPで上位へ広報します。</p>
+<p>またそのアドレスを解決できるホスト名は <tt class="docutils literal">cluster.f110.dev</tt> とします。</p>
+</div>
+<div class="section" id="kube-apiserver">
+<h2>4&nbsp;&nbsp;&nbsp;kube-apiserverのサーバー証明書を更新する</h2>
+<p>最初にkube-apiserverのサーバー証明書のSANを更新します。</p>
+<p>kubeadmで証明書を再発行しkube-apiserverでリロードします。</p>
+<pre class="code console literal-block">
+<span class="gp">$</span> kubectl -n kube-system get configmap kubeadm-config -o <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.data.ClusterConfiguration}'</span> &gt; kubeadm.yaml
+</pre>
+<p>kubeadm.yaml をConfigMapから取得して <tt class="docutils literal">apiServer.certSANs</tt> を変更します。
+IPアドレスとホスト名を定義しておきます。</p>
+<pre class="code console literal-block">
+<span class="gp">$</span> sudo mv /etc/kubernetes/pki/apiserver.<span class="o">{</span>crt,key<span class="o">}</span> ~
+</pre>
+<p>すでに証明書のファイルがあるとkubeadmが証明書を生成しないのでバックアップも兼ねて退避します。</p>
+<pre class="code console literal-block">
+<span class="gp">$</span> sudo kubeadm init phase certs apiserver --config kubeadm.yaml
+</pre>
+<p>kubeadm initからapiserverの証明書生成フェーズのみを実行することで新しい証明書を発行します。</p>
+<p>これでkube-apiserverを再起動し新しい証明書を読み込ませれば切り替えることができます。
+更新されたかどうかはサーバーに接続し証明書を見ることで確認できます。</p>
+<pre class="code console literal-block">
+<span class="gp">$</span> openssl s_client -connect <span class="m">192</span>.168.0.1:6443 &lt; /dev/null <span class="p">|</span> openssl x509 -in - -text -noout
+</pre>
+</div>
+<div class="section" id="keepalived">
+<h2>5&nbsp;&nbsp;&nbsp;keepalivedをセットアップする</h2>
+<p>keepalived はStatic Podとして動作させます。</p>
+<p>設定ファイルは <a class="reference external" href="https://github.com/kubernetes/kubeadm/blob/master/docs/ha-considerations.md">公式ドキュメント</a> を参考にします。</p>
+<p>設定ファイルの必要な部分を置換し適切に配置すれば動くでしょう。</p>
+<p>Static Podのマニフェストは以下です。
+これを <tt class="docutils literal">/etc/kubernetes/manifests/keepalived.yaml</tt> として配置します。</p>
+<pre class="code yaml literal-block">
+<span class="nt">apiVersion</span><span class="p">:</span> <span class="l-Scalar-Plain">v1</span>
+<span class="nt">kind</span><span class="p">:</span> <span class="l-Scalar-Plain">Pod</span>
+<span class="nt">metadata</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">keepalived</span>
+  <span class="nt">namespace</span><span class="p">:</span> <span class="l-Scalar-Plain">kube-system</span>
+<span class="nt">spec</span><span class="p">:</span>
+  <span class="nt">containers</span><span class="p">:</span>
+  <span class="p-Indicator">-</span> <span class="nt">image</span><span class="p">:</span> <span class="l-Scalar-Plain">angelnu/keepalived</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">keepalived</span>
+    <span class="nt">resources</span><span class="p">:</span> <span class="p-Indicator">{}</span>
+    <span class="nt">securityContext</span><span class="p">:</span>
+      <span class="nt">capabilities</span><span class="p">:</span>
+        <span class="nt">add</span><span class="p">:</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">NET_ADMIN</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">NET_BROADCAST</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">NET_RAW</span>
+    <span class="nt">volumeMounts</span><span class="p">:</span>
+    <span class="p-Indicator">-</span> <span class="nt">mountPath</span><span class="p">:</span> <span class="l-Scalar-Plain">/etc/keepalived/keepalived.conf</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">config</span>
+    <span class="p-Indicator">-</span> <span class="nt">mountPath</span><span class="p">:</span> <span class="l-Scalar-Plain">/etc/keepalived/check_apiserver.sh</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">check</span>
+  <span class="nt">hostNetwork</span><span class="p">:</span> <span class="l-Scalar-Plain">true</span>
+  <span class="nt">volumes</span><span class="p">:</span>
+  <span class="p-Indicator">-</span> <span class="nt">hostPath</span><span class="p">:</span>
+      <span class="nt">path</span><span class="p">:</span> <span class="l-Scalar-Plain">/etc/keepalived/keepalived.conf</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">config</span>
+  <span class="p-Indicator">-</span> <span class="nt">hostPath</span><span class="p">:</span>
+      <span class="nt">path</span><span class="p">:</span> <span class="l-Scalar-Plain">/etc/keepalived/check_apiserver.sh</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">check</span>
+</pre>
+<p>公式ドキュメントとイメージが違いますが、これはkeepalivedをRaspberry Pi上（arm）で動かすためなので、プロセスが動作すればこれでなくても問題ありません。</p>
+</div>
+<div class="section" id="haproxy">
+<h2>6&nbsp;&nbsp;&nbsp;haproxyをセットアップする</h2>
+<p>これも公式ドキュメントの設定ファイルを利用しますが、そのままでは都合が悪かったので少し手直しをしました。</p>
+<pre class="code literal-block">
+#---------------------------------------------------------------------
+# Global settings
+#---------------------------------------------------------------------
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    daemon
+
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 1
+    timeout http-request    10s
+    timeout queue           20s
+    timeout connect         5s
+    timeout client          300s
+    timeout server          300s
+    timeout http-keep-alive 10s
+    timeout check           10s
+
+#---------------------------------------------------------------------
+# apiserver frontend which proxys to the masters
+#---------------------------------------------------------------------
+frontend apiserver
+    bind \*:443
+    mode tcp
+    option tcplog
+    default_backend apiserver
+
+frontend stats
+    bind \*:8404
+    stats enable
+    stats uri /stats
+    stats refresh 30s
+    stats admin if LOCALHOST
+
+#---------------------------------------------------------------------
+# round robin balancing for apiserver
+#---------------------------------------------------------------------
+backend apiserver
+    option httpchk GET /healthz
+    http-check expect status 200
+    mode tcp
+    balance     roundrobin
+    server whale1 192.168.0.2:6443 check check-ssl verify none
+</pre>
+<p>公式ドキュメントからの変更点は以下</p>
 <ul class="simple">
-<li>ロジクール G502 LIGHTSPEED WIRELESS<ul>
-<li>自宅ではデスクトップPCを使っている都合上机の上にマウスがあった。
-1つのマウスでPCを2台使うは面倒なので業務用として購入。</li>
-<li>ボタンがいっぱいあるのでいろいろなアクションを割り当てられるのが便利。</li>
+<li>タイムアウトを300秒に延長</li>
+<li>443をListenする</li>
+<li>8404でstatsを見れるようにする</li>
+<li>backendにはL4でロードバランスする</li>
+<li>healthcheckで証明書の検証はしない</li>
 </ul>
-</li>
-<li>ロジクール Powerplay<ul>
-<li>対応マウスに無線給電できる。これのおかげでマウスの充電問題が全て解決。</li>
-</ul>
-</li>
-<li>Shure Beta58a<ul>
-<li>実はSM58も買って試した。Beta58a の方が感度が少しいいのと音質も好み（ただしこの音質の差はテレカンでは分からない）</li>
-<li>コンデンサマイクも買って試したがダイナミックマイクの方が良い。感度が良すぎるのも考えもの。もしコンデンサマイクにするのであればショットガンマイクが良いと思われる。</li>
-</ul>
-</li>
-<li>マイクアーム<ul>
-<li>設置場所により様々なので自分の要件に合わせて。アマゾンの激安からBlueの高いやつまで選べる。</li>
-</ul>
-</li>
-<li>Yamaha AG06<ul>
-<li>仕事中は業務用のマシンを1台しか使わないので必要ないが、オーディオインターフェースとして使用。</li>
-<li>業務外だとデスクトップPCとMacBook Proの2台を使っているので出力を混ぜるために必要。</li>
-</ul>
-</li>
-<li>Microsoft Lifecam Studio<ul>
-<li>正面にディスプレイとキーボードを置いている都合でMacBook Pro内蔵のカメラだと斜め前からになってしまう。そこでWebカメラを画面の上に設置。</li>
-</ul>
-</li>
-<li>Sensaphonics 2XS<ul>
-<li>いわゆるカナル型イヤホンの頂点カスタムIEM。2XSはカナル部が長く他のIEMに比べ鼓膜近くまで達するのでイヤホンをしたままでも喋りやすい。
-他に持ってるイヤホンだとどうしても喋りにくかったので最近はずっとこれを使っている。</li>
-<li>値段がとにかく高いのでおすすめはしない。</li>
-</ul>
-</li>
-</ul>
+<p>haproxyを動作させるStatic Podのマニフェストは以下。</p>
+<pre class="code yaml literal-block">
+<span class="nt">apiVersion</span><span class="p">:</span> <span class="l-Scalar-Plain">v1</span>
+<span class="nt">kind</span><span class="p">:</span> <span class="l-Scalar-Plain">Pod</span>
+<span class="nt">metadata</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">haproxy</span>
+  <span class="nt">namespace</span><span class="p">:</span> <span class="l-Scalar-Plain">kube-system</span>
+<span class="nt">spec</span><span class="p">:</span>
+  <span class="nt">containers</span><span class="p">:</span>
+  <span class="p-Indicator">-</span> <span class="nt">image</span><span class="p">:</span> <span class="l-Scalar-Plain">haproxy:2.2.2</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">haproxy</span>
+    <span class="nt">livenessProbe</span><span class="p">:</span>
+      <span class="nt">failureThreshold</span><span class="p">:</span> <span class="l-Scalar-Plain">8</span>
+      <span class="nt">tcpSocket</span><span class="p">:</span>
+        <span class="nt">host</span><span class="p">:</span> <span class="l-Scalar-Plain">127.0.0.1</span>
+        <span class="nt">port</span><span class="p">:</span> <span class="l-Scalar-Plain">443</span>
+    <span class="nt">volumeMounts</span><span class="p">:</span>
+    <span class="p-Indicator">-</span> <span class="nt">mountPath</span><span class="p">:</span> <span class="l-Scalar-Plain">/usr/local/etc/haproxy/haproxy.cfg</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">haproxyconf</span>
+      <span class="nt">readOnly</span><span class="p">:</span> <span class="l-Scalar-Plain">true</span>
+  <span class="nt">hostNetwork</span><span class="p">:</span> <span class="l-Scalar-Plain">true</span>
+  <span class="nt">volumes</span><span class="p">:</span>
+  <span class="p-Indicator">-</span> <span class="nt">hostPath</span><span class="p">:</span>
+      <span class="nt">path</span><span class="p">:</span> <span class="l-Scalar-Plain">/etc/haproxy/haproxy.cfg</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l-Scalar-Plain">FileOrCreate</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">haproxyconf</span>
+</pre>
+<p>Liveness Probeを <tt class="docutils literal">tcpSocket</tt> に変えてあります。</p>
+</div>
+<div class="section" id="kubectl">
+<h2>7&nbsp;&nbsp;&nbsp;kubectlで動作確認</h2>
+<p>この時点でロードバランサー経由でkube-apiserverへアクセスできるか確認しておきましょう。</p>
 </div>
 <div class="section" id="id4">
-<h2>今後欲しいもの</h2>
-<ul class="simple">
-<li>オーディオインターフェース<ul>
-<li>マイクプリの性能が欲しい。ダイナミックマイクだとゲインを上げることになるのでAG06だとホワイトノイズが気になる。</li>
-</ul>
-</li>
-</ul>
+<h2>8&nbsp;&nbsp;&nbsp;kube-apiserverの引数を修正する</h2>
+<p><tt class="docutils literal"><span class="pre">--advertise-address</span></tt> をロードバランサーのIPアドレスに変更します。</p>
+<p>これはkubeadmでできればそうした方がいいでしょう。
+今回は手動で編集してしまいました。</p>
 </div>
 <div class="section" id="id5">
-<h2>まとめ</h2>
-<p>大体30万くらいあると超快適な仕事環境を作ることができます。</p>
-<p>これくらい投資をするとオフィスよりも快適な環境になります。</p>
+<h2>9&nbsp;&nbsp;&nbsp;各コンポーネントの接続先をホスト名にする</h2>
+<p>kube-controller-manager や kube-scheduler は kubeconfig を利用し接続先を決めています。
+そのためこの kubeconfig を変更しなければロードバランサー経由のアクセスにはなりません。</p>
+<ul class="simple">
+<li><tt class="docutils literal">/etc/kubernetes/kubelet.conf</tt></li>
+<li><tt class="docutils literal"><span class="pre">/etc/kubernetes/controller-manager.conf</span></tt></li>
+<li><tt class="docutils literal">/etc/kubernetes/scheduler.conf</tt></li>
+</ul>
+<p>がそれぞれの kubeconfig なので修正しましょう。</p>
+</div>
+<div class="section" id="id6">
+<h2>10&nbsp;&nbsp;&nbsp;コントローラーなどが正しく動作しているか確認する</h2>
+<p>自作やサードパーティのコントローラーが正しく動作しているか確認してください。</p>
+<p>多くの場合は InClusterConfig() を利用していると思います。
+その場合は <tt class="docutils literal">kubernetes.default.svc</tt> を通してkube-apiserverへアクセスしているのでここからも正しくアクセスできる必要があります。</p>
+<p>上記で <tt class="docutils literal"><span class="pre">--advertise-address</span></tt> を変更していれば正しくアクセスできるようになっているはずです。</p>
+<p>アクセスできない場合は <tt class="docutils literal">Endpoints</tt> を確認します。</p>
+<pre class="code console literal-block">
+<span class="gp">$</span> kubectl get endpoints
+</pre>
 </div>
 </div>
   </section>
@@ -169,17 +296,30 @@
       <div class="c-pagination__ctrl">
         <div class="c-pagination__newer">
           
-          <a href="https://f110.jp/posts/loadbalancer-for-kube-apiserver/">Newer</a>
           
         </div>
         <div class="c-pagination__older">
           
-          <a href="https://f110.jp/posts/made-ci-tool/">Older</a>
+          <a href="https://f110.jp/posts/improve-working-env-at-home/">Older</a>
           
         </div>
       </div>
     </nav>
     
+
+<section class="p-related">
+  <h3>See Also</h3>
+  <ul id="slider" class="p-related__list">
+    
+    <li class="p-related__item js-related__item">
+      <a href="/posts/made-ci-tool/"
+        >
+        <span>CIツールを自作してる</span>
+      </a>
+    </li>
+    
+  </ul>
+</section>
 
 
     

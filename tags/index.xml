@@ -7,10 +7,28 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sun, 26 Jul 2020 13:04:05 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 18 Aug 2020 00:33:16 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>homecluster</title>
+      <link>https://f110.jp/tags/homecluster/</link>
+      <pubDate>Tue, 18 Aug 2020 00:33:16 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/homecluster/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Kubernetes</title>
+      <link>https://f110.jp/tags/kubernetes/</link>
+      <pubDate>Tue, 18 Aug 2020 00:33:16 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/kubernetes/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>WFH</title>
@@ -27,24 +45,6 @@
       <pubDate>Fri, 24 Jul 2020 18:51:14 +0900</pubDate>
       
       <guid>https://f110.jp/tags/bazel/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>homecluster</title>
-      <link>https://f110.jp/tags/homecluster/</link>
-      <pubDate>Fri, 24 Jul 2020 18:51:14 +0900</pubDate>
-      
-      <guid>https://f110.jp/tags/homecluster/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Kubernetes</title>
-      <link>https://f110.jp/tags/kubernetes/</link>
-      <pubDate>Fri, 24 Jul 2020 18:51:14 +0900</pubDate>
-      
-      <guid>https://f110.jp/tags/kubernetes/</guid>
       <description></description>
     </item>
     

@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sun, 26 Jul 2020 13:04:05 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 18 Aug 2020 00:33:16 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Loadbalancer for kube-apiserver</title>
+      <link>https://f110.jp/posts/loadbalancer-for-kube-apiserver/</link>
+      <pubDate>Tue, 18 Aug 2020 00:33:16 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/loadbalancer-for-kube-apiserver/</guid>
+      <description>元々masterサーバーを1台で構築したKubernetesクラスターをHA構成に変更しようとしたので、作業のメモ。 この記事ではetcdを1</description>
+    </item>
     
     <item>
       <title>自宅での仕事環境を改善する</title>
