@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Raspberry Pi on f110&#39;s weblog</title>
+    <link>https://f110.jp/tags/raspberry-pi/</link>
+    <description>Recent content in Raspberry Pi on f110&#39;s weblog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
+    <lastBuildDate>Sun, 23 Aug 2020 00:55:44 +0900</lastBuildDate>
+    
+	<atom:link href="https://f110.jp/tags/raspberry-pi/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Raspberry Pi 4 for k8s&#39;s control plane</title>
+      <link>https://f110.jp/posts/raspberry-pi-4-for-k8s-master/</link>
+      <pubDate>Sun, 23 Aug 2020 00:55:44 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/raspberry-pi-4-for-k8s-master/</guid>
+      <description>Homecluster は Intel NUC を3台で構成していて、ここにコントロールプレーンも同居していました。 しかしこの構成はNUCがそこまで安価ではない故にコントロールプレ</description>
+    </item>
+    
+  </channel>
+</rss>
