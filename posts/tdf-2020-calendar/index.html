@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <title>Raspberry Pi 4 for k8s&#39;s control plane</title>
-  <meta property="og:title" content="Raspberry Pi 4 for k8s&#39;s control plane" />
-  <meta name="twitter:title" content="Raspberry Pi 4 for k8s&#39;s control plane" />
+  <title>ツール・ド・フランス2020放送スケジュール</title>
+  <meta property="og:title" content="ツール・ド・フランス2020放送スケジュール" />
+  <meta name="twitter:title" content="ツール・ド・フランス2020放送スケジュール" />
 
   <meta name="author" content="Fumihiro Ito"/>
   <meta property="og:site_name" content="f110&#39;s weblog" />
-  <meta property="og:url" content="https://f110.jp/posts/raspberry-pi-4-for-k8s-master/" />
+  <meta property="og:url" content="https://f110.jp/posts/tdf-2020-calendar/" />
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
@@ -40,20 +40,16 @@
 
 <article class="p-article">
   <header>
-    <h1>Raspberry Pi 4 for k8s&#39;s control plane</h1>
+    <h1>ツール・ド・フランス2020放送スケジュール</h1>
     <div>
       <div class="c-time">
         Posted on
-        <time datetime="2020-08-23T00:55:44&#43;09:00">
-          Aug 23, 2020
+        <time datetime="2020-08-30T19:40:20&#43;09:00">
+          Aug 30, 2020
         </time>
       </div>
       
-      <a href="https://f110.jp/tags/kubernetes" class="c-tag">Kubernetes</a>
-      
-      <a href="https://f110.jp/tags/homecluster" class="c-tag">Homecluster</a>
-      
-      <a href="https://f110.jp/tags/raspberry-pi" class="c-tag">Raspberry Pi</a>
+      <a href="https://f110.jp/tags/tour-de-france" class="c-tag">Tour de France</a>
       
     </div>
   </header>
@@ -62,57 +58,14 @@
     <div class="document">
 
 
-<p>Homecluster は Intel NUC を3台で構成していて、ここにコントロールプレーンも同居していました。
-しかしこの構成はNUCがそこまで安価ではない故にコントロールプレーンが冗長構成になっていませんでした。</p>
-<p>1台構成の場合、コントロールプレーンが入っているノードのアップグレードが難しい（長い時間オフラインになってしまう）という問題があります。
-当初よりコントロールプレーンを Raspberry Pi で構成しようというのは考えていたので、この度 Raspberry Pi によるコントロールプレーンの検証を始めました。</p>
-<p>今回使用したのは Raspberry Pi 4 Model B 4GB です。</p>
-<div class="section" id="raspberry-pi">
-<h2>Raspberry Piをコントロールプレーンにするポイント</h2>
-<div class="section" id="sd">
-<h3>性能の良いSDカードを使う</h3>
-<p>性能が悪いSDカードを使うとetcdのクラスタで度々Leader changeが起きます。</p>
-<p>Leader changeが起きると各コントローラのLeader electionも再度行われるため、非常のパフォーマンスが悪くなります。</p>
-<p>そのため性能の良いSDカードを使うのは必須です。</p>
-<p>性能が良いSDカードかどうかは <a class="reference external" href="https://www.raspberrypi.org/blog/sd-card-speed-test/">公式のテストツール</a> でチェックすることができます。</p>
-</div>
-<div class="section" id="id2">
-<h3>ファンはつけておく</h3>
-<p>Raspberry Pi 4 は発熱が大きくなっています。
-ファンレスだとアイドリングでもかなり高温になります。
-負荷をかけたら間違いなく動作クロックが下がるか、シャットダウンしてしまうでしょう。</p>
-<p>kube-apiserver がCPUを少し使うのでファンは必須です。</p>
-<p>ファンをつけていると温度は50度強で安定します。
-（どれくらいの温度の空気を吸い込めるかで少し変わります。ラズパイはスタックすることが多いと思うのでその場合はより下側の温度を気にしましょう）</p>
-</div>
-<div class="section" id="gbok">
-<h3>メモリは4GBでOK</h3>
-<p>8GBのモデルも発売されていますが、コントロールプレーンとして使うのであれば4GBモデルで問題ありません。</p>
-<p>実メモリで1GB程度を使っている程度なので8GBモデルは不要でした。
-（ノードが5台、Podが160、コンテナが200程度のクラスタ）</p>
-</div>
-<div class="section" id="cpu">
-<h3>CPU使用率</h3>
-<p>CPUは kube-apiserver と etcd で常時25%くらいを使っています。</p>
-<p>SDカードの性能が悪い場合はio waitが出てくるのでそれで気がつくことができます。</p>
-<div class="figure">
-<img alt="cpu.png" src="cpu.png" />
-</div>
-</div>
-<div class="section" id="id3">
-<h3>メモリ使用量</h3>
-<p>1GB使っています。</p>
-<div class="figure">
-<img alt="memory.png" src="memory.png" />
-</div>
-</div>
-</div>
-<div class="section" id="poe-hat">
-<h2>PoE Hatが品切れ</h2>
-<p>Raspberry Piと一緒にPoE Hatも注文しました。</p>
-<p>しかしこちらは未だに入荷しません。
-せっかくなのでPoEにしてケーブル1本のスッキリ配線にしようと思ったのですが…</p>
-</div>
+<p>8/29に今年のツール・ド・フランスが開幕しました。</p>
+<p>ツール・ド・フランスは毎年オンデマンドで視聴しているのですが、開始時間が日によって異なったり調べるのが面倒です。</p>
+<p>そこで <a class="reference external" href="https://www.jsports.co.jp/cycle/tour/schedule/">公式配信スケジュール</a> を入れたGoogle Calendarを作りました。
+このカレンダーをプライベートにしておく必要はないので公開します。</p>
+<p>Calendar を登録したい人は次のURLを使ってください。 <a class="reference external" href="https://calendar.google.com/calendar?cid=dDY0ZWhtNHQ4MWE2anRtc3BsZGd2bzk1bzRAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ">https://calendar.google.com/calendar?cid=dDY0ZWhtNHQ4MWE2anRtc3BsZGd2bzk1bzRAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ</a></p>
+<p>iCal を使いたい人は次のURLを使ってください。 <a class="reference external" href="https://calendar.google.com/calendar/ical/t64ehm4t81a6jtmspldgvo95o4%40group.calendar.google.com/public/basic.ics">https://calendar.google.com/calendar/ical/t64ehm4t81a6jtmspldgvo95o4%40group.calendar.google.com/public/basic.ics</a></p>
+<p>Google Calendar の使い方や iCal の使い方はサポートできないので、全て自分自身で解決できる方のみご自由にご利用ください。</p>
+<p>スクレイピングに使ったスクリプトも <a class="reference external" href="https://github.com/f110/misc/blob/474468132e30c585b72e6f5128ed1e863c47026c/tdf-schedule/tdf.rb">GitHub</a> に上げておきます。</p>
 </div>
   </section>
   <footer>
@@ -121,38 +74,16 @@
       <div class="c-pagination__ctrl">
         <div class="c-pagination__newer">
           
-          <a href="https://f110.jp/posts/tdf-2020-calendar/">Newer</a>
           
         </div>
         <div class="c-pagination__older">
           
-          <a href="https://f110.jp/posts/loadbalancer-for-kube-apiserver/">Older</a>
+          <a href="https://f110.jp/posts/raspberry-pi-4-for-k8s-master/">Older</a>
           
         </div>
       </div>
     </nav>
     
-
-<section class="p-related">
-  <h3>See Also</h3>
-  <ul id="slider" class="p-related__list">
-    
-    <li class="p-related__item js-related__item">
-      <a href="/posts/loadbalancer-for-kube-apiserver/"
-        >
-        <span>Loadbalancer for kube-apiserver</span>
-      </a>
-    </li>
-    
-    <li class="p-related__item js-related__item">
-      <a href="/posts/made-ci-tool/"
-        >
-        <span>CIツールを自作してる</span>
-      </a>
-    </li>
-    
-  </ul>
-</section>
 
 
     

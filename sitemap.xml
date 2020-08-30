@@ -4,7 +4,27 @@
   
   <url>
     <loc>https://f110.jp/</loc>
-    <lastmod>2020-08-23T00:55:44+09:00</lastmod>
+    <lastmod>2020-08-30T19:40:20+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/posts/</loc>
+    <lastmod>2020-08-30T19:40:20+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/</loc>
+    <lastmod>2020-08-30T19:40:20+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/tour-de-france/</loc>
+    <lastmod>2020-08-30T19:40:20+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/posts/tdf-2020-calendar/</loc>
+    <lastmod>2020-08-30T19:40:20+09:00</lastmod>
   </url>
   
   <url>
@@ -18,22 +38,12 @@
   </url>
   
   <url>
-    <loc>https://f110.jp/posts/</loc>
-    <lastmod>2020-08-23T00:55:44+09:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://f110.jp/tags/raspberry-pi/</loc>
     <lastmod>2020-08-23T00:55:44+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/posts/raspberry-pi-4-for-k8s-master/</loc>
-    <lastmod>2020-08-23T00:55:44+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/</loc>
     <lastmod>2020-08-23T00:55:44+09:00</lastmod>
   </url>
   

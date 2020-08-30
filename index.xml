@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sun, 23 Aug 2020 00:55:44 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 30 Aug 2020 19:40:20 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ツール・ド・フランス2020放送スケジュール</title>
+      <link>https://f110.jp/posts/tdf-2020-calendar/</link>
+      <pubDate>Sun, 30 Aug 2020 19:40:20 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/tdf-2020-calendar/</guid>
+      <description>8/29に今年のツール・ド・フランスが開幕しました。 ツール・ド・フランスは毎年オンデマンドで視聴しているのですが、開始時間が日によって異なっ</description>
+    </item>
     
     <item>
       <title>Raspberry Pi 4 for k8s&#39;s control plane</title>

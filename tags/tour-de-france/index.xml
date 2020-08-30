@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tour de France on f110&#39;s weblog</title>
+    <link>https://f110.jp/tags/tour-de-france/</link>
+    <description>Recent content in Tour de France on f110&#39;s weblog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
+    <lastBuildDate>Sun, 30 Aug 2020 19:40:20 +0900</lastBuildDate>
+    
+	<atom:link href="https://f110.jp/tags/tour-de-france/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>ツール・ド・フランス2020放送スケジュール</title>
+      <link>https://f110.jp/posts/tdf-2020-calendar/</link>
+      <pubDate>Sun, 30 Aug 2020 19:40:20 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/tdf-2020-calendar/</guid>
+      <description>8/29に今年のツール・ド・フランスが開幕しました。 ツール・ド・フランスは毎年オンデマンドで視聴しているのですが、開始時間が日によって異なっ</description>
+    </item>
+    
+  </channel>
+</rss>
