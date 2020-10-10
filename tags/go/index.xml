@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Tue, 31 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 10 Oct 2020 17:47:04 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/tags/go/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Go Conference&#39;20 in Autumn SENDAI</title>
+      <link>https://f110.jp/posts/gocon-20-sendai/</link>
+      <pubDate>Sat, 10 Oct 2020 17:47:04 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/gocon-20-sendai/</guid>
+      <description>2020年10月10日に開催された Go Conference&#39;20 in Autumn SENDAI で Bazel の話をしてきました。 Bazel を全く知らないもしくは名前だけは知っているといった方に向けて Bazel の概要と</description>
+    </item>
     
     <item>
       <title>依存ライブラリは常にvendoringする</title>

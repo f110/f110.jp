@@ -3,18 +3,33 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://f110.jp/tags/bazel/</loc>
+    <lastmod>2020-10-10T17:47:04+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://f110.jp/</loc>
-    <lastmod>2020-08-30T19:40:20+09:00</lastmod>
+    <lastmod>2020-10-10T17:47:04+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/go/</loc>
+    <lastmod>2020-10-10T17:47:04+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/posts/gocon-20-sendai/</loc>
+    <lastmod>2020-10-10T17:47:04+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/posts/</loc>
-    <lastmod>2020-08-30T19:40:20+09:00</lastmod>
+    <lastmod>2020-10-10T17:47:04+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/tags/</loc>
-    <lastmod>2020-08-30T19:40:20+09:00</lastmod>
+    <lastmod>2020-10-10T17:47:04+09:00</lastmod>
   </url>
   
   <url>
@@ -60,11 +75,6 @@
   <url>
     <loc>https://f110.jp/posts/improve-working-env-at-home/</loc>
     <lastmod>2020-07-26T13:04:05+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/bazel/</loc>
-    <lastmod>2020-07-24T18:51:14+09:00</lastmod>
   </url>
   
   <url>
@@ -160,11 +170,6 @@
   <url>
     <loc>https://f110.jp/posts/avoid-docker/</loc>
     <lastmod>2020-04-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/go/</loc>
-    <lastmod>2020-03-31T00:00:00+00:00</lastmod>
   </url>
   
   <url>
