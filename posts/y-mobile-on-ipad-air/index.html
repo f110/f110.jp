@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <title>自宅用のssh loginを簡単にするツールを作った</title>
-  <meta property="og:title" content="自宅用のssh loginを簡単にするツールを作った" />
-  <meta name="twitter:title" content="自宅用のssh loginを簡単にするツールを作った" />
+  <title>iPad Air4をワイモバイルで使う</title>
+  <meta property="og:title" content="iPad Air4をワイモバイルで使う" />
+  <meta name="twitter:title" content="iPad Air4をワイモバイルで使う" />
 
   <meta name="author" content="Fumihiro Ito"/>
   <meta property="og:site_name" content="f110&#39;s weblog" />
-  <meta property="og:url" content="https://f110.jp/posts/ssh-tool/" />
+  <meta property="og:url" content="https://f110.jp/posts/y-mobile-on-ipad-air/" />
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
@@ -40,62 +40,42 @@
 
 <article class="p-article">
   <header>
-    <h1>自宅用のssh loginを簡単にするツールを作った</h1>
+    <h1>iPad Air4をワイモバイルで使う</h1>
     <div>
       <div class="c-time">
         Posted on
-        <time datetime="2020-05-26T23:35:29&#43;09:00">
-          May 26, 2020
+        <time datetime="2020-11-01T21:15:29&#43;09:00">
+          Nov 1, 2020
         </time>
       </div>
-      
-      <a href="https://f110.jp/tags/unifi" class="c-tag">UniFi</a>
       
     </div>
   </header>
   
   <section id="js-article" class="p-article__body">
-    <p>新しい環境やインフラを触り始めると早い段階で簡単にsshできるツールを作っています。
-大体どんなインフラでもやることは一緒で</p>
-<ol>
-<li>ホストをリストアップする</li>
-<li>リストをpecoで絞り込む</li>
-<li>選択されたホストに応じて適切な引数でsshする</li>
-</ol>
-<p>という一連の操作をコマンド1発でできるようにします。</p>
-<p>これを作っておくと</p>
-<ol>
-<li>ホストを探す必要がなくなる</li>
-<li>ホストごとにログインユーザーがバラバラだったとしてもスクリプトで吸収できる</li>
-</ol>
-<p>などの便利さがあり、そのインフラに慣れている人でも慣れていない人でも便利に使うことができます。</p>
-<p>このスクリプトの自宅環境用を作りました。</p>
-<p>以前は業務で1000台以上のホストを管理していたということもあり必須でしたが、自宅は7台程度なので必要とは思っていませんでした。。
-しかしログインしようとするたびに探すのが面倒になってきたのと実装方法を思いついたので作りました。</p>
-<h1 id="unifi-controllerにアクセスする">UniFi Controllerにアクセスする</h1>
-<p>自宅のネットワークにはUniFiを使っており、全ての機器がUniFiです。
-またUniFi Controllerもk8sの上で常に動いています。</p>
-<p>つまりUniFi Controllerは全ホストを知っているのでここからホストの情報を取りたいです。
-しかしUniFi ControllerにはAPIはありません。</p>
-<p>UniFi ControllerのUIは内部APIを呼び出して操作するようになっているのでこれを利用します。
-各エンドポイント・操作についてはコミュニティで <a href="https://ubntwiki.com/products/software/unifi-controller/api">Wikiにまとめられています。</a></p>
-<p><code>stat/sta</code> と <code>stat/device</code> を呼び出せば全クライアントが取得できそうですが、問題は認証です。
-Cookieでセッション管理をしていて、APIトークンといったものは発行されないのでスクリプトに認証情報を持たせるのは現実的ではありません。</p>
-<h2 id="セッションをinjectするプロキシを作った">セッションをInjectするプロキシを作った</h2>
-<p>なのでセッションをInjectするプロキシを作りました。
-このプロキシはメモリ上にCookieを持っていて、リクエストが来たらそのCookieを差し込みさらにプロキシします。
-つまりプロキシにアクセスできればAPIには認証情報を持っていなくても透過的にアクセスできます。</p>
-<h2 id="プロキシのアクセス制限をするプロキシ">プロキシのアクセス制限をするプロキシ</h2>
-<p>自宅クラスタには自作のプロキシが動作していてこのプロキシでアクセス制限ができます。
-これを使い結果的にAPIへアクセスできるユーザーを制限しています。（といっても自分しかいませんが）</p>
-<h2 id="アクセスフロー">アクセスフロー</h2>
-<pre><code>クライアント ---&gt; グローバルプロキシ ---&gt; unifi-proxy ---&gt; UniFi Controller
-</code></pre><p>プロキシするたびに認証情報が変換されています。</p>
-<p>ここまで出来れば後は簡単なシェルスクリプトを書くだけです。</p>
-<h1 id="最後に">最後に</h1>
-<p>今回作ったのは <a href="https://github.com/f110/wing/tree/master/tools/unissh">unissh</a> と <a href="https://github.com/f110/wing/tree/master/tools/unifi-proxy">unifi-proxy</a> の2つです。
-これらのソースコードを自分のモノレポに上げて公開しておきますのでご自由にご利用ください。
-ライセンスはMITです。</p>
+    <p>新しくiPad Air4を買った。</p>
+<p>CellularモデルにしたのでSIMが欲しくて使用量やコストなどを軽く計算した結果、スマートフォンで使っているワイモバイルでSIMを追加するのが良いだろうという結論に。</p>
+<h1 id="ワイモバイルのデータ通信用simは店舗にいかないと契約できない">ワイモバイルのデータ通信用SIMは店舗にいかないと契約できない</h1>
+<p>シェアプランと言われるスマホベーシックプランと容量を共有して子回線を追加できる契約はなんと対面でしか販売されてない。</p>
+<p>ということで前日に来店予約して実店舗で契約。</p>
+<p>契約自体は特別なことはないので入店から15分程度でSIMを手に入れることができる。</p>
+<h1 id="ipad-air4では構成プロファイルをダウンロードできない">iPad Air4では構成プロファイルをダウンロードできない</h1>
+<p><em>(2020/11/01現在の情報です)</em></p>
+<p>APN設定をしなければデータ通信ができないので構成プロファイルをインストールしたい。</p>
+<p>が、iPad Air4では構成プロファイルのダウンロードボタンが出ない。</p>
+<p><a href="https://www.ymobile.jp/service/others/simonly/config/">APN設定用の構成プロファイルについて</a></p>
+<p>このページにアクセスしても出るはずのダウンロードボタンが出ないという現象。</p>
+<p>まぁ解決することはないだろうけど、チャットで気軽にできるしサポートに問い合わせて見るかとやり取りを開始するも案の定解決はせず。
+どうせサポートではマニュアルにある回答しかできないし関係部署にエスカレーションされることも稀なのでそんなもんだろうと思った。</p>
+<p>ふと「もしかしてiPad Air4が新しいからまだ対応してないのでは？このページの作りであればどうせUAでコントロールしてるのでは？」というひらめきが。
+この予想があっているのであればUAを変えれば構成プロファイルをダウンロードできるはず。</p>
+<h2 id="リモートデバッグを使ってuaを変える">リモートデバッグを使ってUAを変える</h2>
+<p>SafariならリモートデバッグをしてUAを変えられるはずと思ってケーブルで接続して早速UAを変えてみることに。</p>
+<p>UAをiPad Proにしたら案の定構成プロファイルをインストールすることが出来た。</p>
+<h1 id="終わりに">終わりに</h1>
+<p>もしiPad Air4でワイモバイルの構成プロファイルがダウンロードできなくてお困りの方がいればUAを変更して試してみてください。
+UAの変更方法は適当にググって調べてみてください。
+（その程度すら調べられない人はやらないほうがいいと思います）</p>
 
   </section>
   <footer>
@@ -104,12 +84,11 @@ Cookieでセッション管理をしていて、APIトークンといったも�
       <div class="c-pagination__ctrl">
         <div class="c-pagination__newer">
           
-          <a href="https://f110.jp/posts/made-ci-tool/">Newer</a>
           
         </div>
         <div class="c-pagination__older">
           
-          <a href="https://f110.jp/posts/update-ubuntu-20.04/">Older</a>
+          <a href="https://f110.jp/posts/gocon-20-sendai/">Older</a>
           
         </div>
       </div>

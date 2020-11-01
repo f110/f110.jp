@@ -57,114 +57,85 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
+    <!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
 <p>元々masterサーバーを1台で構築したKubernetesクラスターをHA構成に変更しようとしたので、作業のメモ。
 この記事ではetcdを1台構成のままkube-apiserverを複数台構成にしてロードバランサーの下に入れることを目指す。</p>
 <p>変更前は以下のようなシンプルな構成です。</p>
-<div class="figure">
-<object data="before.svg" style="width: 70%;" type="image/svg+xml">
-before.svg</object>
-</div>
+<p><img src="./before.svg" alt="Before"></p>
 <p>これを以下のように構成することで kube-apiserver を冗長構成にします。</p>
-<div class="figure">
-<object data="after.svg" style="width: 100%;" type="image/svg+xml">
-after.svg</object>
-</div>
-<div class="section" id="id1">
-<h2>1&nbsp;&nbsp;&nbsp;前提</h2>
+<p><img src="./after.svg" alt="After"></p>
+<h1 id="前提">前提</h1>
 <p>自分のクラスタを前提としています。したがって以下のようなクラスタです。</p>
-<ul class="simple">
+<ul>
 <li>kubeadm で構築したシングルmasterなクラスタ</li>
 <li>masterサーバーにはIPアドレスでアクセスしてる</li>
 <li>kube-apiserverは6443をListenしている</li>
 </ul>
-</div>
-<div class="section" id="id2">
-<h2>2&nbsp;&nbsp;&nbsp;ゴール</h2>
-<ul class="simple">
+<h1 id="ゴール">ゴール</h1>
+<ul>
 <li>任意のホスト名でkube-apiserverにアクセスできるようになっている</li>
 <li>kube-apiserverを別のノードで起動した場合もサーバー側の設定ファイルの変更だけで利用できる状態になる</li>
 <li>複数台構成にした場合そのうち1台が落ちてもAPIにはアクセスできるようにする</li>
 </ul>
-</div>
-<div class="section" id="ip">
-<h2>3&nbsp;&nbsp;&nbsp;IPアドレスとホスト名を決める</h2>
+<h1 id="ipアドレスとホスト名を決める">IPアドレスとホスト名を決める</h1>
 <p>まずはロードバランサーするIPアドレスを決めます。
-ここでは <tt class="docutils literal">192.168.0.2</tt> をそのIPアドレスとします。</p>
+ここでは <code>192.168.0.2</code> をそのIPアドレスとします。</p>
 <p>このIPアドレスはホストに直接割り当てたりはしません。
 keepalived がヘルスチェックをし、適切にARPで上位へ広報します。</p>
-<p>またそのアドレスを解決できるホスト名は <tt class="docutils literal">cluster.f110.dev</tt> とします。</p>
-</div>
-<div class="section" id="kube-apiserver">
-<h2>4&nbsp;&nbsp;&nbsp;kube-apiserverのサーバー証明書を更新する</h2>
+<p>またそのアドレスを解決できるホスト名は <code>cluster.f110.dev</code> とします。</p>
+<h1 id="kube-apiserverのサーバー証明書を更新する">kube-apiserverのサーバー証明書を更新する</h1>
 <p>最初にkube-apiserverのサーバー証明書のSANを更新します。</p>
 <p>kubeadmで証明書を再発行しkube-apiserverでリロードします。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> kubectl -n kube-system get configmap kubeadm-config -o <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.data.ClusterConfiguration}'</span> &gt; kubeadm.yaml
-</pre>
-<p>kubeadm.yaml をConfigMapから取得して <tt class="docutils literal">apiServer.certSANs</tt> を変更します。
+<pre><code class="language-console" data-lang="console">$ kubectl -n kube-system get configmap kubeadm-config -o jsonpath='{.data.ClusterConfiguration}' &gt; kubeadm.yaml
+</code></pre><p>kubeadm.yaml をConfigMapから取得して <code>apiServer.certSANs</code> を変更します。
 IPアドレスとホスト名を定義しておきます。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> sudo mv /etc/kubernetes/pki/apiserver.<span class="o">{</span>crt,key<span class="o">}</span> ~
-</pre>
-<p>すでに証明書のファイルがあるとkubeadmが証明書を生成しないのでバックアップも兼ねて退避します。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> sudo kubeadm init phase certs apiserver --config kubeadm.yaml
-</pre>
-<p>kubeadm initからapiserverの証明書生成フェーズのみを実行することで新しい証明書を発行します。</p>
+<pre><code class="language-console" data-lang="console">$ sudo mv /etc/kubernetes/pki/apiserver.{crt,key} ~
+</code></pre><p>すでに証明書のファイルがあるとkubeadmが証明書を生成しないのでバックアップも兼ねて退避します。</p>
+<pre><code class="language-console" data-lang="console">$ sudo kubeadm init phase certs apiserver --config kubeadm.yaml
+</code></pre><p>kubeadm initからapiserverの証明書生成フェーズのみを実行することで新しい証明書を発行します。</p>
 <p>これでkube-apiserverを再起動し新しい証明書を読み込ませれば切り替えることができます。
 更新されたかどうかはサーバーに接続し証明書を見ることで確認できます。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> openssl s_client -connect <span class="m">192</span>.168.0.1:6443 &lt; /dev/null <span class="p">|</span> openssl x509 -in - -text -noout
-</pre>
-</div>
-<div class="section" id="keepalived">
-<h2>5&nbsp;&nbsp;&nbsp;keepalivedをセットアップする</h2>
+<pre><code class="language-console" data-lang="console">$ openssl s_client -connect 192.168.0.1:6443 &lt; /dev/null | openssl x509 -in - -text -noout
+</code></pre><h1 id="keepalivedをセットアップする">keepalivedをセットアップする</h1>
 <p>keepalived はStatic Podとして動作させます。</p>
-<p>設定ファイルは <a class="reference external" href="https://github.com/kubernetes/kubeadm/blob/master/docs/ha-considerations.md">公式ドキュメント</a> を参考にします。</p>
+<p>設定ファイルは <a href="https://github.com/kubernetes/kubeadm/blob/master/docs/ha-considerations.md">公式ドキュメント</a> を参考にします。</p>
 <p>設定ファイルの必要な部分を置換し適切に配置すれば動くでしょう。</p>
 <p>Static Podのマニフェストは以下です。
-これを <tt class="docutils literal">/etc/kubernetes/manifests/keepalived.yaml</tt> として配置します。</p>
-<pre class="code yaml literal-block">
-<span class="nt">apiVersion</span><span class="p">:</span> <span class="l-Scalar-Plain">v1</span>
-<span class="nt">kind</span><span class="p">:</span> <span class="l-Scalar-Plain">Pod</span>
-<span class="nt">metadata</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">keepalived</span>
-  <span class="nt">namespace</span><span class="p">:</span> <span class="l-Scalar-Plain">kube-system</span>
-<span class="nt">spec</span><span class="p">:</span>
-  <span class="nt">containers</span><span class="p">:</span>
-  <span class="p-Indicator">-</span> <span class="nt">image</span><span class="p">:</span> <span class="l-Scalar-Plain">angelnu/keepalived</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">keepalived</span>
-    <span class="nt">resources</span><span class="p">:</span> <span class="p-Indicator">{}</span>
-    <span class="nt">securityContext</span><span class="p">:</span>
-      <span class="nt">capabilities</span><span class="p">:</span>
-        <span class="nt">add</span><span class="p">:</span>
-        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">NET_ADMIN</span>
-        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">NET_BROADCAST</span>
-        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">NET_RAW</span>
-    <span class="nt">volumeMounts</span><span class="p">:</span>
-    <span class="p-Indicator">-</span> <span class="nt">mountPath</span><span class="p">:</span> <span class="l-Scalar-Plain">/etc/keepalived/keepalived.conf</span>
-      <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">config</span>
-    <span class="p-Indicator">-</span> <span class="nt">mountPath</span><span class="p">:</span> <span class="l-Scalar-Plain">/etc/keepalived/check_apiserver.sh</span>
-      <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">check</span>
-  <span class="nt">hostNetwork</span><span class="p">:</span> <span class="l-Scalar-Plain">true</span>
-  <span class="nt">volumes</span><span class="p">:</span>
-  <span class="p-Indicator">-</span> <span class="nt">hostPath</span><span class="p">:</span>
-      <span class="nt">path</span><span class="p">:</span> <span class="l-Scalar-Plain">/etc/keepalived/keepalived.conf</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">config</span>
-  <span class="p-Indicator">-</span> <span class="nt">hostPath</span><span class="p">:</span>
-      <span class="nt">path</span><span class="p">:</span> <span class="l-Scalar-Plain">/etc/keepalived/check_apiserver.sh</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">check</span>
-</pre>
-<p>公式ドキュメントとイメージが違いますが、これはkeepalivedをRaspberry Pi上（arm）で動かすためなので、プロセスが動作すればこれでなくても問題ありません。</p>
-</div>
-<div class="section" id="haproxy">
-<h2>6&nbsp;&nbsp;&nbsp;haproxyをセットアップする</h2>
+これを <code>/etc/kubernetes/manifests/keepalived.yaml</code> として配置します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: Pod
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: keepalived
+  <span style="color:#66d9ef">namespace</span>: kube-system
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">containers</span>:
+  - <span style="color:#66d9ef">image</span>: angelnu/keepalived
+    <span style="color:#66d9ef">name</span>: keepalived
+    <span style="color:#66d9ef">resources</span>: {}
+    <span style="color:#66d9ef">securityContext</span>:
+      <span style="color:#66d9ef">capabilities</span>:
+        <span style="color:#66d9ef">add</span>:
+        - NET_ADMIN
+        - NET_BROADCAST
+        - NET_RAW
+    <span style="color:#66d9ef">volumeMounts</span>:
+    - <span style="color:#66d9ef">mountPath</span>: /etc/keepalived/keepalived.conf
+      <span style="color:#66d9ef">name</span>: config
+    - <span style="color:#66d9ef">mountPath</span>: /etc/keepalived/check_apiserver.sh
+      <span style="color:#66d9ef">name</span>: check
+  <span style="color:#66d9ef">hostNetwork</span>: <span style="color:#66d9ef">true</span>
+  <span style="color:#66d9ef">volumes</span>:
+  - <span style="color:#66d9ef">hostPath</span>:
+      <span style="color:#66d9ef">path</span>: /etc/keepalived/keepalived.conf
+    <span style="color:#66d9ef">name</span>: config
+  - <span style="color:#66d9ef">hostPath</span>:
+      <span style="color:#66d9ef">path</span>: /etc/keepalived/check_apiserver.sh
+    <span style="color:#66d9ef">name</span>: check
+</code></pre></div><p>公式ドキュメントとイメージが違いますが、これはkeepalivedをRaspberry Pi上（arm）で動かすためなので、プロセスが動作すればこれでなくても問題ありません。</p>
+<h1 id="haproxyをセットアップする">haproxyをセットアップする</h1>
 <p>これも公式ドキュメントの設定ファイルを利用しますが、そのままでは都合が悪かったので少し手直しをしました。</p>
-<pre class="code literal-block">
-#---------------------------------------------------------------------
+<pre><code>#---------------------------------------------------------------------
 # Global settings
 #---------------------------------------------------------------------
 global
@@ -218,9 +189,8 @@ backend apiserver
     mode tcp
     balance     roundrobin
     server whale1 192.168.0.2:6443 check check-ssl verify none
-</pre>
-<p>公式ドキュメントからの変更点は以下</p>
-<ul class="simple">
+</code></pre><p>公式ドキュメントからの変更点は以下</p>
+<ul>
 <li>タイムアウトを300秒に延長</li>
 <li>443をListenする</li>
 <li>8404でstatsを見れるようにする</li>
@@ -228,67 +198,54 @@ backend apiserver
 <li>healthcheckで証明書の検証はしない</li>
 </ul>
 <p>haproxyを動作させるStatic Podのマニフェストは以下。</p>
-<pre class="code yaml literal-block">
-<span class="nt">apiVersion</span><span class="p">:</span> <span class="l-Scalar-Plain">v1</span>
-<span class="nt">kind</span><span class="p">:</span> <span class="l-Scalar-Plain">Pod</span>
-<span class="nt">metadata</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">haproxy</span>
-  <span class="nt">namespace</span><span class="p">:</span> <span class="l-Scalar-Plain">kube-system</span>
-<span class="nt">spec</span><span class="p">:</span>
-  <span class="nt">containers</span><span class="p">:</span>
-  <span class="p-Indicator">-</span> <span class="nt">image</span><span class="p">:</span> <span class="l-Scalar-Plain">haproxy:2.2.2</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">haproxy</span>
-    <span class="nt">livenessProbe</span><span class="p">:</span>
-      <span class="nt">failureThreshold</span><span class="p">:</span> <span class="l-Scalar-Plain">8</span>
-      <span class="nt">tcpSocket</span><span class="p">:</span>
-        <span class="nt">host</span><span class="p">:</span> <span class="l-Scalar-Plain">127.0.0.1</span>
-        <span class="nt">port</span><span class="p">:</span> <span class="l-Scalar-Plain">443</span>
-    <span class="nt">volumeMounts</span><span class="p">:</span>
-    <span class="p-Indicator">-</span> <span class="nt">mountPath</span><span class="p">:</span> <span class="l-Scalar-Plain">/usr/local/etc/haproxy/haproxy.cfg</span>
-      <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">haproxyconf</span>
-      <span class="nt">readOnly</span><span class="p">:</span> <span class="l-Scalar-Plain">true</span>
-  <span class="nt">hostNetwork</span><span class="p">:</span> <span class="l-Scalar-Plain">true</span>
-  <span class="nt">volumes</span><span class="p">:</span>
-  <span class="p-Indicator">-</span> <span class="nt">hostPath</span><span class="p">:</span>
-      <span class="nt">path</span><span class="p">:</span> <span class="l-Scalar-Plain">/etc/haproxy/haproxy.cfg</span>
-      <span class="nt">type</span><span class="p">:</span> <span class="l-Scalar-Plain">FileOrCreate</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">haproxyconf</span>
-</pre>
-<p>Liveness Probeを <tt class="docutils literal">tcpSocket</tt> に変えてあります。</p>
-</div>
-<div class="section" id="kubectl">
-<h2>7&nbsp;&nbsp;&nbsp;kubectlで動作確認</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: Pod
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: haproxy
+  <span style="color:#66d9ef">namespace</span>: kube-system
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">containers</span>:
+  - <span style="color:#66d9ef">image</span>: haproxy:<span style="color:#ae81ff">2.2.2</span>
+    <span style="color:#66d9ef">name</span>: haproxy
+    <span style="color:#66d9ef">livenessProbe</span>:
+      <span style="color:#66d9ef">failureThreshold</span>: <span style="color:#ae81ff">8</span>
+      <span style="color:#66d9ef">tcpSocket</span>:
+        <span style="color:#66d9ef">host</span>: <span style="color:#ae81ff">127.0.0.1</span>
+        <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">443</span>
+    <span style="color:#66d9ef">volumeMounts</span>:
+    - <span style="color:#66d9ef">mountPath</span>: /usr/local/etc/haproxy/haproxy.cfg
+      <span style="color:#66d9ef">name</span>: haproxyconf
+      <span style="color:#66d9ef">readOnly</span>: <span style="color:#66d9ef">true</span>
+  <span style="color:#66d9ef">hostNetwork</span>: <span style="color:#66d9ef">true</span>
+  <span style="color:#66d9ef">volumes</span>:
+  - <span style="color:#66d9ef">hostPath</span>:
+      <span style="color:#66d9ef">path</span>: /etc/haproxy/haproxy.cfg
+      <span style="color:#66d9ef">type</span>: FileOrCreate
+    <span style="color:#66d9ef">name</span>: haproxyconf
+</code></pre></div><p>Liveness Probeを <code>tcpSocket</code> に変えてあります。</p>
+<h1 id="kubectlで動作確認">kubectlで動作確認</h1>
 <p>この時点でロードバランサー経由でkube-apiserverへアクセスできるか確認しておきましょう。</p>
-</div>
-<div class="section" id="id4">
-<h2>8&nbsp;&nbsp;&nbsp;kube-apiserverの引数を修正する</h2>
-<p><tt class="docutils literal"><span class="pre">--advertise-address</span></tt> をロードバランサーのIPアドレスに変更します。</p>
+<h1 id="kube-apiserverの引数を修正する">kube-apiserverの引数を修正する</h1>
+<p><code>--advertise-address</code> をロードバランサーのIPアドレスに変更します。</p>
 <p>これはkubeadmでできればそうした方がいいでしょう。
 今回は手動で編集してしまいました。</p>
-</div>
-<div class="section" id="id5">
-<h2>9&nbsp;&nbsp;&nbsp;各コンポーネントの接続先をホスト名にする</h2>
+<h1 id="各コンポーネントの接続先をホスト名にする">各コンポーネントの接続先をホスト名にする</h1>
 <p>kube-controller-manager や kube-scheduler は kubeconfig を利用し接続先を決めています。
 そのためこの kubeconfig を変更しなければロードバランサー経由のアクセスにはなりません。</p>
-<ul class="simple">
-<li><tt class="docutils literal">/etc/kubernetes/kubelet.conf</tt></li>
-<li><tt class="docutils literal"><span class="pre">/etc/kubernetes/controller-manager.conf</span></tt></li>
-<li><tt class="docutils literal">/etc/kubernetes/scheduler.conf</tt></li>
+<ul>
+<li><code>/etc/kubernetes/kubelet.conf</code></li>
+<li><code>/etc/kubernetes/controller-manager.conf</code></li>
+<li><code>/etc/kubernetes/scheduler.conf</code></li>
 </ul>
 <p>がそれぞれの kubeconfig なので修正しましょう。</p>
-</div>
-<div class="section" id="id6">
-<h2>10&nbsp;&nbsp;&nbsp;コントローラーなどが正しく動作しているか確認する</h2>
+<h1 id="コントローラーなどが正しく動作しているか確認する">コントローラーなどが正しく動作しているか確認する</h1>
 <p>自作やサードパーティのコントローラーが正しく動作しているか確認してください。</p>
 <p>多くの場合は InClusterConfig() を利用していると思います。
-その場合は <tt class="docutils literal">kubernetes.default.svc</tt> を通してkube-apiserverへアクセスしているのでここからも正しくアクセスできる必要があります。</p>
-<p>上記で <tt class="docutils literal"><span class="pre">--advertise-address</span></tt> を変更していれば正しくアクセスできるようになっているはずです。</p>
-<p>アクセスできない場合は <tt class="docutils literal">Endpoints</tt> を確認します。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> kubectl get endpoints
-</pre>
-</div>
-</div>
+その場合は <code>kubernetes.default.svc</code> を通してkube-apiserverへアクセスしているのでここからも正しくアクセスできる必要があります。</p>
+<p>上記で <code>--advertise-address</code> を変更していれば正しくアクセスできるようになっているはずです。</p>
+<p>アクセスできない場合は <code>Endpoints</code> を確認します。</p>
+<pre><code class="language-console" data-lang="console">$ kubectl get endpoints
+</code></pre>
   </section>
   <footer>
     

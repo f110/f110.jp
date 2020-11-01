@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 10 Oct 2020 17:47:04 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 01 Nov 2020 21:15:29 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>iPad Air4をワイモバイルで使う</title>
+      <link>https://f110.jp/posts/y-mobile-on-ipad-air/</link>
+      <pubDate>Sun, 01 Nov 2020 21:15:29 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/y-mobile-on-ipad-air/</guid>
+      <description>新しくiPad Air4を買った。 CellularモデルにしたのでSIMが欲しくて使用量やコストなどを軽く計算した結果、スマートフォンで使って</description>
+    </item>
     
     <item>
       <title>Go Conference&#39;20 in Autumn SENDAI</title>
@@ -18,7 +27,7 @@
       <pubDate>Sat, 10 Oct 2020 17:47:04 +0900</pubDate>
       
       <guid>https://f110.jp/posts/gocon-20-sendai/</guid>
-      <description>2020年10月10日に開催された Go Conference&#39;20 in Autumn SENDAI で Bazel の話をしてきました。 Bazel を全く知らないもしくは名前だけは知っているといった方に向けて Bazel の概要と</description>
+      <description>2020年10月10日に開催された Go Conference&amp;rsquo;20 in Autumn SENDAI で Bazel の話をしてきました。 Bazel を全く知らないもしくは名前だけは知っているといった方に向けて Bazel の概要と</description>
     </item>
     
     <item>
@@ -135,7 +144,7 @@
       <pubDate>Thu, 02 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://f110.jp/posts/homecluster/</guid>
-      <description>自宅の Kubernetes クラスタをどうやって構成するかという話。 自宅クラスタ関連は タグ で一覧できるようにしています。 1&amp;nbsp;&amp;nbsp;&amp;nbsp;m</description>
+      <description>自宅の Kubernetes クラスタをどうやって構成するかという話。 自宅クラスタ関連は タグ で一覧できるようにしています。 minikubeではなく物理クラスタとい</description>
     </item>
     
     <item>
@@ -207,7 +216,7 @@
       <pubDate>Tue, 07 May 2019 00:00:00 +0000</pubDate>
       
       <guid>https://f110.jp/posts/monorepo-with-bazel/</guid>
-      <description>本エントリは オリジナル の一部を再編集して掲載しています。（2020/03/31） 1&amp;nbsp;&amp;nbsp;&amp;nbsp;モノレポのメリット 2&amp;</description>
+      <description>本エントリは オリジナル の一部を再編集して掲載しています。（2020/03/31） モノレポのメリット gitでこのようなリポジトリ運用をされてい</description>
     </item>
     
   </channel>

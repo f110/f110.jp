@@ -57,92 +57,72 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>Prometheusが収集しているメトリクスから少しだけまともなグラフの画像を生成する方法です。</p>
+    <p>Prometheusが収集しているメトリクスから少しだけまともなグラフの画像を生成する方法です。</p>
 <p>大まかに次のステップで画像を生成します。</p>
-<ol class="arabic simple">
+<ol>
 <li>グラフのデータにするクエリを用意する</li>
 <li>そのクエリの結果をCSVでエクスポートする</li>
 <li>スクリプトでグラフの体裁を整える</li>
 </ol>
-<div class="section" id="id1">
-<h2>クエリを用意する</h2>
+<h1 id="クエリを用意する">クエリを用意する</h1>
 <p>グラフのデータはなるべくPrometheusで計算させてしまいます。</p>
 <p>この時ラベルは自分が分かる程度でよく、グラフにするにあたって必要な情報が欠けてなければ問題ありません。</p>
 <p>ここでは次のクエリ使うことにします。</p>
-<pre class="code literal-block">
-avg(irate(node_cpu_seconds_total[1m])) by (instance, mode)
-</pre>
-<p>クエリを組み立てる時は Prometheus のUIを利用してデータを見たり簡易的にグラフにして確かめるようにしてください。
+<pre><code>avg(irate(node_cpu_seconds_total[1m])) by (instance, mode)
+</code></pre><p>クエリを組み立てる時は Prometheus のUIを利用してデータを見たり簡易的にグラフにして確かめるようにしてください。
 ここで意図しないクエリを作ってしまうと元も子もありません。</p>
-</div>
-<div class="section" id="csv">
-<h2>CSVでエクスポートする</h2>
+<h1 id="csvでエクスポートする">CSVでエクスポートする</h1>
 <p>Prometheusに任意のクエリを投げてCSVでエクスポートできるツールを使います。</p>
-<p><a class="reference external" href="https://github.com/go-pluto/styx">github.com/go-pluto/styx</a> は簡単なCLIツールで任意の Prometheus にクエリを投げてCSVを出力できる便利なコマンドです。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> go get github.com/go-pluto/styx
-</pre>
-<p>でインストールできます。</p>
+<p><a href="https://github.com/go-pluto/styx">github.com/go-pluto/styx</a> は簡単なCLIツールで任意の Prometheus にクエリを投げてCSVを出力できる便利なコマンドです。</p>
+<pre><code class="language-console" data-lang="console">$ go get github.com/go-pluto/styx
+</code></pre><p>でインストールできます。</p>
 <p>以下のようにコマンドを実行します。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> styx --prometheus https://prometheus.example.com --duration 24h <span class="s1">'avg(irate(node_cpu_seconds_total[1m])) by (instance, mode)'</span> &gt; data.csv
-</pre>
-<p>使用するPrometheusのアドレスは <tt class="docutils literal"><span class="pre">--prometheus</span></tt> 期間は <tt class="docutils literal"><span class="pre">--duration</span></tt> で指定します。</p>
-<p>が、 <tt class="docutils literal"><span class="pre">go-pluto/styx</span></tt> はCSVを単純な文字列結合で出力しており壊れたCSVが出力されることがほとんどでしょう。
-<tt class="docutils literal">csv.Writer</tt> を使ってちゃんとしたCSVを出力するように変更する必要があります。</p>
-<p><a class="reference external" href="https://github.com/f110/styx">https://github.com/f110/styx</a> にその変更を加えたコードを置いておきます。</p>
-</div>
-<div class="section" id="id2">
-<h2>グラフを描く</h2>
+<pre><code class="language-console" data-lang="console">$ styx --prometheus https://prometheus.example.com --duration 24h 'avg(irate(node_cpu_seconds_total[1m])) by (instance, mode)' &gt; data.csv
+</code></pre><p>使用するPrometheusのアドレスは <code>--prometheus</code> 期間は <code>--duration</code> で指定します。</p>
+<p>が、 <code>go-pluto/styx</code> はCSVを単純な文字列結合で出力しており壊れたCSVが出力されることがほとんどでしょう。
+<code>csv.Writer</code> を使ってちゃんとしたCSVを出力するように変更する必要があります。</p>
+<p><a href="https://github.com/f110/styx">https://github.com/f110/styx</a> にその変更を加えたコードを置いておきます。</p>
+<h1 id="グラフを描く">グラフを描く</h1>
 <p>最後にグラフを描きます。好きなツールで描いてください。
-今回は <a class="reference external" href="https://matplotlib.org/">matplotlib</a> を使います。</p>
-<pre class="code python literal-block">
-<span class="kn">import</span> <span class="nn">pandas</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plot</span>
-<span class="kn">import</span> <span class="nn">matplotlib.dates</span> <span class="k">as</span> <span class="nn">dates</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+今回は <a href="https://matplotlib.org/">matplotlib</a> を使います。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> pandas
+<span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#f92672">as</span> plot
+<span style="color:#f92672">import</span> matplotlib.dates <span style="color:#f92672">as</span> dates
+<span style="color:#f92672">from</span> datetime <span style="color:#f92672">import</span> datetime
 
-<span class="k">def</span> <span class="nf">parse_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'=&quot;'</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">label</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
-    <span class="k">return</span> <span class="nb">dict</span><span class="p">([[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">parse_label</span>(label):
+    x <span style="color:#f92672">=</span> [v<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;=&#34;&#39;</span>) <span style="color:#66d9ef">for</span> v <span style="color:#f92672">in</span> label[<span style="color:#ae81ff">1</span>:<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#34;,&#34;</span>)]
+    <span style="color:#66d9ef">return</span> dict([[v[<span style="color:#ae81ff">0</span>], v[<span style="color:#ae81ff">1</span>][:<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]] <span style="color:#66d9ef">for</span> v <span style="color:#f92672">in</span> x])
 
-<span class="n">d</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'data.csv'</span><span class="p">)</span>
-<span class="n">time</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcfromtimestamp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s1">'Time'</span><span class="p">]]</span>
+d <span style="color:#f92672">=</span> pandas<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;data.csv&#39;</span>)
+time <span style="color:#f92672">=</span> [datetime<span style="color:#f92672">.</span>utcfromtimestamp(x) <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> d[<span style="color:#e6db74">&#39;Time&#39;</span>]]
 
-<span class="n">columns</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="n">parse_label</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">'Time'</span><span class="p">])</span>
+columns <span style="color:#f92672">=</span> dict([(x, parse_label(x)) <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> d<span style="color:#f92672">.</span>columns <span style="color:#66d9ef">if</span> x <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;Time&#39;</span>])
 
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+fig <span style="color:#f92672">=</span> plot<span style="color:#f92672">.</span>figure(figsize <span style="color:#f92672">=</span> (<span style="color:#ae81ff">12</span>, <span style="color:#ae81ff">10</span>))
+ax <span style="color:#f92672">=</span> fig<span style="color:#f92672">.</span>add_subplot(<span style="color:#ae81ff">111</span>)
 
-<span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="k">if</span> <span class="s2">&quot;192.168.100.2&quot;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;instance&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;idle&quot;</span><span class="p">:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">])</span>
+<span style="color:#66d9ef">for</span> col, v <span style="color:#f92672">in</span> columns<span style="color:#f92672">.</span>items():
+    <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;192.168.100.2&#34;</span> <span style="color:#f92672">in</span> v[<span style="color:#e6db74">&#34;instance&#34;</span>] <span style="color:#f92672">and</span> v[<span style="color:#e6db74">&#34;mode&#34;</span>] <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;idle&#34;</span>:
+        ax<span style="color:#f92672">.</span>plot(time, d[col], label <span style="color:#f92672">=</span> v[<span style="color:#e6db74">&#39;mode&#39;</span>])
 
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;CPU Usage (192.168.100.2)&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Date&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Ratio&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">dates</span><span class="o">.</span><span class="n">HourLocator</span><span class="p">(</span><span class="n">interval</span> <span class="o">=</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">dates</span><span class="o">.</span><span class="n">DateFormatter</span><span class="p">(</span><span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2"> %H:%M&quot;</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+ax<span style="color:#f92672">.</span>set_title(<span style="color:#e6db74">&#34;CPU Usage (192.168.100.2)&#34;</span>)
+ax<span style="color:#f92672">.</span>set_xlabel(<span style="color:#e6db74">&#34;Date&#34;</span>)
+ax<span style="color:#f92672">.</span>set_ylabel(<span style="color:#e6db74">&#34;Ratio&#34;</span>)
+ax<span style="color:#f92672">.</span>set_xlim(time[<span style="color:#ae81ff">0</span>], time[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])
+ax<span style="color:#f92672">.</span>set_ylim(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>)
+ax<span style="color:#f92672">.</span>xaxis<span style="color:#f92672">.</span>set_major_locator(dates<span style="color:#f92672">.</span>HourLocator(interval <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>))
+ax<span style="color:#f92672">.</span>xaxis<span style="color:#f92672">.</span>set_major_formatter(dates<span style="color:#f92672">.</span>DateFormatter(<span style="color:#e6db74">&#34;%m/</span><span style="color:#e6db74">%d</span><span style="color:#e6db74"> %H:%M&#34;</span>))
+ax<span style="color:#f92672">.</span>grid(True)
+ax<span style="color:#f92672">.</span>legend()
 
-<span class="n">plot</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span> <span class="o">=</span> <span class="mi">45</span><span class="p">)</span>
-<span class="n">plot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre>
-<p>データをファイルに保存すると</p>
-<div class="figure">
-<object data="graph.svg" style="width: 100%;" type="image/svg+xml">
-graph.svg</object>
-</div>
+plot<span style="color:#f92672">.</span>setp(ax<span style="color:#f92672">.</span>get_xticklabels(), rotation <span style="color:#f92672">=</span> <span style="color:#ae81ff">45</span>)
+plot<span style="color:#f92672">.</span>show()
+</code></pre></div><p>データをファイルに保存すると</p>
+<p><img src="./graph.svg" alt="Graph"></p>
 <p>といったグラフが出力されます。</p>
 <p>一度テンプレートを作っておけば使い回しはそれほど難しくなさそうですね。</p>
-</div>
-</div>
+
   </section>
   <footer>
     

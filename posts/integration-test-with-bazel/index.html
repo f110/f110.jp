@@ -57,232 +57,202 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>GoのプロジェクトをビルドするツールとしてGNU MakeではなくBazelを利用し、インテグレーションテストを実現する方法について紹介します。
+    <p>GoのプロジェクトをビルドするツールとしてGNU MakeではなくBazelを利用し、インテグレーションテストを実現する方法について紹介します。
 Bazelでテストを実行する場合、Go以外の言語でもユニットテストを実行するのは比較的容易です。
 （ユニットテスト=テストコードだけで完結し外部のミドルウェアに依存しないもの）</p>
-<p>Kubernetes Operatorを <a class="reference external" href="https://github.com/kubernetes-sigs/kubebuilder">kubebuilder</a> で実装すると付属してくるテストがetcdとkube-apiserverを要求します。
+<p>Kubernetes Operatorを <a href="https://github.com/kubernetes-sigs/kubebuilder">kubebuilder</a> で実装すると付属してくるテストがetcdとkube-apiserverを要求します。
 実行バイナリが必要なのでこれをBazelで実行したいというのがモチベーションです。</p>
-<div class="section" id="bazel">
-<h2>Bazelとは</h2>
+<h1 id="bazelとは">Bazelとは</h1>
 <p>Bazelを知らないという人のために簡単にBazelを説明します。（そもそもBazelをまったく知らない人はこれを読んでない気もしますが）</p>
 <p>BazelとはGoogleが中心となって開発しているOSSのビルドツールです。
 BazelはGoogle社内で使われているBlazeというビルドツールが源流にあるそうです。
 このBlazeはなかなか使い勝手が良かったらしく、ex-Googlerが各所で同様なコンセプトのビルドツールを作っているとかいないとか…
 Bazelと似ているビルドツールとしては</p>
-<ul class="simple">
-<li>Facebookの <a class="reference external" href="https://buck.build/">Buck</a></li>
-<li>Twitterを中心に数社で使われている <a class="reference external" href="https://www.pantsbuild.org/index.html">Pants</a></li>
-<li>Through Machineが作っている <a class="reference external" href="https://please.build/index.html">Please</a></li>
+<ul>
+<li>Facebookの <a href="https://buck.build/">Buck</a></li>
+<li>Twitterを中心に数社で使われている <a href="https://www.pantsbuild.org/index.html">Pants</a></li>
+<li>Through Machineが作っている <a href="https://please.build/index.html">Please</a></li>
 </ul>
 <p>などがあります。</p>
 <p>ツールとしては以下のような特徴を持っています。</p>
-<ul class="simple">
+<ul>
 <li>ビルドを独自のサンドボックス環境の中で行う</li>
 <li>ビルドの再現性が高い（サンドボックスの中で行われるので）</li>
 <li>高速</li>
 <li>複数の言語に対応できる</li>
 <li>拡張性が高い</li>
 </ul>
-<p>ビルドルールの定義に <a class="reference external" href="https://github.com/bazelbuild/starlark">Starlark</a> というPythonのサブセット言語が使われます。（StarlarkはBazelのためにデザインされた言語です）</p>
+<p>ビルドルールの定義に <a href="https://github.com/bazelbuild/starlark">Starlark</a> というPythonの方言が使われます。（StarlarkはBazelのためにデザインされた言語です）</p>
 <p>さらに詳しい情報や使い方等は以下の拙稿をご覧ください。</p>
-<ul class="simple">
-<li><a class="reference external" href="../monorepo-with-bazel">Bazelとモノレポ</a></li>
-<li><a class="reference external" href="../tips-on-bazel">Bazelの使い方詰め合わせ</a></li>
-<li><a class="reference external" href="../go-and-bazel">GoとBazel</a></li>
+<ul>
+<li><a href="../monorepo-with-bazel">Bazelとモノレポ</a></li>
+<li><a href="../tips-on-bazel">Bazelの使い方詰め合わせ</a></li>
+<li><a href="../go-and-bazel">GoとBazel</a></li>
 </ul>
-<p>（これまでの記事は会社のmediumに書いており、今回は諸事情でqiitaに書いています。mediumでの更新はもうありません）</p>
-</div>
-<div class="section" id="id3">
-<h2>依存してるミドルウェアの実行ファイルを取得する</h2>
-<p>今回の完全なソースコードを <a class="reference external" href="https://github.com/f110/bazel-example">f110/bazel-example</a> に用意しました。
+<p>（これまでの記事は会社のmediumに書いており、今回はblogに書いています。mediumでの更新はもうありません）</p>
+<h1 id="依存してるミドルウェアの実行ファイルを取得する">依存してるミドルウェアの実行ファイルを取得する</h1>
+<p>今回の完全なソースコードを <a href="https://github.com/f110/bazel-example">f110/bazel-example</a> に用意しました。
 実際に動作する状態を見たい方はそちらを見てください。
 また以下の説明では一部のソースコードを省略しています。そのためリポジトリの方を見て適宜補完してください。</p>
 <p>今回のターゲットはetcdとkube-apiserverです。
 幸いなことに両方共バイナリ1つで動作するため非常に扱いやすいです。
 まずはこれらのバイナリをBazelで取得してくる必要があります。</p>
-<p>お手軽な方法としては <tt class="docutils literal">http_archive</tt> で取得してくることですがせっかくなのでマルチプラットフォームでテストが実行できることを目標にもう少し頑張ります。
+<p>お手軽な方法としては <code>http_archive</code> で取得してくることですがせっかくなのでマルチプラットフォームでテストが実行できることを目標にもう少し頑張ります。
 （kube-apiserverのバイナリがLinux向けしか提供されていないので今回は生かされないのですが…）</p>
-<pre class="code python literal-block">
-<span class="n">ETCD_URLS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;3.4.3&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;linux_amd64&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="s2">&quot;https://github.com/etcd-io/etcd/releases/download/v3.4.3/etcd-v3.4.3-linux-amd64.tar.gz&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;6c642b723a86941b99753dff6c00b26d3b033209b15ee33325dc8e7f4cd68f07&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;darwin_amd64&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="s2">&quot;https://github.com/etcd-io/etcd/releases/download/v3.4.3/etcd-v3.4.3-darwin-amd64.zip&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;9e530371ac2a0b10ee7d5cf1230b493a18c9ff909c6f034d609994728de276f7&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
-    <span class="p">},</span>
-<span class="p">}</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ETCD_URLS <span style="color:#f92672">=</span> {
+    <span style="color:#e6db74">&#34;3.4.3&#34;</span>: {
+        <span style="color:#e6db74">&#34;linux_amd64&#34;</span>: (
+            <span style="color:#e6db74">&#34;https://github.com/etcd-io/etcd/releases/download/v3.4.3/etcd-v3.4.3-linux-amd64.tar.gz&#34;</span>,
+            <span style="color:#e6db74">&#34;6c642b723a86941b99753dff6c00b26d3b033209b15ee33325dc8e7f4cd68f07&#34;</span>,
+        ),
+        <span style="color:#e6db74">&#34;darwin_amd64&#34;</span>: (
+            <span style="color:#e6db74">&#34;https://github.com/etcd-io/etcd/releases/download/v3.4.3/etcd-v3.4.3-darwin-amd64.zip&#34;</span>,
+            <span style="color:#e6db74">&#34;9e530371ac2a0b10ee7d5cf1230b493a18c9ff909c6f034d609994728de276f7&#34;</span>,
+        ),
+    },
+}
 
-<span class="k">def</span> <span class="nf">_etcd_impl</span><span class="p">(</span><span class="n">ctx</span><span class="p">):</span>
-    <span class="n">version</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">attr</span><span class="o">.</span><span class="n">version</span>
-    <span class="n">os</span><span class="p">,</span> <span class="n">arch</span> <span class="o">=</span> <span class="n">_detect_os_and_arch</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">_etcd_impl</span>(ctx):
+    version <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>attr<span style="color:#f92672">.</span>version
+    os, arch <span style="color:#f92672">=</span> _detect_os_and_arch(ctx)
 
-    <span class="n">url</span><span class="p">,</span> <span class="n">checksum</span> <span class="o">=</span> <span class="n">ETCD_URLS</span><span class="p">[</span><span class="n">version</span><span class="p">][</span><span class="n">os</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">arch</span><span class="p">]</span>
+    url, checksum <span style="color:#f92672">=</span> ETCD_URLS[version][os <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;_&#34;</span> <span style="color:#f92672">+</span> arch]
 
-    <span class="n">ctx</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="s2">&quot;WORKSPACE&quot;</span><span class="p">,</span> <span class="s2">&quot;workspace(name = </span><span class="se">\&quot;</span><span class="si">{name}</span><span class="se">\&quot;</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-    <span class="n">ctx</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="s2">&quot;BUILD&quot;</span><span class="p">,</span> <span class="s2">&quot;filegroup(name = </span><span class="se">\&quot;</span><span class="s2">bin</span><span class="se">\&quot;</span><span class="s2">, srcs = [</span><span class="se">\&quot;</span><span class="s2">etcd</span><span class="se">\&quot;</span><span class="s2">], visibility = [</span><span class="se">\&quot;</span><span class="s2">//visibility:public</span><span class="se">\&quot;</span><span class="s2">])&quot;</span><span class="p">)</span>
-    <span class="n">ctx</span><span class="o">.</span><span class="n">download_and_extract</span><span class="p">(</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="p">,</span>
-        <span class="n">sha256</span> <span class="o">=</span> <span class="n">checksum</span><span class="p">,</span>
-        <span class="n">stripPrefix</span> <span class="o">=</span> <span class="s2">&quot;etcd-v&quot;</span> <span class="o">+</span> <span class="n">version</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="n">os</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="n">arch</span><span class="p">,</span>
-    <span class="p">)</span>
+    ctx<span style="color:#f92672">.</span>file(<span style="color:#e6db74">&#34;WORKSPACE&#34;</span>, <span style="color:#e6db74">&#34;workspace(name = </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">{name}</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">)&#34;</span><span style="color:#f92672">.</span>format(name <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>name))
+    ctx<span style="color:#f92672">.</span>file(<span style="color:#e6db74">&#34;BUILD&#34;</span>, <span style="color:#e6db74">&#34;filegroup(name = </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">bin</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">, srcs = [</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">etcd</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">], visibility = [</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">//visibility:public</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">])&#34;</span>)
+    ctx<span style="color:#f92672">.</span>download_and_extract(
+        url <span style="color:#f92672">=</span> url,
+        sha256 <span style="color:#f92672">=</span> checksum,
+        stripPrefix <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;etcd-v&#34;</span> <span style="color:#f92672">+</span> version <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#f92672">+</span> os <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#f92672">+</span> arch,
+    )
 
-<span class="n">etcd</span> <span class="o">=</span> <span class="n">repository_rule</span><span class="p">(</span>
-    <span class="n">implementation</span> <span class="o">=</span> <span class="n">_etcd_impl</span><span class="p">,</span>
-    <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">string</span><span class="p">(),</span>
-    <span class="p">},</span>
-<span class="p">)</span>
+etcd <span style="color:#f92672">=</span> repository_rule(
+    implementation <span style="color:#f92672">=</span> _etcd_impl,
+    attrs <span style="color:#f92672">=</span> {
+        <span style="color:#e6db74">&#34;version&#34;</span>: attr<span style="color:#f92672">.</span>string(),
+    },
+)
 
-<span class="k">def</span> <span class="nf">_detect_os_and_arch</span><span class="p">(</span><span class="n">ctx</span><span class="p">):</span>
-    <span class="n">os</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span>
-    <span class="k">if</span> <span class="n">ctx</span><span class="o">.</span><span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;mac os x&quot;</span><span class="p">:</span>
-        <span class="n">os</span> <span class="o">=</span> <span class="s2">&quot;darwin&quot;</span>
-    <span class="n">arch</span> <span class="o">=</span> <span class="s2">&quot;amd64&quot;</span>
-    <span class="k">return</span> <span class="n">os</span><span class="p">,</span> <span class="n">arch</span>
-</pre>
-<p>このようなリポジトリルールを定義します。 <a class="reference external" href="https://github.com/f110/bazel-example/blob/24d674c020ca4895247bd614785fd3d728c33fe6/build/rules/k8s_testing/deps.bzl">（全体）</a>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">_detect_os_and_arch</span>(ctx):
+    os <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;linux&#34;</span>
+    <span style="color:#66d9ef">if</span> ctx<span style="color:#f92672">.</span>os<span style="color:#f92672">.</span>name <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;mac os x&#34;</span>:
+        os <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;darwin&#34;</span>
+    arch <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;amd64&#34;</span>
+    <span style="color:#66d9ef">return</span> os, arch
+</code></pre></div><p>このようなリポジトリルールを定義します。 <a href="https://github.com/f110/bazel-example/blob/24d674c020ca4895247bd614785fd3d728c33fe6/build/rules/k8s_testing/deps.bzl">（全体）</a>
 やっていることは非常に簡単で、ホストOSからダウンロードしなければいけないアーカイブを決定しダウンロードします。
 ダウンロードしたアーカイブを展開し、WORKSPACEファイルとBUILDファイルを流し込むだけです。
 このルールをWORKSPACEから以下のように使います。</p>
-<pre class="code python literal-block">
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;//build/rules/k8s_testing:deps.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;etcd&quot;</span><span class="p">,</span> <span class="s2">&quot;kube_apiserver&quot;</span><span class="p">)</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;//build/rules/k8s_testing:deps.bzl&#34;</span>, <span style="color:#e6db74">&#34;etcd&#34;</span>, <span style="color:#e6db74">&#34;kube_apiserver&#34;</span>)
 
-<span class="n">etcd</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;io_etcd&quot;</span><span class="p">,</span>
-    <span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;3.4.3&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-</pre>
-</div>
-<div class="section" id="id5">
-<h2>実行ファイルを流し込む</h2>
-<p>ここからが少しややこしいところで基本的に <tt class="docutils literal">go_test</tt> は外部依存も含めてテストを実行することができません。
+etcd(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;io_etcd&#34;</span>,
+    version <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;3.4.3&#34;</span>,
+)
+</code></pre></div><h1 id="実行ファイルを流し込む">実行ファイルを流し込む</h1>
+<p>ここからが少しややこしいところで基本的に <code>go_test</code> は外部依存も含めてテストを実行することができません。
 ビルドルールを拡張し対応した場合はルールのメンテナンスコストが高そうです。
-（ <tt class="docutils literal">go_test</tt> の実装のどこかに割り込むことができないので全てをコピーしてくることになります。つまりアップストリームに追従していく必要があります）
+（ <code>go_test</code> の実装のどこかに割り込むことができないので全てをコピーしてくることになります。つまりアップストリームに追従していく必要があります）
 アップストリームにそのような変更をいれるように頑張ってもよいのですがこれが最善の方法とは思えないのでなんとかハックして解決します。
 （このようなインテグレーションテストをBazelで上手に実行する方法はまだないように見え、もしかしたらBlaze側にはあるのではないかなと期待しています）</p>
 <p>実行ファイルを組み合わせてテストを実行するためにはまず実行ファイルをサンドボックスの中に入れる必要があります。
-そこで以下のように <tt class="docutils literal">go_test</tt> のdata attrを利用します。</p>
-<pre class="code python literal-block">
-<span class="n">go_test</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;go_default_test&quot;</span><span class="p">,</span>
-    <span class="n">srcs</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;suite_test.go&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;utils_test.go&quot;</span><span class="p">,</span>
-    <span class="p">],</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;&#64;io_etcd//:bin&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;&#64;io_k8s_kube_apiserver//:bin&quot;</span><span class="p">,</span>
-    <span class="p">],</span>  <span class="c1"># keep</span>
-    <span class="n">embed</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;:go_default_library&quot;</span><span class="p">],</span>
-    <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;//operator/api/v1:go_default_library&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;//operator/vendor/github.com/onsi/ginkgo:go_default_library&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;//operator/vendor/github.com/onsi/gomega:go_default_library&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;//operator/vendor/k8s.io/client-go/kubernetes/scheme:go_default_library&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;//operator/vendor/k8s.io/client-go/rest:go_default_library&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;//operator/vendor/sigs.k8s.io/controller-runtime/pkg/client:go_default_library&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;//operator/vendor/sigs.k8s.io/controller-runtime/pkg/envtest:go_default_library&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;//operator/vendor/sigs.k8s.io/controller-runtime/pkg/log:go_default_library&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;//operator/vendor/sigs.k8s.io/controller-runtime/pkg/log/zap:go_default_library&quot;</span><span class="p">,</span>
-    <span class="p">],</span>
-<span class="p">)</span>
-</pre>
-<p>本来 data はtestdataをサンドボックスに入れるためのattrです。
+そこで以下のように <code>go_test</code> のdata attrを利用します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">go_test(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;go_default_test&#34;</span>,
+    srcs <span style="color:#f92672">=</span> [
+        <span style="color:#e6db74">&#34;suite_test.go&#34;</span>,
+        <span style="color:#e6db74">&#34;utils_test.go&#34;</span>,
+    ],
+    data <span style="color:#f92672">=</span> [
+        <span style="color:#e6db74">&#34;@io_etcd//:bin&#34;</span>,
+        <span style="color:#e6db74">&#34;@io_k8s_kube_apiserver//:bin&#34;</span>,
+    ],  <span style="color:#75715e"># keep</span>
+    embed <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;:go_default_library&#34;</span>],
+    deps <span style="color:#f92672">=</span> [
+        <span style="color:#e6db74">&#34;//operator/api/v1:go_default_library&#34;</span>,
+        <span style="color:#e6db74">&#34;//operator/vendor/github.com/onsi/ginkgo:go_default_library&#34;</span>,
+        <span style="color:#e6db74">&#34;//operator/vendor/github.com/onsi/gomega:go_default_library&#34;</span>,
+        <span style="color:#e6db74">&#34;//operator/vendor/k8s.io/client-go/kubernetes/scheme:go_default_library&#34;</span>,
+        <span style="color:#e6db74">&#34;//operator/vendor/k8s.io/client-go/rest:go_default_library&#34;</span>,
+        <span style="color:#e6db74">&#34;//operator/vendor/sigs.k8s.io/controller-runtime/pkg/client:go_default_library&#34;</span>,
+        <span style="color:#e6db74">&#34;//operator/vendor/sigs.k8s.io/controller-runtime/pkg/envtest:go_default_library&#34;</span>,
+        <span style="color:#e6db74">&#34;//operator/vendor/sigs.k8s.io/controller-runtime/pkg/log:go_default_library&#34;</span>,
+        <span style="color:#e6db74">&#34;//operator/vendor/sigs.k8s.io/controller-runtime/pkg/log/zap:go_default_library&#34;</span>,
+    ],
+)
+</code></pre></div><p>本来 data はtestdataをサンドボックスに入れるためのattrです。
 なのでtestdataディレクトリを含むパッケージのビルドファイルをgazelleで生成するとdata attrは利用されます。
 今回はここに実行ファイルを指定することでサンドボックスに閉じ込めるというハックをします。</p>
-<p>これだけだとファイルがサンドボックスに同梱されるだけなので <a class="reference external" href="https://github.com/f110/bazel-example/blob/24d674c020ca4895247bd614785fd3d728c33fe6/operator/controllers/utils_test.go">テスト側</a> も少し直します。</p>
-<pre class="code go literal-block">
-<span class="kd">func</span> <span class="nx">FindEtcd</span><span class="p">()</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">wd</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Getwd</span><span class="p">()</span>
-    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="nx">err</span>
-    <span class="p">}</span>
+<p>これだけだとファイルがサンドボックスに同梱されるだけなので <a href="https://github.com/f110/bazel-example/blob/24d674c020ca4895247bd614785fd3d728c33fe6/operator/controllers/utils_test.go">テスト側</a> も少し直します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">FindEtcd</span>() (<span style="color:#66d9ef">string</span>, <span style="color:#66d9ef">error</span>) {
+    <span style="color:#a6e22e">wd</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getwd</span>()
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#a6e22e">err</span>
+    }
 
-    <span class="nx">e</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">findExternal</span><span class="p">(</span><span class="nx">wd</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="nx">err</span>
-    <span class="p">}</span>
-    <span class="nx">path</span> <span class="o">:=</span> <span class="nx">filepath</span><span class="p">.</span><span class="nx">Join</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="s">&quot;io_etcd/etcd&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Stat</span><span class="p">(</span><span class="nx">path</span><span class="p">);</span> <span class="nx">os</span><span class="p">.</span><span class="nx">IsNotExist</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">&quot;can't find etcd binary&quot;</span><span class="p">)</span>
-    <span class="p">}</span>
+    <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">findExternal</span>(<span style="color:#a6e22e">wd</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#a6e22e">err</span>
+    }
+    <span style="color:#a6e22e">path</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">filepath</span>.<span style="color:#a6e22e">Join</span>(<span style="color:#a6e22e">e</span>, <span style="color:#e6db74">&#34;io_etcd/etcd&#34;</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stat</span>(<span style="color:#a6e22e">path</span>); <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">IsNotExist</span>(<span style="color:#a6e22e">err</span>) {
+        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;can&#39;t find etcd binary&#34;</span>)
+    }
 
-    <span class="k">return</span> <span class="nx">path</span><span class="p">,</span> <span class="kc">nil</span>
-<span class="p">}</span>
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">path</span>, <span style="color:#66d9ef">nil</span>
+}
 
-<span class="kd">func</span> <span class="nx">findExternal</span><span class="p">(</span><span class="nx">start</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">p</span> <span class="o">:=</span> <span class="nx">start</span>
-    <span class="k">for</span> <span class="p">{</span>
-        <span class="nx">files</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nx">ReadDir</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="nx">err</span>
-        <span class="p">}</span>
-        <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">files</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">HasSuffix</span><span class="p">(</span><span class="nx">filepath</span><span class="p">.</span><span class="nx">Join</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">v</span><span class="p">.</span><span class="nx">Name</span><span class="p">()),</span> <span class="s">&quot;__main__/external&quot;</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="nx">filepath</span><span class="p">.</span><span class="nx">Join</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">v</span><span class="p">.</span><span class="nx">Name</span><span class="p">()),</span> <span class="kc">nil</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="nx">p</span> <span class="p">=</span> <span class="nx">filepath</span><span class="p">.</span><span class="nx">Dir</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nx">p</span> <span class="o">==</span> <span class="s">&quot;/&quot;</span> <span class="p">{</span>
-            <span class="k">break</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">findExternal</span>(<span style="color:#a6e22e">start</span> <span style="color:#66d9ef">string</span>) (<span style="color:#66d9ef">string</span>, <span style="color:#66d9ef">error</span>) {
+    <span style="color:#a6e22e">p</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">start</span>
+    <span style="color:#66d9ef">for</span> {
+        <span style="color:#a6e22e">files</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadDir</span>(<span style="color:#a6e22e">p</span>)
+        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#a6e22e">err</span>
+        }
+        <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">v</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">files</span> {
+            <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">HasSuffix</span>(<span style="color:#a6e22e">filepath</span>.<span style="color:#a6e22e">Join</span>(<span style="color:#a6e22e">p</span>, <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">Name</span>()), <span style="color:#e6db74">&#34;__main__/external&#34;</span>) {
+                <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">filepath</span>.<span style="color:#a6e22e">Join</span>(<span style="color:#a6e22e">p</span>, <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">Name</span>()), <span style="color:#66d9ef">nil</span>
+            }
+        }
+        <span style="color:#a6e22e">p</span> = <span style="color:#a6e22e">filepath</span>.<span style="color:#a6e22e">Dir</span>(<span style="color:#a6e22e">p</span>)
+        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">p</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;/&#34;</span> {
+            <span style="color:#66d9ef">break</span>
+        }
+    }
 
-    <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">&quot;can't find external&quot;</span><span class="p">)</span>
-<span class="p">}</span>
-</pre>
-<p>カレントディレクトリから上の遡っていき実行ファイルを探します。
+    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;can&#39;t find external&#34;</span>)
+}
+</code></pre></div><p>カレントディレクトリから上の遡っていき実行ファイルを探します。
 サンドボックスの中は下のような構造になっているので少し上に遡れば実行ファイルを見つけることができます。</p>
-<pre class="code literal-block">
-__main__
+<pre><code>__main__
 ├── external
-│&nbsp;&nbsp; ├── io_etcd
-│&nbsp;&nbsp; │&nbsp;&nbsp; └── etcd
-│&nbsp;&nbsp; └── io_k8s_kube_apiserver
-│&nbsp;&nbsp;     └── kube-apiserver
+│   ├── io_etcd
+│   │   └── etcd
+│   └── io_k8s_kube_apiserver
+│       └── kube-apiserver
 └── operator
     └── controllers
         └── linux_amd64_stripped &lt;-- working directory
             └── go_default_test
-</pre>
-<p>最後に <tt class="docutils literal">suite_test.go</tt> （テストの本体）から環境変数に実行ファイルのパスを設定してあげれば完成です。</p>
-<pre class="code go literal-block">
-<span class="k">if</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">FindEtcd</span><span class="p">();</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-    <span class="nx">os</span><span class="p">.</span><span class="nx">Setenv</span><span class="p">(</span><span class="s">&quot;TEST_ASSET_ETCD&quot;</span><span class="p">,</span> <span class="nx">path</span><span class="p">)</span>
-<span class="p">}</span>
-</pre>
-</div>
-<div class="section" id="id7">
-<h2>この方法の致命的な欠点</h2>
+</code></pre><p>最後に <code>suite_test.go</code> （テストの本体）から環境変数に実行ファイルのパスを設定してあげれば完成です。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">if</span> <span style="color:#a6e22e">path</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">FindEtcd</span>(); <span style="color:#a6e22e">err</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {
+    <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Setenv</span>(<span style="color:#e6db74">&#34;TEST_ASSET_ETCD&#34;</span>, <span style="color:#a6e22e">path</span>)
+}
+</code></pre></div><h1 id="この方法の致命的な欠点">この方法の致命的な欠点</h1>
 <p>定義された名前に依存します。
-これがうまく動作するのはetcdが <tt class="docutils literal">&#64;io_etcd</tt> 、 kube-apiserverが <tt class="docutils literal">&#64;io_k8s_kube_apiserver</tt> という名前で定義されているときだけです。
+これがうまく動作するのはetcdが <code>@io_etcd</code> 、 kube-apiserverが <code>@io_k8s_kube_apiserver</code> という名前で定義されているときだけです。
 違う名前で定義するとサンドボックス内のパスが変わるのでテスト側もそれに対応するか名前のゆらぎに対応できるようにする必要があります。</p>
-</div>
-<div class="section" id="id8">
-<h2>他に考えられる方法</h2>
-<div class="section" id="id9">
-<h3>ソースコードごと持ってくる</h3>
+<h1 id="他に考えられる方法">他に考えられる方法</h1>
+<h2 id="ソースコードごと持ってくる">ソースコードごと持ってくる</h2>
 <p>etcdもkube-apiserverもオープンソースなプロジェクトなのでソースコードを手に入れることができます。
 それを利用してテストにそれらそのものをテストに埋め込んでしまうこともできます。</p>
 <p>ですがこれはおそらくテスト側の記述量が増えメンテしていくコストも高いはずです。
 またバージョンアップ時のコストもそれなりに発生するはずです。</p>
-</div>
-<div class="section" id="id10">
-<h3>テストの中でビルドする</h3>
+<h2 id="テストの中でビルドする">テストの中でビルドする</h2>
 <p>テストの中でビルドして別のプロセスとして実行するということもできなくもないかもしれません。
 が、これも現実的ではないように思います。</p>
 <p>特にマルチプラットフォームをサポートしようと思った場合、相当な量の作業が発生することでしょう。</p>
-</div>
-</div>
-<div class="section" id="id11">
-<h2>まとめ</h2>
+<h1 id="まとめ">まとめ</h1>
 <p>kubebuilderを題材にBazelでインテグレーションテストを実行する方法の一例を紹介しました。
 rules_go を改変したりせず最小のコーディングと少々のハックでインテグレーションテストの実行を実現しています。
 data attrを使った依存ファイルの流し込みハックは見かけたことがなかったので紹介しました。</p>
@@ -291,8 +261,7 @@ data attrを使った依存ファイルの流し込みハックは見かけた�
 <p>ここまで読んだ多くの人の感想は「Bazelめんどくせえ」でしょう。
 はい、実際ここまでやらないといけないのは面倒くさいです。
 ですがこれをやると再現性も高くなりますし将来への投資だと思って試行錯誤している段階です。</p>
-</div>
-</div>
+
   </section>
   <footer>
     

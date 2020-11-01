@@ -54,7 +54,7 @@
       <pubDate>Thu, 02 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://f110.jp/posts/homecluster/</guid>
-      <description>自宅の Kubernetes クラスタをどうやって構成するかという話。 自宅クラスタ関連は タグ で一覧できるようにしています。 1&amp;nbsp;&amp;nbsp;&amp;nbsp;m</description>
+      <description>自宅の Kubernetes クラスタをどうやって構成するかという話。 自宅クラスタ関連は タグ で一覧できるようにしています。 minikubeではなく物理クラスタとい</description>
     </item>
     
   </channel>

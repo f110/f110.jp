@@ -55,94 +55,75 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>本エントリは <a class="reference external" href="https://medium.com/mixi-developers/go-tips-when-building-web-server-384c8242f5ff">オリジナル</a> の一部を再編集して掲載しています。(2020/03/31)</p>
-<p><a class="reference external" href="https://medium.com/p/ip%E5%88%B6%E9%99%90%E3%82%92%E6%B8%9B%E3%82%89%E3%81%99%E5%8F%96%E3%82%8A%E7%B5%84%E3%81%BF-3793890639e0">内部ツール向けプロキシサーバを自作</a> しているためいわゆるリバースプロキシサーバをGoの標準ライブラリを活用して作っています。
+    <p>本エントリは <a href="https://medium.com/mixi-developers/go-tips-when-building-web-server-384c8242f5ff">オリジナル</a> の一部を再編集して掲載しています。(2020/03/31)</p>
+<p><a href="https://medium.com/p/ip%E5%88%B6%E9%99%90%E3%82%92%E6%B8%9B%E3%82%89%E3%81%99%E5%8F%96%E3%82%8A%E7%B5%84%E3%81%BF-3793890639e0">内部ツール向けプロキシサーバを自作</a> しているためいわゆるリバースプロキシサーバをGoの標準ライブラリを活用して作っています。
 今回はこのプロキシを作っている際に気がついたTipsについてご紹介します。</p>
 <p>※決して全て自前でHTTPプロトコルをパースして作るWebサーバのことではありません。</p>
-<div class="section" id="http-serveridletimeout">
-<h2>1. http.ServerにIdleTimeoutを指定する</h2>
-<p><tt class="docutils literal">IdleTimeout</tt> はkeep-aliveの最大持続時間です。
+<h1 id="1-httpserverにidletimeoutを指定する">1. http.ServerにIdleTimeoutを指定する</h1>
+<p><code>IdleTimeout</code> はkeep-aliveの最大持続時間です。
 特にHTTP/2で通信している場合において、適度にコネクションを切ってあげないとgoroutineが増え続けます。</p>
 <p>HTTP/2のサーバは1クライアントに対していくつかのgoroutineを起動しています。
 クライアント数がそこまで多くない場合であればgoroutineが増えたとしてもたかがしれています。
-ですが、goroutineが増え続けることにより、 <tt class="docutils literal">http.Server</tt> 以外でgoroutineリークが発生していた場合発見が遅れるかもしれません。</p>
+ですが、goroutineが増え続けることにより、 <code>http.Server</code> 以外でgoroutineリークが発生していた場合発見が遅れるかもしれません。</p>
 <p>使用するリソースがわずかとはいえ不必要なgoroutineが起動されっぱなしというのはよくないので早めに潰しておきましょう。</p>
 <p>なお自分は最初にこのgoroutineリークを観測した時にここが原因だとは知らなかったのでgoroutineのリストをダンプする機能をつけるなどしてデバッグをしました。</p>
-</div>
-<div class="section" id="http-serverlogger">
-<h2>2. http.Serverが内部で持っているLoggerを奪っておく</h2>
-<p>http.Serverはエラーログの出力用に <tt class="docutils literal">ErrorLog</tt> という変数を持っておりこれがnilの場合は <tt class="docutils literal">log</tt> パッケージの標準Loggerが使われます。</p>
+<h1 id="2-httpserverが内部で持っているloggerを奪っておく">2. http.Serverが内部で持っているLoggerを奪っておく</h1>
+<p>http.Serverはエラーログの出力用に <code>ErrorLog</code> という変数を持っておりこれがnilの場合は <code>log</code> パッケージの標準Loggerが使われます。</p>
 <p>他でも標準Loggerを使われているのであればそのままでも問題ないですが、ロガーのライブラリを使っててそちらもStdout/errに出力している場合は2つのフォーマットが混じってしまいます。
-そこでこの <tt class="docutils literal">ErrorLog</tt> に自分たちのロガーを差し込んで同じフォーマットで出力させましょう。</p>
+そこでこの <code>ErrorLog</code> に自分たちのロガーを差し込んで同じフォーマットで出力させましょう。</p>
 <p>特に自分たちの場合はシステムのログをStackdriver Loggingで集めており後から検索する都合上、同じフォーマットの方がより望ましい状態でした。
 （今回の話題のベースになっているプロキシはGKE上にデプロイしています）</p>
-<p>ただこの <tt class="docutils literal">ErrorLog</tt> は <tt class="docutils literal">log.Logger</tt> なのでほんの少しだけ工夫しないとロガーを差し込めません。</p>
-<pre class="code go literal-block">
-<span class="kd">type</span> <span class="nx">buf</span> <span class="kd">struct</span><span class="p">{</span>
-    <span class="nx">internal</span> <span class="o">*</span><span class="nx">zap</span><span class="p">.</span><span class="nx">Logger</span>
-<span class="p">}</span>
+<p>ただこの <code>ErrorLog</code> は <code>log.Logger</code> なのでほんの少しだけ工夫しないとロガーを差し込めません。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">buf</span> <span style="color:#66d9ef">struct</span>{
+    <span style="color:#a6e22e">internal</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">zap</span>.<span style="color:#a6e22e">Logger</span>
+}
 
-<span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="o">*</span><span class="nx">buf</span><span class="p">)</span> <span class="nx">Write</span><span class="p">(</span><span class="nx">p</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">b</span><span class="p">.</span><span class="nx">internal</span><span class="p">.</span><span class="nx">Debug</span><span class="p">(</span><span class="nb">string</span><span class="p">(</span><span class="nx">bytes</span><span class="p">.</span><span class="nx">TrimRight</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="s">&quot;\n&quot;</span><span class="p">)))</span>
-    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nx">p</span><span class="p">),</span> <span class="kc">nil</span>
-<span class="p">}</span>
+<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">buf</span>) <span style="color:#a6e22e">Write</span>(<span style="color:#a6e22e">p</span> []<span style="color:#66d9ef">byte</span>) (<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">error</span>) {
+    <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">internal</span>.<span style="color:#a6e22e">Debug</span>(string(<span style="color:#a6e22e">bytes</span>.<span style="color:#a6e22e">TrimRight</span>(<span style="color:#a6e22e">p</span>, <span style="color:#e6db74">&#34;\n&#34;</span>)))
+    <span style="color:#66d9ef">return</span> len(<span style="color:#a6e22e">p</span>), <span style="color:#66d9ef">nil</span>
+}
 
-<span class="kd">func</span> <span class="nx">NewServer</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nx">logger</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">zap</span><span class="p">.</span><span class="nx">NewProduction</span><span class="p">()</span>
-    <span class="nx">server</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Server</span><span class="p">{</span>
-        <span class="nx">ErrorLog</span><span class="p">:</span> <span class="nx">log</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">buf</span><span class="p">{</span><span class="nx">internal</span><span class="p">:</span> <span class="nx">logger</span><span class="p">},</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre>
-<p>やることとしてはこれだけです。</p>
-<p><tt class="docutils literal">io.Writer</tt> を実装して自分たちのロガーとブリッジするだけです。</p>
-</div>
-<div class="section" id="http-2">
-<h2>3. HTTP/2を有効にする別の手段を知っておく</h2>
-<p><tt class="docutils literal">http.Server</tt> はデフォルトでHTTP/2をサポートしています。</p>
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NewServer</span>() {
+    <span style="color:#a6e22e">logger</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">zap</span>.<span style="color:#a6e22e">NewProduction</span>()
+    <span style="color:#a6e22e">server</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Server</span>{
+        <span style="color:#a6e22e">ErrorLog</span>: <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">New</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">buf</span>{<span style="color:#a6e22e">internal</span>: <span style="color:#a6e22e">logger</span>}, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#ae81ff">0</span>)
+    }
+}
+</code></pre></div><p>やることとしてはこれだけです。</p>
+<p><code>io.Writer</code> を実装して自分たちのロガーとブリッジするだけです。</p>
+<h1 id="3-http2を有効にする別の手段を知っておく">3. HTTP/2を有効にする別の手段を知っておく</h1>
+<p><code>http.Server</code> はデフォルトでHTTP/2をサポートしています。</p>
 <p>ですが、これは複雑なサーバを作らない場合に限られ、ALPNを使った拡張などを実装してしまうと標準ライブラリだけではHTTP/2を有効にできません。</p>
-<p>そういった場合は <tt class="docutils literal">golang.org/x/net/http2</tt> を使いましょう。
-<tt class="docutils literal">http2.ConfigureServer</tt> に <tt class="docutils literal">http.Server</tt> を渡せばALPNで <tt class="docutils literal">h2</tt> とそれ以外を共存させることができます。
+<p>そういった場合は <code>golang.org/x/net/http2</code> を使いましょう。
+<code>http2.ConfigureServer</code> に <code>http.Server</code> を渡せばALPNで <code>h2</code> とそれ以外を共存させることができます。
 （そんなことをしたい人はそれほど多くないかもしれませんが…）</p>
-</div>
-<div class="section" id="tls">
-<h2>4. 開発時からTLSを必須にしてしまう</h2>
+<h1 id="4-開発時からtlsを必須にしてしまう">4. 開発時からTLSを必須にしてしまう</h1>
 <p>これは自作のプロキシがALPNでプロトコルを切り替えているためTLSが必須ということもありますが、開発時からTLSを有効にしてしまった方が楽でした。
 普通はこれは逆かもしれません。開発用に証明書を用意するのは普通は面倒です。</p>
-<p>開発用の証明書はLet's Encryptなどで発行してもいいですが、あくまで開発用なのでいわゆるオレオレ証明書を作っています。
+<p>開発用の証明書はLet&rsquo;s Encryptなどで発行してもいいですが、あくまで開発用なのでいわゆるオレオレ証明書を作っています。
 オレオレ証明書をopensslコマンドで作るのも面倒なので、開発時に必要なファイルをセットアップするCLIツールを作ってありコマンド1発でCAからサーバ証明書まで用意できるようになっています。</p>
 <p>Goは標準ライブラリだけで自己署名CAとそのCAに署名されたサーバ証明書を作り、pemでエンコードして出力できます。
 それを出力する実装をするには少し証明書の知識が必要にはなりますが基本的に必要なところを穴埋めするだけで実装が完了します。</p>
 <p>ここまで標準ライブラリで用意されているGoはとても便利ですね！</p>
-</div>
-<div class="section" id="tls-1-3-go-1-12">
-<h2>5. TLS 1.3にオプトインする（Go 1.12の場合のみ）</h2>
+<h1 id="5-tls-13にオプトインするgo-112の場合のみ">5. TLS 1.3にオプトインする（Go 1.12の場合のみ）</h1>
 <p>Go 1.12の場合はTLS 1.3がオプトインになっています。</p>
-<pre class="code go literal-block">
-<span class="kd">func</span> <span class="nx">init</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nx">os</span><span class="p">.</span><span class="nx">Setenv</span><span class="p">(</span><span class="s">&quot;GODEBUG&quot;</span><span class="p">,</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Getenv</span><span class="p">(</span><span class="s">&quot;GODEBUG&quot;</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;,tls13=1&quot;</span><span class="p">)</span>
-<span class="p">}</span>
-</pre>
-<p>もっとも現在であればオプトインを考える前にGo 1.13へのアップデートを考えてください。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">init</span>() {
+    <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Setenv</span>(<span style="color:#e6db74">&#34;GODEBUG&#34;</span>, <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">&#34;GODEBUG&#34;</span>)<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;,tls13=1&#34;</span>)
+}
+</code></pre></div><p>もっとも現在であればオプトインを考える前にGo 1.13へのアップデートを考えてください。
 1.13ではTLS 1.3はオプトアウトになっておりデフォルトで有効です。</p>
 <p>ただし、GoのTLS 1.3はまだ 0-RTT Resumption が実装されてないなど完全な実装ではありません。
 ですが通常の通信をする分にはまったく問題がないと思うので積極的に有効にしていきましょう。（そして何か問題があればバグ報告へ…）</p>
-</div>
-<div class="section" id="id3">
-<h2>6. サーバ証明書を動的にリロードする</h2>
+<h1 id="6-サーバ証明書を動的にリロードする">6. サーバ証明書を動的にリロードする</h1>
 <p>実際のトラフィックを受け取るプロセスはオレオレ証明書ではなく本物の証明書を使うことでしょう。
-昨今はDV証明書でかつ有効期限が短い証明書を使われることが多いと思います（e.g. Let's Encrypt）</p>
+昨今はDV証明書でかつ有効期限が短い証明書を使われることが多いと思います（e.g. Let&rsquo;s Encrypt）</p>
 <p>なので、初期から証明書の動的な再読込に対応しておきましょう。</p>
 <p>再読込を実現する方法は色々あるかと思いますが、k8sにデプロイするのであればSecretの変更（証明書の更新）を検知してファイルを再読込するのがいいと思います。
-<tt class="docutils literal">crypto/tls</tt> の <tt class="docutils literal">tls.Config</tt> は動的な証明書の読み込みが <tt class="docutils literal">GetCertificate</tt> で実現できます。</p>
-<p>TLSのハンドシェイクで <tt class="docutils literal">ClientHello</tt> メッセージを受け取った後にこの関数が呼ばれるのでSNIをチェックし証明書を変えることもできますし、その必要がなければ同じ証明書を返せば良いです。</p>
+<code>crypto/tls</code> の <code>tls.Config</code> は動的な証明書の読み込みが <code>GetCertificate</code> で実現できます。</p>
+<p>TLSのハンドシェイクで <code>ClientHello</code> メッセージを受け取った後にこの関数が呼ばれるのでSNIをチェックし証明書を変えることもできますし、その必要がなければ同じ証明書を返せば良いです。</p>
 <p>自作プロキシでは証明書はk8sのSecretをVolumeとしてマウントして読み込むので、このVolumeの変更をinotifyで監視しています。
-ファイルに変更があれば証明書を読み込み、成功した場合はロックを取得し <tt class="docutils literal">GetCertificate</tt> が返す証明書を置き換えます。</p>
-</div>
-</div>
+ファイルに変更があれば証明書を読み込み、成功した場合はロックを取得し <code>GetCertificate</code> が返す証明書を置き換えます。</p>
+
   </section>
   <footer>
     

@@ -57,30 +57,11 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>自宅の Kubernetes クラスタをどうやって構成するかという話。</p>
-<p>自宅クラスタ関連は <a class="reference external" href="/tags/homecluster">タグ</a> で一覧できるようにしています。</p>
-<div class="contents local topic" id="contents">
-<ul class="auto-toc simple">
-<li><a class="reference internal" href="#minikube" id="id11">1&nbsp;&nbsp;&nbsp;minikubeではなく物理クラスタという選択</a></li>
-<li><a class="reference internal" href="#id2" id="id12">2&nbsp;&nbsp;&nbsp;ハードウェア</a></li>
-<li><a class="reference internal" href="#id3" id="id13">3&nbsp;&nbsp;&nbsp;ソフトウェア</a></li>
-<li><a class="reference internal" href="#id4" id="id14">4&nbsp;&nbsp;&nbsp;ブートストラップ</a><ul class="auto-toc">
-<li><a class="reference internal" href="#os" id="id15">4.1&nbsp;&nbsp;&nbsp;OSのインストール</a></li>
-<li><a class="reference internal" href="#swap" id="id16">4.2&nbsp;&nbsp;&nbsp;Swapを切る</a></li>
-<li><a class="reference internal" href="#kubeadm" id="id17">4.3&nbsp;&nbsp;&nbsp;kubeadm によるセットアップ</a></li>
-<li><a class="reference internal" href="#calico" id="id18">4.4&nbsp;&nbsp;&nbsp;Calicoのインストール</a></li>
-<li><a class="reference internal" href="#metallb" id="id19">4.5&nbsp;&nbsp;&nbsp;MetalLBのインストール</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id7" id="id20">5&nbsp;&nbsp;&nbsp;動作確認</a></li>
-<li><a class="reference internal" href="#id8" id="id21">6&nbsp;&nbsp;&nbsp;ユーザー認証</a></li>
-</ul>
-</div>
-<div class="section" id="minikube">
-<h2><a class="toc-backref" href="#id11">1&nbsp;&nbsp;&nbsp;minikubeではなく物理クラスタという選択</a></h2>
+    <p>自宅の Kubernetes クラスタをどうやって構成するかという話。</p>
+<p>自宅クラスタ関連は <a href="/tags/homecluster">タグ</a> で一覧できるようにしています。</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h1 id="minikubeではなく物理クラスタという選択">minikubeではなく物理クラスタという選択</h1>
 <p>minikubeではなく物理マシンを複数台用意してクラスタを構成しています。</p>
 <p>デスクトップマシンでは Kubernetes のAPIを使った開発をするために minikube を利用していますが、それとは別に24時間稼働する物理クラスタがあります。</p>
 <p>物理クラスタを構築したのは UniFi Controller を動かそうと思ったからです。</p>
@@ -89,38 +70,34 @@
 都度ローカルマシンでコントローラを起動する運用でもそれほど不便ではないのですが、やはり常時起動しておきたい。
 ふと「もしかしてUniFi Controllerのhelm chartがあるのでは？」と思いリポジトリを見てみるとありがたいことにメンテしてくれている人がいました。
 であればこれを利用させてもらうのが一番簡単だろうと考えたからです。</p>
-</div>
-<div class="section" id="id2">
-<h2><a class="toc-backref" href="#id12">2&nbsp;&nbsp;&nbsp;ハードウェア</a></h2>
-<p>基本的には <a class="reference external" href="https://www.intel.com/content/www/us/en/products/boards-kits/nuc.html">Intel NUC</a> を使っています。</p>
+<h1 id="ハードウェア">ハードウェア</h1>
+<p>基本的には <a href="https://www.intel.com/content/www/us/en/products/boards-kits/nuc.html">Intel NUC</a> を使っています。</p>
 <p>HDDを搭載するつもりは一切ないのでそれを搭載できないモデルを選んでいます。
-具体的には <a class="reference external" href="https://www.intel.com/content/www/us/en/products/boards-kits/nuc/kits/nuc8i3bek.html">NUC8I3BEK</a> を使っています。</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="25%" />
-<col width="25%" />
-<col width="25%" />
-<col width="25%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">パーツ</th>
-<th class="head">型番</th>
-<th class="head">スペック</th>
-<th class="head">備考</th>
+具体的には <a href="https://www.intel.com/content/www/us/en/products/boards-kits/nuc/kits/nuc8i3bek.html">NUC8I3BEK</a> を使っています。</p>
+<table>
+<thead>
+<tr>
+<th>パーツ</th>
+<th>型番</th>
+<th>スペック</th>
+<th>備考</th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr><td>本体</td>
+<tbody>
+<tr>
+<td>本体</td>
 <td>Intel NUC8I3BEK</td>
 <td>Core i3</td>
-<td>&nbsp;</td>
+<td></td>
 </tr>
-<tr><td>メモリー</td>
+<tr>
+<td>メモリー</td>
 <td>SO-DIMM DDR4</td>
 <td>8GB x 2</td>
-<td>&nbsp;</td>
+<td></td>
 </tr>
-<tr><td>ディスク</td>
+<tr>
+<td>ディスク</td>
 <td>SSD</td>
 <td>480GB</td>
 <td>詳細な型番は忘れました</td>
@@ -130,47 +107,44 @@
 <p>1台あたりおおよそ5万5千円です。
 これを2台持っています。</p>
 <p>クラスタ運用中にマシンの買い増しを行い今は3台構成のクラスタになっています。</p>
-<pre class="code literal-block">
-$ k get nodes
+<pre><code>$ k get nodes
 NAME     STATUS   ROLES    AGE    VERSION
 whale1   Ready    master   162d   v1.17.4
 whale2   Ready    &lt;none&gt;   162d   v1.17.4
 whale3   Ready    &lt;none&gt;   16d    v1.17.4
-</pre>
-</div>
-<div class="section" id="id3">
-<h2><a class="toc-backref" href="#id13">3&nbsp;&nbsp;&nbsp;ソフトウェア</a></h2>
+</code></pre><h1 id="ソフトウェア">ソフトウェア</h1>
 <p>クラスタを構築するためのソフトウェアは以下を利用しています。</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">種類</th>
-<th class="head">ソフトウェア</th>
-<th class="head">備考</th>
+<table>
+<thead>
+<tr>
+<th>種類</th>
+<th>ソフトウェア</th>
+<th>備考</th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr><td>OS</td>
+<tbody>
+<tr>
+<td>OS</td>
 <td>Ubuntu 19.10</td>
-<td>&nbsp;</td>
+<td></td>
 </tr>
-<tr><td>管理ツール</td>
+<tr>
+<td>管理ツール</td>
 <td>kubeadm</td>
-<td>&nbsp;</td>
+<td></td>
 </tr>
-<tr><td>コンテナランタイム</td>
+<tr>
+<td>コンテナランタイム</td>
 <td>docker / contaienrd</td>
 <td>containerdに移行中</td>
 </tr>
-<tr><td>ネットワーク</td>
+<tr>
+<td>ネットワーク</td>
 <td>Calico</td>
 <td>BGPモード</td>
 </tr>
-<tr><td>ロードバランサ</td>
+<tr>
+<td>ロードバランサ</td>
 <td>MetalLB</td>
 <td>ARPモード</td>
 </tr>
@@ -179,120 +153,91 @@ whale3   Ready    &lt;none&gt;   16d    v1.17.4
 <p>最低限これらを用いればPodをスケジュールするところまではできます。</p>
 <p>この構成であればコンシューマ向けルータ配下でも構築できるでしょう。
 自宅はルータがUniFi Security Gatewayなのでもっと踏み込んだ使い方もできます。(例えばMetalLBをBGPモードで動かすとか）</p>
-</div>
-<div class="section" id="id4">
-<h2><a class="toc-backref" href="#id14">4&nbsp;&nbsp;&nbsp;ブートストラップ</a></h2>
+<h1 id="ブートストラップ">ブートストラップ</h1>
 <p>クラスタを動作させるまでを簡単に書きます。
 記憶を頼りに書いているため、この手順を踏んでも構築できるとは限りません。</p>
-<p>基本的には kubeadm の <a class="reference external" href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/">オフィシャルドキュメント</a> を進めます。
+<p>基本的には kubeadm の <a href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/">オフィシャルドキュメント</a> を進めます。
 台数を確保出来る場合はマスターもHA構成を取ることをおすすめします。</p>
-<div class="section" id="os">
-<h3><a class="toc-backref" href="#id15">4.1&nbsp;&nbsp;&nbsp;OSのインストール</a></h3>
+<h2 id="osのインストール">OSのインストール</h2>
 <p>台数が少ないので手動インストールをしています。</p>
 <p>UbuntuのブートUSBを作成し、インストーラを用いて通常通りインストールします。</p>
 <p>インストール中にパッケージを選択できますがそこではopenssh-serverのみインストールする最小構成にします。</p>
-</div>
-<div class="section" id="swap">
-<h3><a class="toc-backref" href="#id16">4.2&nbsp;&nbsp;&nbsp;Swapを切る</a></h3>
+<h2 id="swapを切る">Swapを切る</h2>
 <p>kubeadm によるセットアップを行う前にswapを切っておく必要があります。</p>
-<pre class="code literal-block">
-$ swapoff
-</pre>
-<p>でswapを切っておきます。
-再起動してswapが元に戻ってしまうのも面倒なので合わせて <tt class="docutils literal">/etc/fstab</tt> からも消しておきましょう。</p>
-</div>
-<div class="section" id="kubeadm">
-<h3><a class="toc-backref" href="#id17">4.3&nbsp;&nbsp;&nbsp;kubeadm によるセットアップ</a></h3>
+<pre><code>$ swapoff
+</code></pre><p>でswapを切っておきます。
+再起動してswapが元に戻ってしまうのも面倒なので合わせて <code>/etc/fstab</code> からも消しておきましょう。</p>
+<h2 id="kubeadm-によるセットアップ">kubeadm によるセットアップ</h2>
 <p>このステップはオフィシャルドキュメントの通りに行ってください。</p>
-<p><tt class="docutils literal">kubeadm init</tt> と <tt class="docutils literal">kubeadm join</tt> を繰り返し実行するだけになります。</p>
-</div>
-<div class="section" id="calico">
-<h3><a class="toc-backref" href="#id18">4.4&nbsp;&nbsp;&nbsp;Calicoのインストール</a></h3>
+<p><code>kubeadm init</code> と <code>kubeadm join</code> を繰り返し実行するだけになります。</p>
+<h2 id="calicoのインストール">Calicoのインストール</h2>
 <p>ネットワークプラグインには Calico を利用しますが配布されているマニフェストはIPIPが有効になっています。
 特にこだわりがなければそのまま動かすのがいいでしょう。</p>
 <p>自宅クラスタではIPIPは不要なのでoffにしておきます。</p>
 <p>マニフェストをダウンロードし編集します。</p>
-<pre class="code literal-block">
-$ curl -O https://docs.projectcalico.org/manifests/calico.yaml
-</pre>
-<p>ここで行う編集は3つ。</p>
-<ol class="arabic simple">
+<pre><code class="language-console" data-lang="console">$ curl -O https://docs.projectcalico.org/manifests/calico.yaml
+</code></pre><p>ここで行う編集は3つ。</p>
+<ol>
 <li>PodのIPレンジを決める</li>
 <li>IPIPを切る</li>
 <li>XDPをdisableにする</li>
 </ol>
-<pre class="code diff literal-block">
-<span class="gd">--- calico.yaml 2020-04-02 00:10:56.197222351 +0900
-</span><span class="gi">+++ calico.a.yaml       2020-04-02 00:10:15.728870190 +0900
-</span><span class="gu">&#64;&#64; -614,7 +614,7 &#64;&#64;
-</span>               value: &quot;autodetect&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"><span style="color:#f92672">--- calico.yaml 2020-04-02 00:10:56.197222351 +0900
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ calico.a.yaml       2020-04-02 00:10:15.728870190 +0900
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -614,7 +614,7 @@
+</span><span style="color:#75715e"></span>               value: &#34;autodetect&#34;
              # Enable IPIP
              - name: CALICO_IPV4POOL_IPIP
-<span class="gd">-              value: &quot;Always&quot;
-</span><span class="gi">+              value: &quot;off&quot;
-</span>             # Set MTU for tunnel device used if ipip is enabled
+<span style="color:#f92672">-              value: &#34;Always&#34;
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+              value: &#34;off&#34;
+</span><span style="color:#a6e22e"></span>             # Set MTU for tunnel device used if ipip is enabled
              - name: FELIX_IPINIPMTU
                valueFrom:
-<span class="gu">&#64;&#64; -624,8 +624,8 &#64;&#64;
-</span>             # The default IPv4 pool to create on startup if none exists. Pod IPs will be
+<span style="color:#75715e">@@ -624,8 +624,8 @@
+</span><span style="color:#75715e"></span>             # The default IPv4 pool to create on startup if none exists. Pod IPs will be
              # chosen from this range. Changing this value after installation will have
              # no effect. This should fall within `--cluster-cidr`.
-<span class="gd">-             - name: CALICO_IPV4POOL_CIDR
--               value: &quot;192.168.0.0/16&quot;
-</span><span class="gi">+            - name: CALICO_IPV4POOL_CIDR
-+              value: &quot;192.168.0.1/16&quot;
-</span>             # Disable file logging so `kubectl logs` works.
+<span style="color:#f92672">-             - name: CALICO_IPV4POOL_CIDR
+</span><span style="color:#f92672">-               value: &#34;192.168.0.0/16&#34;
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+            - name: CALICO_IPV4POOL_CIDR
+</span><span style="color:#a6e22e">+              value: &#34;192.168.0.1/16&#34;
+</span><span style="color:#a6e22e"></span>             # Disable file logging so `kubectl logs` works.
              - name: CALICO_DISABLE_FILE_LOGGING
-               value: &quot;true&quot;
-<span class="gu">&#64;&#64; -640,6 +640,8 &#64;&#64;
-</span>               value: &quot;info&quot;
+               value: &#34;true&#34;
+<span style="color:#75715e">@@ -640,6 +640,8 @@
+</span><span style="color:#75715e"></span>               value: &#34;info&#34;
              - name: FELIX_HEALTHENABLED
-               value: &quot;true&quot;
-<span class="gi">+            - name: FELIX_XDPENABLED
-+              value: &quot;false&quot;
-</span>           securityContext:
+               value: &#34;true&#34;
+<span style="color:#a6e22e">+            - name: FELIX_XDPENABLED
+</span><span style="color:#a6e22e">+              value: &#34;false&#34;
+</span><span style="color:#a6e22e"></span>           securityContext:
              privileged: true
            resources:
-</pre>
-<p>XDPをdisableにするのはCalicoのバージョンに依存するはずです。
+</code></pre></div><p>XDPをdisableにするのはCalicoのバージョンに依存するはずです。
 enableのままでcalico-nodeのPodが正常に動作しているようであればenableのままでいいでしょう。</p>
 <p>あとは</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> k apply -f calico.yaml
-</pre>
-<p>とするだけです。</p>
-<p><tt class="docutils literal"><span class="pre">kube-system</span></tt> で必要なPodが動作するので動作を確認しましょう。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> k -n kube-system get pod
-</pre>
-</div>
-<div class="section" id="metallb">
-<h3><a class="toc-backref" href="#id19">4.5&nbsp;&nbsp;&nbsp;MetalLBのインストール</a></h3>
-<p>これも <a class="reference external" href="https://metallb.universe.tf/installation/">MetalLBのオフィシャルドキュメント</a> の通りで出来ます。</p>
+<pre><code class="language-console" data-lang="console">$ k apply -f calico.yaml
+</code></pre><p>とするだけです。</p>
+<p><code>kube-system</code> で必要なPodが動作するので動作を確認しましょう。</p>
+<pre><code class="language-console" data-lang="console">$ k -n kube-system get pod
+</code></pre><h2 id="metallbのインストール">MetalLBのインストール</h2>
+<p>これも <a href="https://metallb.universe.tf/installation/">MetalLBのオフィシャルドキュメント</a> の通りで出来ます。</p>
 <p>作業を行う前に MetalLB が使うIPのレンジを決めましょう。
 上位のルータとServiceを使う予定の数でレンジの幅は調整してください。</p>
 <p>ちなみに現時点でクラスタ内には60以上のServiceがありますが Type=LoadBalancer でIPアドレスを割り当てられているものは6個程度しかありません。
 あまり広いレンジを確保する必要はないでしょう。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> k apply -f https://raw.githubusercontent.com/google/metallb/v0.9.3/manifests/metallb.yaml
-</pre>
-<p><a class="reference external" href="https://metallb.universe.tf/configuration/#layer-2-configuration">Layer2のConfigration</a> も忘れずに行ってください。</p>
+<pre><code class="language-console" data-lang="console">$ k apply -f https://raw.githubusercontent.com/google/metallb/v0.9.3/manifests/metallb.yaml
+</code></pre><p><a href="https://metallb.universe.tf/configuration/#layer-2-configuration">Layer2のConfigration</a> も忘れずに行ってください。</p>
 <p>MetalLBにBGPを喋らせる場合はそれに応じた設定をしましょう。</p>
-</div>
-</div>
-<div class="section" id="id7">
-<h2><a class="toc-backref" href="#id20">5&nbsp;&nbsp;&nbsp;動作確認</a></h2>
+<h1 id="動作確認">動作確認</h1>
 <p>後は適当にPodをデプロイして動作確認をしてください。</p>
-</div>
-<div class="section" id="id8">
-<h2><a class="toc-backref" href="#id21">6&nbsp;&nbsp;&nbsp;ユーザー認証</a></h2>
-<p>ユーザー認証の設定をしていないのでクラスタの操作は <tt class="docutils literal"><span class="pre">kubernetes-admin</span></tt> で行うことになります。</p>
-<p><a class="reference external" href="https://kubernetes.io/docs/reference/access-authn-authz/authentication/">認証方法についてのオフィシャルドキュメント</a> を参照して自分にあった認証方法を選択してください。</p>
-<p>我が家のクラスターは <a class="reference external" href="https://kubernetes.io/docs/reference/access-authn-authz/authentication/#x509-client-certs">クライアント証明書認証</a> を採用しています。
+<h1 id="ユーザー認証">ユーザー認証</h1>
+<p>ユーザー認証の設定をしていないのでクラスタの操作は <code>kubernetes-admin</code> で行うことになります。</p>
+<p><a href="https://kubernetes.io/docs/reference/access-authn-authz/authentication/">認証方法についてのオフィシャルドキュメント</a> を参照して自分にあった認証方法を選択してください。</p>
+<p>我が家のクラスターは <a href="https://kubernetes.io/docs/reference/access-authn-authz/authentication/#x509-client-certs">クライアント証明書認証</a> を採用しています。
 複数台あるマシンでそれぞれ秘密鍵とCSRを生成し Control plane のマシンにあるCAで署名するようにしています。
 このプロセスはopensslコマンドで実施されており、何らかのPKIエンジンを使っているわけではありません。</p>
-</div>
-</div>
+
   </section>
   <footer>
     

@@ -59,229 +59,210 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>UniFi Controllerは内部に持っているMongoDBに設定が保存されており、プロビジョニング（設定の反映）を行うとCLIから行ったものは消えてしまいます。</p>
-<p>なので <a class="reference external" href="../vpn-with-wireguard">先のポスト</a> のように設定をするとプロビジョニングのたびに手動でconfigureしないといけなくなります。</p>
+    <p>UniFi Controllerは内部に持っているMongoDBに設定が保存されており、プロビジョニング（設定の反映）を行うとCLIから行ったものは消えてしまいます。</p>
+<p>なので <a href="../vpn-with-wireguard">先のポスト</a> のように設定をするとプロビジョニングのたびに手動でconfigureしないといけなくなります。</p>
 <p>UniFi Controllerにはコントローラの設定にオーバーレイする形で独自の設定をインジェクトできる仕組みがあるのでそれを使ってWireGuardの設定を行います。</p>
-<div class="section" id="id2">
-<h2>オーバーレイ</h2>
-<p>適切なパスに <tt class="docutils literal">config.gateway.json</tt> というファイルを作るとUniFi Controllerはこのファイルの内容をマージしてから各デバイスに設定を反映します。</p>
+<h1 id="オーバーレイ">オーバーレイ</h1>
+<p>適切なパスに <code>config.gateway.json</code> というファイルを作るとUniFi Controllerはこのファイルの内容をマージしてから各デバイスに設定を反映します。</p>
 <p>これを使いWireGuardの設定を行います。
-まず <tt class="docutils literal">config.gateway.json</tt> は以下のような内容にします。</p>
-<pre class="code json literal-block">
-<span class="p">{</span>
-  <span class="nt">&quot;firewall&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;network-group&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="nt">&quot;wireguard_network&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Remote WireGuard (VPN) subnets&quot;</span><span class="p">,</span>
-                  <span class="nt">&quot;network&quot;</span><span class="p">:</span> <span class="p">[</span>
-                        <span class="s2">&quot;192.168.12.0/24&quot;</span>
-                  <span class="p">]</span>
-                <span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;WAN_LOCAL&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="nt">&quot;rule&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="nt">&quot;20&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="nt">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;accept&quot;</span><span class="p">,</span>
-                        <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;WireGuard&quot;</span><span class="p">,</span>
-                        <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;udp&quot;</span><span class="p">,</span>
-                        <span class="nt">&quot;destination&quot;</span><span class="p">:</span> <span class="p">{</span>
-                          <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="s2">&quot;51820&quot;</span>
-                        <span class="p">}</span>
-                  <span class="p">}</span>
-                <span class="p">}</span>
-          <span class="p">},</span>
-          <span class="nt">&quot;GUEST_IN&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="nt">&quot;rule&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="nt">&quot;20&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="nt">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;drop&quot;</span><span class="p">,</span>
-                        <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;drop packet to wireguard network&quot;</span><span class="p">,</span>
-                        <span class="nt">&quot;destination&quot;</span><span class="p">:</span> <span class="p">{</span>
-                          <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="p">{</span>
-                                <span class="nt">&quot;network-group&quot;</span><span class="p">:</span> <span class="s2">&quot;wireguard_network&quot;</span>
-                          <span class="p">}</span>
-                        <span class="p">}</span>
-                  <span class="p">}</span>
-                <span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
-  <span class="p">},</span>
-  <span class="nt">&quot;interfaces&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="nt">&quot;wireguard&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;wg0&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="nt">&quot;listen-port&quot;</span><span class="p">:</span> <span class="s2">&quot;51820&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;private-key&quot;</span><span class="p">:</span> <span class="s2">&quot;/config/auth/wg.key&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;address&quot;</span><span class="p">:</span> <span class="p">[</span>
-                  <span class="s2">&quot;192.168.12.1/24&quot;</span>
-                <span class="p">],</span>
-                <span class="nt">&quot;route-allowed-ips&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;peer&quot;</span><span class="p">:</span> <span class="p">[</span>
-                  <span class="p">{</span>
-                        <span class="nt">&quot;bwqE81/MNgb/D6klMd+AFGGB3FXBVRv1RC+p8JTk6wE=&quot;</span><span class="p">:</span> <span class="p">{</span>
-                          <span class="nt">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;[your vpn host or ip]:51820&quot;</span><span class="p">,</span>
-                          <span class="nt">&quot;allowed-ips&quot;</span><span class="p">:</span> <span class="p">[</span>
-                                <span class="s2">&quot;192.168.12.2/32&quot;</span>
-                          <span class="p">]</span>
-                        <span class="p">}</span>
-                  <span class="p">}</span>
-                <span class="p">]</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
-  <span class="p">},</span>
-  <span class="nt">&quot;service&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="nt">&quot;nat&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;rule&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="nt">&quot;5001&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;masquerade&quot;</span><span class="p">,</span>
-                  <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;MASQ wireguard_network to WAN&quot;</span><span class="p">,</span>
-                  <span class="nt">&quot;log&quot;</span><span class="p">:</span> <span class="s2">&quot;disable&quot;</span><span class="p">,</span>
-                  <span class="nt">&quot;outbound-interface&quot;</span><span class="p">:</span> <span class="s2">&quot;eth0&quot;</span><span class="p">,</span>
-                  <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-                  <span class="nt">&quot;source&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="p">{</span>
-                          <span class="nt">&quot;network-group&quot;</span><span class="p">:</span> <span class="s2">&quot;wireguard_network&quot;</span>
-                        <span class="p">}</span>
-                  <span class="p">}</span>
-                <span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</pre>
-<p>CLIで行っていた設定を適切なデータ構造に置き換えただけです。</p>
+まず <code>config.gateway.json</code> は以下のような内容にします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#f92672">&#34;firewall&#34;</span>: {
+  <span style="color:#f92672">&#34;group&#34;</span>: {
+    <span style="color:#f92672">&#34;network-group&#34;</span>: {
+    <span style="color:#f92672">&#34;wireguard_network&#34;</span>: {
+      <span style="color:#f92672">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;Remote WireGuard (VPN) subnets&#34;</span>,
+      <span style="color:#f92672">&#34;network&#34;</span>: [
+      <span style="color:#e6db74">&#34;192.168.12.0/24&#34;</span>
+      ]
+    }
+    }
+  },
+  <span style="color:#f92672">&#34;name&#34;</span>: {
+    <span style="color:#f92672">&#34;WAN_LOCAL&#34;</span>: {
+    <span style="color:#f92672">&#34;rule&#34;</span>: {
+      <span style="color:#f92672">&#34;20&#34;</span>: {
+      <span style="color:#f92672">&#34;action&#34;</span>: <span style="color:#e6db74">&#34;accept&#34;</span>,
+      <span style="color:#f92672">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;WireGuard&#34;</span>,
+      <span style="color:#f92672">&#34;protocol&#34;</span>: <span style="color:#e6db74">&#34;udp&#34;</span>,
+      <span style="color:#f92672">&#34;destination&#34;</span>: {
+        <span style="color:#f92672">&#34;port&#34;</span>: <span style="color:#e6db74">&#34;51820&#34;</span>
+      }
+      }
+    }
+    },
+    <span style="color:#f92672">&#34;GUEST_IN&#34;</span>: {
+    <span style="color:#f92672">&#34;rule&#34;</span>: {
+      <span style="color:#f92672">&#34;20&#34;</span>: {
+      <span style="color:#f92672">&#34;action&#34;</span>: <span style="color:#e6db74">&#34;drop&#34;</span>,
+      <span style="color:#f92672">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;drop packet to wireguard network&#34;</span>,
+      <span style="color:#f92672">&#34;destination&#34;</span>: {
+        <span style="color:#f92672">&#34;group&#34;</span>: {
+        <span style="color:#f92672">&#34;network-group&#34;</span>: <span style="color:#e6db74">&#34;wireguard_network&#34;</span>
+        }
+      }
+      }
+    }
+    }
+  }
+  },
+  <span style="color:#f92672">&#34;interfaces&#34;</span>: {
+  <span style="color:#f92672">&#34;wireguard&#34;</span>: {
+    <span style="color:#f92672">&#34;wg0&#34;</span>: {
+    <span style="color:#f92672">&#34;listen-port&#34;</span>: <span style="color:#e6db74">&#34;51820&#34;</span>,
+    <span style="color:#f92672">&#34;private-key&#34;</span>: <span style="color:#e6db74">&#34;/config/auth/wg.key&#34;</span>,
+    <span style="color:#f92672">&#34;address&#34;</span>: [
+      <span style="color:#e6db74">&#34;192.168.12.1/24&#34;</span>
+    ],
+    <span style="color:#f92672">&#34;route-allowed-ips&#34;</span>: <span style="color:#e6db74">&#34;true&#34;</span>,
+    <span style="color:#f92672">&#34;peer&#34;</span>: [
+      {
+      <span style="color:#f92672">&#34;bwqE81/MNgb/D6klMd+AFGGB3FXBVRv1RC+p8JTk6wE=&#34;</span>: {
+        <span style="color:#f92672">&#34;endpoint&#34;</span>: <span style="color:#e6db74">&#34;[your vpn host or ip]:51820&#34;</span>,
+        <span style="color:#f92672">&#34;allowed-ips&#34;</span>: [
+        <span style="color:#e6db74">&#34;192.168.12.2/32&#34;</span>
+        ]
+      }
+      }
+    ]
+    }
+  }
+  },
+  <span style="color:#f92672">&#34;service&#34;</span>: {
+  <span style="color:#f92672">&#34;nat&#34;</span>: {
+    <span style="color:#f92672">&#34;rule&#34;</span>: {
+    <span style="color:#f92672">&#34;5001&#34;</span>: {
+      <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;masquerade&#34;</span>,
+      <span style="color:#f92672">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;MASQ wireguard_network to WAN&#34;</span>,
+      <span style="color:#f92672">&#34;log&#34;</span>: <span style="color:#e6db74">&#34;disable&#34;</span>,
+      <span style="color:#f92672">&#34;outbound-interface&#34;</span>: <span style="color:#e6db74">&#34;eth0&#34;</span>,
+      <span style="color:#f92672">&#34;protocol&#34;</span>: <span style="color:#e6db74">&#34;all&#34;</span>,
+      <span style="color:#f92672">&#34;source&#34;</span>: {
+      <span style="color:#f92672">&#34;group&#34;</span>: {
+        <span style="color:#f92672">&#34;network-group&#34;</span>: <span style="color:#e6db74">&#34;wireguard_network&#34;</span>
+      }
+      }
+    }
+    }
+  }
+  }
+}
+</code></pre></div><p>CLIで行っていた設定を適切なデータ構造に置き換えただけです。</p>
 <p>現在の設定をJSON形式でみたい場合は</p>
-<pre class="code console literal-block">
-<span class="go">usg$ mca-ctrl -t dump-cfg</span>
-</pre>
-<p>で手に入れることができます。</p>
+<pre><code class="language-console" data-lang="console">usg$ mca-ctrl -t dump-cfg
+</code></pre><p>で手に入れることができます。</p>
 <p>現在の設定をJSON形式を参考にしながらWireGuard用のJSONを作りました。</p>
-</div>
-<div class="section" id="id3">
-<h2>配置</h2>
+<h1 id="配置">配置</h1>
 <p>ファイルを作るよりファイルを適切なパスに置く方が少し難しいです。</p>
-<p>UniFi Controllerをどこかのホストで動かしているのであれば <tt class="docutils literal"><span class="pre">&lt;unifi_base&gt;/data/sites/&lt;site_id&gt;</span></tt> に置くだけですが、うちの場合はUniFi Controllerがk8sのPodとして動作しています。</p>
-<p>UniFi Controllerのデプロイはhelmを使っていて <a class="reference external" href="https://github.com/helm/charts/tree/master/stable/unifi">Chart はstable</a> を使っています。
-このchartには <tt class="docutils literal">config.gateway.json</tt> を差し込む方法が用意されていないのでchartを修正する必要があります。</p>
-<div class="section" id="chart">
-<h3>chartの修正</h3>
-<ol class="arabic simple">
-<li>ConfigMapで <tt class="docutils literal">config.gateway.json</tt> を保持する</li>
-<li>Deploymentで <tt class="docutils literal"><span class="pre">/unifi/data/sites/&lt;site_id&gt;/config.gateway.json</span></tt> にマウントする</li>
+<p>UniFi Controllerをどこかのホストで動かしているのであれば <code>&lt;unifi_base&gt;/data/sites/&lt;site_id&gt;</code> に置くだけですが、うちの場合はUniFi Controllerがk8sのPodとして動作しています。</p>
+<p>UniFi Controllerのデプロイはhelmを使っていて <a href="https://github.com/helm/charts/tree/master/stable/unifi">Chart はstable</a> を使っています。
+このchartには <code>config.gateway.json</code> を差し込む方法が用意されていないのでchartを修正する必要があります。</p>
+<h2 id="chartの修正">chartの修正</h2>
+<ol>
+<li>ConfigMapで <code>config.gateway.json</code> を保持する</li>
+<li>Deploymentで <code>/unifi/data/sites/&lt;site_id&gt;/config.gateway.json</code> にマウントする</li>
 <li>DeploymentのPodTemplateにjsonファイルのハッシュ値を書き込んでおいて変更されたらPodを再作成するようにする</li>
 </ol>
 <p>という変更を加えます。</p>
 <p>helmでファイルを差し込むには現状chartをまるごと持ってくるしかないので自分のリポジトリにすべてコピーしてきましょう。</p>
 <p>実際に加えた変更はプライベートリポジトリなのでここではcommitをお見せすることは出来ません。
 代わりにdiffを載せておくのでこれを参考に修正してください。</p>
-<pre class="code diff literal-block">
-<span class="gh">diff --git a/chart/files/config.gateway.json b/chart/files/config.gateway.json
-</span>new file mode 100644
-<span class="gh">index 0000000..64020c6
-</span><span class="gd">--- /dev/null
-</span><span class="gi">+++ b/chart/files/config.gateway.json
-</span><span class="gu">&#64;&#64; -0,0 +1,2 &#64;&#64;
-</span><span class="gi">+{
-+}
-</span>\ No newline at end of file
-<span class="gh">diff --git a/chart/templates/configmap.yaml b/chart/templates/configmap.yaml
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">diff --git a/chart/files/config.gateway.json b/chart/files/config.gateway.json
+new file mode 100644
+index 0000000..64020c6
+<span style="color:#f92672">--- /dev/null
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/chart/files/config.gateway.json
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -0,0 +1,2 @@
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">+{
+</span><span style="color:#a6e22e">+}
+</span><span style="color:#a6e22e"></span>\ No newline at end of file
+diff --git a/chart/templates/configmap.yaml b/chart/templates/configmap.yaml
 index 463abb1..94723b2 100644
-</span><span class="gd">--- a/chart/templates/configmap.yaml
-</span><span class="gi">+++ b/chart/templates/configmap.yaml
-</span><span class="gu">&#64;&#64; -10,4 +10,18 &#64;&#64; metadata:
-</span>     app.kubernetes.io/managed-by: {{ .Release.Service }}
+<span style="color:#f92672">--- a/chart/templates/configmap.yaml
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/chart/templates/configmap.yaml
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -10,4 +10,18 @@ metadata:
+</span><span style="color:#75715e"></span>     app.kubernetes.io/managed-by: {{ .Release.Service }}
  data:
  {{ toYaml .Values.extraConfigFiles | indent 2 }}
-<span class="gi">+---
-</span> {{- end }}
-<span class="gi">+{{- if .Values.customSiteConfig }}
-+apiVersion: v1
-+kind: ConfigMap
-+metadata:
-+  name: {{ template &quot;unifi.fullname&quot; . }}-site
-+  labels:
-+    app.kubernetes.io/name: {{ include &quot;unifi.name&quot; . }}
-+    helm.sh/chart: {{ include &quot;unifi.chart&quot; . }}
-+    app.kubernetes.io/instance: {{ .Release.Name }}
-+    app.kubernetes.io/managed-by: {{ .Release.Service }}
-+data:
-+{{ (.Files.Glob &quot;files/config.gateway.json&quot;).AsConfig | indent 2 }}
-+{{- end }}
-</span>\ No newline at end of file
-<span class="gh">diff --git a/chart/templates/deployment.yaml b/chart/templates/deployment.yaml
+<span style="color:#a6e22e">+---
+</span><span style="color:#a6e22e"></span> {{- end }}
+<span style="color:#a6e22e">+{{- if .Values.customSiteConfig }}
+</span><span style="color:#a6e22e">+apiVersion: v1
+</span><span style="color:#a6e22e">+kind: ConfigMap
+</span><span style="color:#a6e22e">+metadata:
+</span><span style="color:#a6e22e">+  name: {{ template &#34;unifi.fullname&#34; . }}-site
+</span><span style="color:#a6e22e">+  labels:
+</span><span style="color:#a6e22e">+    app.kubernetes.io/name: {{ include &#34;unifi.name&#34; . }}
+</span><span style="color:#a6e22e">+    helm.sh/chart: {{ include &#34;unifi.chart&#34; . }}
+</span><span style="color:#a6e22e">+    app.kubernetes.io/instance: {{ .Release.Name }}
+</span><span style="color:#a6e22e">+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+</span><span style="color:#a6e22e">+data:
+</span><span style="color:#a6e22e">+{{ (.Files.Glob &#34;files/config.gateway.json&#34;).AsConfig | indent 2 }}
+</span><span style="color:#a6e22e">+{{- end }}
+</span><span style="color:#a6e22e"></span>\ No newline at end of file
+diff --git a/chart/templates/deployment.yaml b/chart/templates/deployment.yaml
 index c93d444..60082c8 100644
-</span><span class="gd">--- a/chart/templates/deployment.yaml
-</span><span class="gi">+++ b/chart/templates/deployment.yaml
-</span><span class="gu">&#64;&#64; -26,11 +26,9 &#64;&#64; spec:
-</span>       labels:
-         app.kubernetes.io/name: {{ include &quot;unifi.name&quot; . }}
+<span style="color:#f92672">--- a/chart/templates/deployment.yaml
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/chart/templates/deployment.yaml
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -26,11 +26,9 @@ spec:
+</span><span style="color:#75715e"></span>       labels:
+         app.kubernetes.io/name: {{ include &#34;unifi.name&#34; . }}
          app.kubernetes.io/instance: {{ .Release.Name }}
-<span class="gd">-      {{- if .Values.podAnnotations }}
-</span><span class="gi">+      {{- if .Values.customSiteConfig }}
-</span>       annotations:
-<span class="gd">-        {{- range $key, $value := .Values.podAnnotations }}
--        {{ $key }}: {{ $value | quote }}
--        {{- end }}
-</span><span class="gi">+        checksum/site-config: {{ .Files.Get &quot;files/config.gateway.json&quot; | sha256sum }}
-</span>       {{- end }}
+<span style="color:#f92672">-      {{- if .Values.podAnnotations }}
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+      {{- if .Values.customSiteConfig }}
+</span><span style="color:#a6e22e"></span>       annotations:
+<span style="color:#f92672">-        {{- range $key, $value := .Values.podAnnotations }}
+</span><span style="color:#f92672">-        {{ $key }}: {{ $value | quote }}
+</span><span style="color:#f92672">-        {{- end }}
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+        checksum/site-config: {{ .Files.Get &#34;files/config.gateway.json&#34; | sha256sum }}
+</span><span style="color:#a6e22e"></span>       {{- end }}
      spec:
        containers:
-<span class="gu">&#64;&#64; -118,6 +116,10 &#64;&#64; spec:
-</span>             - name: extra-config
+<span style="color:#75715e">@@ -118,6 +116,10 @@ spec:
+</span><span style="color:#75715e"></span>             - name: extra-config
                mountPath: /configmap
              {{- end }}
-<span class="gi">+            {{- if .Values.customSiteConfig }}
-+            - name: custom-site-config
-+              mountPath: /unifi/data/sites/default
-+            {{- end }}
-</span>           resources:
+<span style="color:#a6e22e">+            {{- if .Values.customSiteConfig }}
+</span><span style="color:#a6e22e">+            - name: custom-site-config
+</span><span style="color:#a6e22e">+              mountPath: /unifi/data/sites/default
+</span><span style="color:#a6e22e">+            {{- end }}
+</span><span style="color:#a6e22e"></span>           resources:
  {{ toYaml .Values.resources | indent 12 }}
        volumes:
-<span class="gu">&#64;&#64; -133,6 +135,11 &#64;&#64; spec:
-</span>           configMap:
-             name: {{ template &quot;unifi.fullname&quot; . }}
+<span style="color:#75715e">@@ -133,6 +135,11 @@ spec:
+</span><span style="color:#75715e"></span>           configMap:
+             name: {{ template &#34;unifi.fullname&#34; . }}
          {{- end }}
-<span class="gi">+        {{- if .Values.customSiteConfig }}
-+        - name: custom-site-config
-+          configMap:
-+            name: {{ template &quot;unifi.fullname&quot; . }}-site
-+        {{- end }}
-</span>     {{- with .Values.nodeSelector }}
+<span style="color:#a6e22e">+        {{- if .Values.customSiteConfig }}
+</span><span style="color:#a6e22e">+        - name: custom-site-config
+</span><span style="color:#a6e22e">+          configMap:
+</span><span style="color:#a6e22e">+            name: {{ template &#34;unifi.fullname&#34; . }}-site
+</span><span style="color:#a6e22e">+        {{- end }}
+</span><span style="color:#a6e22e"></span>     {{- with .Values.nodeSelector }}
        nodeSelector:
  {{ toYaml . | indent 8 }}
-<span class="gh">diff --git a/chart/values.yaml b/chart/values.yaml
+diff --git a/chart/values.yaml b/chart/values.yaml
 index 4609dbd..f0bccad 100644
-</span><span class="gd">--- a/chart/values.yaml
-</span><span class="gi">+++ b/chart/values.yaml
-</span><span class="gu">&#64;&#64; -244,6 +244,8 &#64;&#64; extraConfigFiles: {}
-</span>   #     &lt;/Loggers&gt;
+<span style="color:#f92672">--- a/chart/values.yaml
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/chart/values.yaml
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -244,6 +244,8 @@ extraConfigFiles: {}
+</span><span style="color:#75715e"></span>   #     &lt;/Loggers&gt;
    #   &lt;/Configuration&gt;
-
-<span class="gi">+customSiteConfig: false
-+
-</span> resources: {}
+ 
+<span style="color:#a6e22e">+customSiteConfig: false
+</span><span style="color:#a6e22e">+
+</span><span style="color:#a6e22e"></span> resources: {}
    # We usually recommend not to specify default resources and to leave this as a conscious
    # choice for the user. This also increases chances charts run on environments with little
-</pre>
-</div>
-</div>
-<div class="section" id="id4">
-<h2>反映</h2>
+</code></pre></div><h1 id="反映">反映</h1>
 <p>jsonを更新してコントローラを再起動しただけだと反映しないはずです。</p>
-<p>強制的に反映させるには <tt class="docutils literal">Devices <span class="pre">-&gt;</span> Security Gateway <span class="pre">-&gt;</span> Config <span class="pre">-&gt;</span> Manage Device <span class="pre">-&gt;</span> Force Provision</tt> を行う必要があります。</p>
-</div>
-<div class="section" id="id5">
-<h2>参考</h2>
-<ul class="simple">
-<li><a class="reference external" href="https://help.ui.com/hc/en-us/articles/215458888-UniFi-USG-Advanced-Configuration-Using-config-gateway-json">https://help.ui.com/hc/en-us/articles/215458888-UniFi-USG-Advanced-Configuration-Using-config-gateway-json</a></li>
-<li><a class="reference external" href="https://graham.hayes.ie/posts/wireguard-%2B-unifi/">https://graham.hayes.ie/posts/wireguard-%2B-unifi/</a></li>
+<p>強制的に反映させるには <code>Devices -&gt; Security Gateway -&gt; Config -&gt; Manage Device -&gt; Force Provision</code> を行う必要があります。</p>
+<h1 id="参考">参考</h1>
+<ul>
+<li><a href="https://help.ui.com/hc/en-us/articles/215458888-UniFi-USG-Advanced-Configuration-Using-config-gateway-json">https://help.ui.com/hc/en-us/articles/215458888-UniFi-USG-Advanced-Configuration-Using-config-gateway-json</a></li>
+<li><a href="https://graham.hayes.ie/posts/wireguard-%2B-unifi/">https://graham.hayes.ie/posts/wireguard-%2B-unifi/</a></li>
 </ul>
-</div>
-</div>
+
   </section>
   <footer>
     

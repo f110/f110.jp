@@ -59,111 +59,90 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>自宅のKubernetesクラスタはLoadBalancerとしてMetalLBを使っていてExternalIPはARPを使って広報しています。</p>
+    <p>自宅のKubernetesクラスタはLoadBalancerとしてMetalLBを使っていてExternalIPはARPを使って広報しています。</p>
 <p>自宅で使う上では特にこれで不満もないけども上位のルータがBGPを喋ることができるのでせっかくなのでBGPで広報するレンジも追加してみました。</p>
 <p>その一連の作業ですがBGPで広報する必要がなければARPで十分だと思います。
 今は2つのレンジを使っていますがBGPだけにしようとは考えてないです。</p>
-<div class="section" id="unifi-security-gateway">
-<h2>UniFi Security Gateway側</h2>
+<h1 id="unifi-security-gateway側">UniFi Security Gateway側</h1>
 <p>まずはUSG側でBGPを話せるようにする必要があるので以下の設定をします。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> configure
-<span class="gp">$</span> <span class="nb">set</span> protocols bgp <span class="m">64512</span> parameters router-id <span class="m">192</span>.168.1.1
-<span class="gp">$</span> commit
-<span class="gp">$</span> save
-</pre>
-<p>ついでにneighborも設定しておきます。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> <span class="nb">set</span> protocols bgp <span class="m">64512</span> neighbor <span class="m">192</span>.168.100.2 remote-as <span class="m">64513</span>
-<span class="gp">$</span> <span class="nb">set</span> protocols bgp <span class="m">64512</span> neighbor <span class="m">192</span>.168.100.3 remote-as <span class="m">64513</span>
-</pre>
-<p>今回はルータ側を64512、MetalLB側を64513のeBGPにしています。</p>
+<pre><code class="language-console" data-lang="console">$ configure
+$ set protocols bgp 64512 parameters router-id 192.168.1.1
+$ commit
+$ save
+</code></pre><p>ついでにneighborも設定しておきます。</p>
+<pre><code class="language-console" data-lang="console">$ set protocols bgp 64512 neighbor 192.168.100.2 remote-as 64513
+$ set protocols bgp 64512 neighbor 192.168.100.3 remote-as 64513
+</code></pre><p>今回はルータ側を64512、MetalLB側を64513のeBGPにしています。</p>
 <p>もちろんこのままだとコントローラのプロビジョニングやアップデートで戻ってしまうのでJSONに書いておきます。</p>
-<pre class="code console literal-block">
-<span class="go">{
-        &quot;protocols&quot;: {
-                &quot;bgp&quot;: {
-                        &quot;64512&quot;: {
-                                &quot;neighbor&quot;: {
-                                        &quot;192.168.100.2&quot;: {
-                                        &quot;remote-as&quot;: &quot;64513&quot;
-                                        },
-                                        &quot;192.168.100.3&quot;: {
-                                                &quot;remote-as&quot;: &quot;64513&quot;
-                                        }
-                                },
-                                &quot;parameters&quot;: {
-                                        &quot;router-id&quot;: &quot;192.168.1.1&quot;
-                                }
-                        }
-                }
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#f92672">&#34;protocols&#34;</span>: {
+    <span style="color:#f92672">&#34;bgp&#34;</span>: {
+      <span style="color:#f92672">&#34;64512&#34;</span>: {
+        <span style="color:#f92672">&#34;neighbor&#34;</span>: {
+          <span style="color:#f92672">&#34;192.168.100.2&#34;</span>: {
+          <span style="color:#f92672">&#34;remote-as&#34;</span>: <span style="color:#e6db74">&#34;64513&#34;</span>
+          },
+          <span style="color:#f92672">&#34;192.168.100.3&#34;</span>: {
+            <span style="color:#f92672">&#34;remote-as&#34;</span>: <span style="color:#e6db74">&#34;64513&#34;</span>
+          }
+        },
+        <span style="color:#f92672">&#34;parameters&#34;</span>: {
+          <span style="color:#f92672">&#34;router-id&#34;</span>: <span style="color:#e6db74">&#34;192.168.1.1&#34;</span>
         }
-}</span>
-</pre>
-<p>これらの設定を反映してUSG側でneighborの情報が見れれば大丈夫です。
+      }
+    }
+  }
+}
+</code></pre></div><p>これらの設定を反映してUSG側でneighborの情報が見れれば大丈夫です。
 この時点で実際のneighborがいないのでBGPのstateはEstablishedにはなりません。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> show ip bgp neighbor
-</pre>
-</div>
-<div class="section" id="metallb">
-<h2>MetalLB側</h2>
+<pre><code class="language-console" data-lang="console">$ show ip bgp neighbor
+</code></pre><h1 id="metallb側">MetalLB側</h1>
 <p>ConfigMapにMetalLBが使用するアドレスのレンジが書かれているのでこれを変更します。</p>
-<pre class="code yaml literal-block">
-<span class="nt">apiVersion</span><span class="p">:</span> <span class="l-Scalar-Plain">v1</span>
-<span class="nt">kind</span><span class="p">:</span> <span class="l-Scalar-Plain">ConfigMap</span>
-<span class="nt">metadata</span><span class="p">:</span>
-  <span class="nt">namespace</span><span class="p">:</span> <span class="l-Scalar-Plain">metallb-system</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">config</span>
-<span class="nt">data</span><span class="p">:</span>
-  <span class="nt">config</span><span class="p">:</span> <span class="p-Indicator">|</span>
-    <span class="no">address-pools:</span>
-      <span class="no">- name: default</span>
-        <span class="no">protocol: layer2</span>
-        <span class="no">addresses:</span>
-          <span class="no">- 192.168.100.128/25</span>
-      <span class="no">- name: bgp</span>
-        <span class="no">protocol: bgp</span>
-        <span class="no">addresses:</span>
-          <span class="no">- 192.168.101.0/24</span>
-        <span class="no">auto-assign: false</span>
-        <span class="no">avoid-buggy-ips: true</span>
-    <span class="no">peers:</span>
-      <span class="no">- peer-address: 192.168.1.1</span>
-        <span class="no">peer-asn: 64512</span>
-        <span class="no">my-asn: 64513</span>
-</pre>
-<p><tt class="docutils literal"><span class="pre">address-pools</span></tt> に <tt class="docutils literal">protocol: bgp</tt> な要素を追加するのと <tt class="docutils literal">peers</tt> に自分とピアの設定をしておきます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: ConfigMap
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">namespace</span>: metallb-system
+  <span style="color:#66d9ef">name</span>: config
+<span style="color:#66d9ef">data</span>:
+  <span style="color:#66d9ef">config</span>: <span style="color:#e6db74">|
+</span><span style="color:#e6db74">    address-pools:</span>
+      - <span style="color:#66d9ef">name</span>: default
+        <span style="color:#66d9ef">protocol</span>: layer2
+        <span style="color:#66d9ef">addresses</span>:
+          - <span style="color:#ae81ff">192.168.100.128</span>/<span style="color:#ae81ff">25</span>
+      - <span style="color:#66d9ef">name</span>: bgp
+        <span style="color:#66d9ef">protocol</span>: bgp
+        <span style="color:#66d9ef">addresses</span>:
+          - <span style="color:#ae81ff">192.168.101.0</span>/<span style="color:#ae81ff">24</span>
+        <span style="color:#66d9ef">auto-assign</span>: <span style="color:#66d9ef">false</span>
+        <span style="color:#66d9ef">avoid-buggy-ips</span>: <span style="color:#66d9ef">true</span>
+    <span style="color:#66d9ef">peers</span>:
+      - <span style="color:#66d9ef">peer-address</span>: <span style="color:#ae81ff">192.168.1.1</span>
+        <span style="color:#66d9ef">peer-asn</span>: <span style="color:#ae81ff">64512</span>
+        <span style="color:#66d9ef">my-asn</span>: <span style="color:#ae81ff">64513</span>
+</code></pre></div><p><code>address-pools</code> に <code>protocol: bgp</code> な要素を追加するのと <code>peers</code> に自分とピアの設定をしておきます。</p>
 <p>後はこれをapplyすればMetalLBのコントローラが自動的に読み込み直します。</p>
-<p>BGPのレンジは <tt class="docutils literal"><span class="pre">auto-assign:</span> false</tt> なので明示しない限り使われません。</p>
-</div>
-<div class="section" id="id1">
-<h2>動作テスト</h2>
+<p>BGPのレンジは <code>auto-assign: false</code> なので明示しない限り使われません。</p>
+<h1 id="動作テスト">動作テスト</h1>
 <p>まずはServiceを作ります。</p>
 <p>既存の動作しているServiceの定義を持ってきて修正を加えるのがいいと思います。</p>
-<pre class="code yaml literal-block">
-<span class="nt">apiVersion</span><span class="p">:</span> <span class="l-Scalar-Plain">v1</span>
-<span class="nt">kind</span><span class="p">:</span> <span class="l-Scalar-Plain">Service</span>
-<span class="nt">metadata</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">test</span>
-<span class="nt">spec</span><span class="p">:</span>
-  <span class="nt">type</span><span class="p">:</span> <span class="l-Scalar-Plain">LoadBalancer</span>
-  <span class="nt">loadBalancerIP</span><span class="p">:</span> <span class="l-Scalar-Plain">192.168.101.32</span>
-  <span class="nt">ports</span><span class="p">:</span>
-  <span class="p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l-Scalar-Plain">http</span>
-    <span class="nt">port</span><span class="p">:</span> <span class="l-Scalar-Plain">80</span>
-    <span class="nt">protocol</span><span class="p">:</span> <span class="l-Scalar-Plain">TCP</span>
-    <span class="nt">targetPort</span><span class="p">:</span> <span class="l-Scalar-Plain">4002</span>
-  <span class="nt">selector</span><span class="p">:</span>
-    <span class="nt">app</span><span class="p">:</span> <span class="l-Scalar-Plain">proxy</span>
-</pre>
-<p>例えばこのような定義を書きます。 <tt class="docutils literal">loadBalancerIP</tt> で新しいアドレスのレンジ内を指定するのがポイントです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: Service
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: test
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">type</span>: LoadBalancer
+  <span style="color:#66d9ef">loadBalancerIP</span>: <span style="color:#ae81ff">192.168.101.32</span>
+  <span style="color:#66d9ef">ports</span>:
+  - <span style="color:#66d9ef">name</span>: http
+    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">80</span>
+    <span style="color:#66d9ef">protocol</span>: TCP
+    <span style="color:#66d9ef">targetPort</span>: <span style="color:#ae81ff">4002</span>
+  <span style="color:#66d9ef">selector</span>:
+    <span style="color:#66d9ef">app</span>: proxy
+</code></pre></div><p>例えばこのような定義を書きます。 <code>loadBalancerIP</code> で新しいアドレスのレンジ内を指定するのがポイントです。</p>
 <p>このyamlをapplyすればUSG側から広報された経路を見ることができるはずです。</p>
-<pre class="code literal-block">
-admin&#64;SecurityGateway:~$ show ip bgp
+<pre><code>admin@SecurityGateway:~$ show ip bgp
 BGP table version is 0, local router ID is 192.168.1.1
 Status codes: s suppressed, d damped, h history, * valid, &gt; best, i - internal,
               r RIB-failure, S Stale, R Removed
@@ -173,22 +152,16 @@ Origin codes: i - IGP, e - EGP, ? - incomplete
 *  192.168.101.32/32
                     192.168.100.3                          0 64513 ?
 *                   192.168.100.2                          0 64513 ?
-</pre>
-<p>もし経路が広報されてこない場合はServiceの裏にいるPodがReadyかどうか確認してみてください。
+</code></pre><p>もし経路が広報されてこない場合はServiceの裏にいるPodがReadyかどうか確認してみてください。
 Podが全てUnhealthyでトラフィックをバランシング出来ない場合、MetalLBは経路を広報しません。</p>
-</div>
-<div class="section" id="id2">
-<h2>なぜ全て切り替えないのか</h2>
+<h1 id="なぜ全て切り替えないのか">なぜ全て切り替えないのか</h1>
 <p>自宅ではARPで十分。</p>
-</div>
-<div class="section" id="id3">
-<h2>参考</h2>
-<ul class="simple">
-<li><a class="reference external" href="http://blog.cowger.us/2019/02/10/using-metallb-with-the-unifi-usg-for-in-home-kubernetes-loadbalancer-services.html">http://blog.cowger.us/2019/02/10/using-metallb-with-the-unifi-usg-for-in-home-kubernetes-loadbalancer-services.html</a></li>
-<li><a class="reference external" href="https://medium.com/&#64;ipuustin/using-metallb-as-kubernetes-load-balancer-with-ubiquiti-edgerouter-7ff680e9dca3">https://medium.com/&#64;ipuustin/using-metallb-as-kubernetes-load-balancer-with-ubiquiti-edgerouter-7ff680e9dca3</a></li>
+<h1 id="参考">参考</h1>
+<ul>
+<li><a href="http://blog.cowger.us/2019/02/10/using-metallb-with-the-unifi-usg-for-in-home-kubernetes-loadbalancer-services.html">http://blog.cowger.us/2019/02/10/using-metallb-with-the-unifi-usg-for-in-home-kubernetes-loadbalancer-services.html</a></li>
+<li><a href="https://medium.com/@ipuustin/using-metallb-as-kubernetes-load-balancer-with-ubiquiti-edgerouter-7ff680e9dca3">https://medium.com/@ipuustin/using-metallb-as-kubernetes-load-balancer-with-ubiquiti-edgerouter-7ff680e9dca3</a></li>
 </ul>
-</div>
-</div>
+
   </section>
   <footer>
     

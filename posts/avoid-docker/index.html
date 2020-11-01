@@ -57,19 +57,13 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>皆さんはdockerを使っていますか？使っていますよね？
+    <p>皆さんはdockerを使っていますか？使っていますよね？
 でもその使い方、本当にdockerじゃないとダメですか？</p>
-<div class="section" id="docker">
-<h2>自分のdockerの使い方</h2>
-<p>ほぼ <tt class="docutils literal">docker build</tt> か <tt class="docutils literal">docker run <span class="pre">--rm</span> <span class="pre">-it</span></tt> しかしません。
+<h1 id="自分のdockerの使い方">自分のdockerの使い方</h1>
+<p>ほぼ <code>docker build</code> か <code>docker run --rm -it</code> しかしません。
 runする場合もOSのパッケージングを調べるだとかその程度です。</p>
 <p>この使い方にdockerは果たして必要なのでしょうか？</p>
-</div>
-<div class="section" id="id1">
-<h2>dockerはコンテナランタイムではない</h2>
+<h1 id="dockerはコンテナランタイムではない">dockerはコンテナランタイムではない</h1>
 <p>当初、dockerはコンテナランタイムでした。
 しかし今はもう違います。</p>
 <p>dockerはコンテナを扱うパッケージソフトウェアといえる立ち位置にいます。
@@ -78,19 +72,16 @@ runする場合もOSのパッケージングを調べるだとかその程度で
 <p>ちょっとコンテナを実行して中身を確認したいとか、ちょっとコマンドが使ってみたいくらいであればコンテナランタイムさえあれば十分です。</p>
 <p>なのに大きなソフトウェアであるdockerをインストールする必要があるでしょうか？
 もしdockerを使わずに困らないのであれば頑張ってdockerを入れる必要はないのです。</p>
-</div>
-<div class="section" id="containerd">
-<h2>そこでcontainerd</h2>
+<h1 id="そこでcontainerd">そこでcontainerd</h1>
 <p>だったらdockerのランタイム部分のcontainerdだけを使えばいいです。
 ちょっとコンテナを走らせるくらいであればdockerを使わずに素のcontainerdを使っても特に問題ありません。</p>
-<p><tt class="docutils literal">docker build</tt> はBazelで行うようにします。</p>
+<p><code>docker build</code> はBazelで行うようにします。</p>
 <p>自宅で24時間起動しているマシンのうち1台はcontainerdのみをインストールしました。
 他のマシンはまだdockerが動いていますが、次にセットアップする時にcontainerdにしようと思っています。</p>
 <p>一方通常利用しているLinuxデスクトップマシンはdockerをインストールしたままです。
-<tt class="docutils literal">ctr</tt> コマンドは使えるのでdockerをバイパスしてcontainerdを利用するようにしています。
+<code>ctr</code> コマンドは使えるのでdockerをバイパスしてcontainerdを利用するようにしています。
 ただデスクトップマシンでコンテナを動かすことは稀なのでそもそもほとんどコンテナの操作はしません。</p>
-</div>
-</div>
+
   </section>
   <footer>
     

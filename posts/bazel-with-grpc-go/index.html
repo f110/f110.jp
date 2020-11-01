@@ -59,16 +59,12 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p><a class="reference external" href="https://bazel.build">Bazel</a> をGoのプロジェクトで使っている際に多くの人が悩むのがProtocol Buffersの扱い。
+    <p><a href="https://bazel.build">Bazel</a> をGoのプロジェクトで使っている際に多くの人が悩むのがProtocol Buffersの扱い。
 gRPCを使っているリポジトリでBazelとgrpc-goを仲良くさせる方法をご紹介します。</p>
-<div class="section" id="id1">
-<h2>Bazelとは</h2>
-<p><a class="reference external" href="../integration-test-with-bazel">前の記事</a> を参照してください。</p>
+<h1 id="bazelとは">Bazelとは</h1>
+<p><a href="../integration-test-with-bazel">前の記事</a> を参照してください。</p>
 <p>Googleが中心となって開発している</p>
-<ul class="simple">
+<ul>
 <li>ビルドを独自のサンドボックス環境の中で行う</li>
 <li>ビルドの再現性が高い（サンドボックスの中で行われるので）</li>
 <li>高速</li>
@@ -76,102 +72,89 @@ gRPCを使っているリポジトリでBazelとgrpc-goを仲良くさせる方�
 <li>拡張性が高い</li>
 </ul>
 <p>というような特徴を持ったビルドツールです。</p>
-</div>
-<div class="section" id="protocol-buffers">
-<h2>Protocol Buffersをどう扱うか</h2>
-<p><a class="reference external" href="https://medium.com/mixi-developers/bazel%E3%81%A8%E3%83%A2%E3%83%8E%E3%83%AC%E3%83%9D-b901ffba61ce">以前書いた</a> 方針から変わっていません。
+<h1 id="protocol-buffersをどう扱うか">Protocol Buffersをどう扱うか</h1>
+<p><a href="https://medium.com/mixi-developers/bazel%E3%81%A8%E3%83%A2%E3%83%8E%E3%83%AC%E3%83%9D-b901ffba61ce">以前書いた</a> 方針から変わっていません。
 protoファイルは生成されたソースコードもリポジトリに含めてしまいます。
 生成されたソースコードをリポジトリに入れてしまうのは主にエディタのコード補完のためです。</p>
 <p>生成されたソースコードはサンドボックスの中に閉じ込められてしまうのでサンドボックスから救出してあげる必要があります。
-Bazelとは別に <tt class="docutils literal">protoc</tt> や <tt class="docutils literal"><span class="pre">protoc-gen-go</span></tt> を用意してそれでソースコードを生成することもできますが、複数の開発者がいる場合はバージョンの差異で余計なことに悩むことになるはずです。
+Bazelとは別に <code>protoc</code> や <code>protoc-gen-go</code> を用意してそれでソースコードを生成することもできますが、複数の開発者がいる場合はバージョンの差異で余計なことに悩むことになるはずです。
 なのでできるだけBazelが用意するProtocol Buffersのコンパイラを使うようにして全員の環境を揃えたいところです。</p>
-</div>
-<div class="section" id="id4">
-<h2>方針</h2>
-<ol class="arabic simple">
-<li>Bazelが用意する <tt class="docutils literal">protoc</tt> でコンパイルする</li>
+<h1 id="方針">方針</h1>
+<ol>
+<li>Bazelが用意する <code>protoc</code> でコンパイルする</li>
 <li>コンパイル結果をサンドボックスの中から救う</li>
 </ol>
-</div>
-<div class="section" id="id5">
-<h2>Bazelにコンパイルさせる</h2>
+<h1 id="bazelにコンパイルさせる">Bazelにコンパイルさせる</h1>
 <p>Bazelにコンパイルさせるとサンドボックスの中に閉じ込められてしまいますが、まずはなにはともあれコンパイルさせます。
 コンパイルした結果をサンドボックスから救出するという方針でやります。</p>
-<p><tt class="docutils literal">gazelle:proto disable_proto</tt> を <a class="reference external" href="https://github.com/f110/bazel-example/blob/24d674c020ca4895247bd614785fd3d728c33fe6/build/root/BUILD.bazel#L4">指定している</a> のでproto関連のルールは手動で各必要があります。</p>
-<pre class="code python literal-block">
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;io_bazel_rules_go//proto:def.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;go_proto_library&quot;</span><span class="p">)</span>
+<p><code>gazelle:proto disable_proto</code> を <a href="https://github.com/f110/bazel-example/blob/24d674c020ca4895247bd614785fd3d728c33fe6/build/root/BUILD.bazel#L4">指定している</a> のでproto関連のルールは手動で各必要があります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;@io_bazel_rules_go//proto:def.bzl&#34;</span>, <span style="color:#e6db74">&#34;go_proto_library&#34;</span>)
 
-<span class="n">proto_library</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;helloworld_proto&quot;</span><span class="p">,</span>
-    <span class="n">srcs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;helloworld.proto&quot;</span><span class="p">],</span>
-    <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">],</span>
-<span class="p">)</span>
+proto_library(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helloworld_proto&#34;</span>,
+    srcs <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;helloworld.proto&#34;</span>],
+    visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:public&#34;</span>],
+)
 
-<span class="n">go_proto_library</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;helloworld_go_proto&quot;</span><span class="p">,</span>
-    <span class="n">compilers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&#64;io_bazel_rules_go//proto:go_grpc&quot;</span><span class="p">],</span>
-    <span class="n">importpath</span> <span class="o">=</span> <span class="s2">&quot;github.com/f110/bazel-example/tools/rpc/helloworld&quot;</span><span class="p">,</span>
-    <span class="n">proto</span> <span class="o">=</span> <span class="s2">&quot;:helloworld_proto&quot;</span><span class="p">,</span>
-    <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:private&quot;</span><span class="p">],</span>
-<span class="p">)</span>
-</pre>
-<p>ファイルが数個であれば手動で書けるレベルだとは思います。この手のルールを書くことに不慣れな人は gazelle でルールを生成するようにして1度だけ実行してみるといいと思います。</p>
-</div>
-<div class="section" id="id7">
-<h2>カスタムルールを作る</h2>
-<p>サンドボックスから生成されたファイルを救出するためのビルドルールを用意します。 <a class="reference external" href="https://github.com/f110/bazel-example/blob/21a356c81341a3bb0cdab41ffe3064e18ecca03d/build/rules/go/proto.bzl">（全体）</a></p>
-<pre class="code python literal-block">
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;bazel_skylib//lib:shell.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;shell&quot;</span><span class="p">)</span>
+go_proto_library(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helloworld_go_proto&#34;</span>,
+    compilers <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;@io_bazel_rules_go//proto:go_grpc&#34;</span>],
+    importpath <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;github.com/f110/bazel-example/tools/rpc/helloworld&#34;</span>,
+    proto <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;:helloworld_proto&#34;</span>,
+    visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:private&#34;</span>],
+)
+</code></pre></div><p>ファイルが数個であれば手動で書けるレベルだとは思います。この手のルールを書くことに不慣れな人は gazelle でルールを生成するようにして1度だけ実行してみるといいと思います。</p>
+<h1 id="カスタムルールを作る">カスタムルールを作る</h1>
+<p>サンドボックスから生成されたファイルを救出するためのビルドルールを用意します。 <a href="https://github.com/f110/bazel-example/blob/21a356c81341a3bb0cdab41ffe3064e18ecca03d/build/rules/go/proto.bzl">（全体）</a></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;@bazel_skylib//lib:shell.bzl&#34;</span>, <span style="color:#e6db74">&#34;shell&#34;</span>)
 
-<span class="k">def</span> <span class="nf">_proto_gen_impl</span><span class="p">(</span><span class="n">ctx</span><span class="p">):</span>
-    <span class="n">generated</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">attr</span><span class="o">.</span><span class="n">src</span><span class="p">[</span><span class="n">OutputGroupInfo</span><span class="p">]</span><span class="o">.</span><span class="n">go_generated_srcs</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
-    <span class="n">substitutions</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;&#64;&#64;FROM&#64;&#64;&quot;</span><span class="p">:</span> <span class="n">shell</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">generated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">path</span><span class="p">),</span>
-        <span class="s2">&quot;&#64;&#64;TO&#64;&#64;&quot;</span><span class="p">:</span> <span class="n">shell</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">attr</span><span class="o">.</span><span class="n">dir</span><span class="p">),</span>
-    <span class="p">}</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">declare_file</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.sh&quot;</span><span class="p">)</span>
-    <span class="n">ctx</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">expand_template</span><span class="p">(</span>
-        <span class="n">template</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_template</span><span class="p">,</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">out</span><span class="p">,</span>
-        <span class="n">substitutions</span> <span class="o">=</span> <span class="n">substitutions</span><span class="p">,</span>
-        <span class="n">is_executable</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">runfiles</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">runfiles</span><span class="p">(</span><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">generated</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
-    <span class="k">return</span> <span class="p">[</span>
-        <span class="n">DefaultInfo</span><span class="p">(</span>
-            <span class="n">runfiles</span> <span class="o">=</span> <span class="n">runfiles</span><span class="p">,</span>
-            <span class="n">executable</span> <span class="o">=</span> <span class="n">out</span><span class="p">,</span>
-        <span class="p">),</span>
-    <span class="p">]</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">_proto_gen_impl</span>(ctx):
+    generated <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>attr<span style="color:#f92672">.</span>src[OutputGroupInfo]<span style="color:#f92672">.</span>go_generated_srcs<span style="color:#f92672">.</span>to_list()
+    substitutions <span style="color:#f92672">=</span> {
+        <span style="color:#e6db74">&#34;@@FROM@@&#34;</span>: shell<span style="color:#f92672">.</span>quote(generated[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">.</span>path),
+        <span style="color:#e6db74">&#34;@@TO@@&#34;</span>: shell<span style="color:#f92672">.</span>quote(ctx<span style="color:#f92672">.</span>attr<span style="color:#f92672">.</span>dir),
+    }
+    out <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>declare_file(ctx<span style="color:#f92672">.</span>label<span style="color:#f92672">.</span>name <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.sh&#34;</span>)
+    ctx<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>expand_template(
+        template <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>file<span style="color:#f92672">.</span>_template,
+        output <span style="color:#f92672">=</span> out,
+        substitutions <span style="color:#f92672">=</span> substitutions,
+        is_executable <span style="color:#f92672">=</span> True,
+    )
+    runfiles <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>runfiles(files <span style="color:#f92672">=</span> [generated[<span style="color:#ae81ff">0</span>]])
+    <span style="color:#66d9ef">return</span> [
+        DefaultInfo(
+            runfiles <span style="color:#f92672">=</span> runfiles,
+            executable <span style="color:#f92672">=</span> out,
+        ),
+    ]
 
-<span class="n">_proto_gen</span> <span class="o">=</span> <span class="n">rule</span><span class="p">(</span>
-    <span class="n">implementation</span> <span class="o">=</span> <span class="n">_proto_gen_impl</span><span class="p">,</span>
-    <span class="n">executable</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;dir&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">string</span><span class="p">(),</span>
-        <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">label</span><span class="p">(),</span>
-        <span class="s2">&quot;_template&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">label</span><span class="p">(</span>
-            <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;//build/rules/go:move-into-workspace.bash&quot;</span><span class="p">,</span>
-            <span class="n">allow_single_file</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="p">),</span>
-    <span class="p">},</span>
-<span class="p">)</span>
+_proto_gen <span style="color:#f92672">=</span> rule(
+    implementation <span style="color:#f92672">=</span> _proto_gen_impl,
+    executable <span style="color:#f92672">=</span> True,
+    attrs <span style="color:#f92672">=</span> {
+        <span style="color:#e6db74">&#34;dir&#34;</span>: attr<span style="color:#f92672">.</span>string(),
+        <span style="color:#e6db74">&#34;src&#34;</span>: attr<span style="color:#f92672">.</span>label(),
+        <span style="color:#e6db74">&#34;_template&#34;</span>: attr<span style="color:#f92672">.</span>label(
+            default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;//build/rules/go:move-into-workspace.bash&#34;</span>,
+            allow_single_file <span style="color:#f92672">=</span> True,
+        ),
+    },
+)
 
-<span class="k">def</span> <span class="nf">proto_gen</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;dir&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-        <span class="nb">dir</span> <span class="o">=</span> <span class="n">native</span><span class="o">.</span><span class="n">package_name</span><span class="p">()</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dir</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">proto_gen</span>(name, <span style="color:#f92672">**</span>kwargs):
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> <span style="color:#e6db74">&#34;dir&#34;</span> <span style="color:#f92672">in</span> kwargs:
+        dir <span style="color:#f92672">=</span> native<span style="color:#f92672">.</span>package_name()
+        kwargs[<span style="color:#e6db74">&#34;dir&#34;</span>] <span style="color:#f92672">=</span> dir
 
-    <span class="n">_proto_gen</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</pre>
-<p>ファイルを救出するだけなのでやっていることは非常に単純でファイルをコピーするだけです。
+    _proto_gen(name <span style="color:#f92672">=</span> name, <span style="color:#f92672">**</span>kwargs)
+</code></pre></div><p>ファイルを救出するだけなのでやっていることは非常に単純でファイルをコピーするだけです。
 ただし救出するファイル自体もサンドボックスに閉じ込める必要があります。
 どういうことかと言うと、Bazelはターゲットごとに別のサンドボックスを用意します。
 つまりファイルをコピーするターゲットに生成されたソースコードを含めなければいけません。
 そのために少しビルド定義を書く必要があります。</p>
-<p>[サンプルリポジトリ](<a class="reference external" href="https://github.com/f110/bazel-example">https://github.com/f110/bazel-example</a>) で上のルールを実行した時のサンドボックス内は以下のようになります</p>
-<pre class="code literal-block">
-bazel-bin/tools/rpc/helloworld/gen.sh.runfiles/__main__
+<p><a href="https://github.com/f110/bazel-example">サンプルリポジトリ</a> で上のルールを実行した時のサンドボックス内は以下のようになります</p>
+<pre><code>bazel-bin/tools/rpc/helloworld/gen.sh.runfiles/__main__
 └── tools
     └── rpc
         └── helloworld
@@ -185,34 +168,25 @@ bazel-bin/tools/rpc/helloworld/gen.sh.runfiles/__main__
                                     └── rpc
                                         └── helloworld
                                             └── helloworld.pb.go
-</pre>
-<p><tt class="docutils literal">helloworld.pb.go</tt> のパスは <tt class="docutils literal"><span class="pre">ctx.attr.src[OutputGroupInfo].go_generated_srcs.to_list()[0].path</span></tt> に入っています。
-コピー先は <tt class="docutils literal">native.package_name()</tt> を取ることでWORKSPACEからターゲットまでのパスを手に入れることができます。
+</code></pre><p><code>helloworld.pb.go</code> のパスは <code>ctx.attr.src[OutputGroupInfo].go_generated_srcs.to_list()[0].path</code> に入っています。
+コピー先は <code>native.package_name()</code> を取ることでWORKSPACEからターゲットまでのパスを手に入れることができます。
 あとはこれらを組み合わせてファイルをコピーします。簡単ですね！</p>
-<pre class="code python literal-block">
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;//build/rules/go:proto.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;proto_gen&quot;</span><span class="p">)</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;//build/rules/go:proto.bzl&#34;</span>, <span style="color:#e6db74">&#34;proto_gen&#34;</span>)
 
-<span class="n">proto_gen</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;gen&quot;</span><span class="p">,</span>
-    <span class="n">src</span> <span class="o">=</span> <span class="s2">&quot;:helloworld_go_proto&quot;</span><span class="p">,</span>
-    <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">],</span>
-<span class="p">)</span>
-</pre>
-<p><tt class="docutils literal">src</tt> に <tt class="docutils literal">go_proto_library</tt> のターゲットを指定するだけです。
-サンプルリポジトリであれば <tt class="docutils literal">bazel run //tools/rpc/helloworld:gen</tt> で <tt class="docutils literal">helloworld.pb.go</tt> がリポジトリ内にコピーされてきます。</p>
-</div>
-<div class="section" id="id9">
-<h2>ワンライナーを用意して仕上げ</h2>
-<p>protoが複数のパッケージに分散している場合など、いちいち <tt class="docutils literal">bazel run</tt> していくのは面倒なのでワンライナーを用意しておきましょう。</p>
-<pre class="code shell literal-block">
-$ bazel query <span class="s1">'attr(generator_function, proto_gen, //...)'</span> <span class="p">|</span> xargs -n1 bazel run
-</pre>
-<p>これでリポジトリ内の <tt class="docutils literal">proto_gen</tt> を全て実行することができます。
+proto_gen(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;gen&#34;</span>,
+    src <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;:helloworld_go_proto&#34;</span>,
+    visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:public&#34;</span>],
+)
+</code></pre></div><p><code>src</code> に <code>go_proto_library</code> のターゲットを指定するだけです。
+サンプルリポジトリであれば <code>bazel run //tools/rpc/helloworld:gen</code> で <code>helloworld.pb.go</code> がリポジトリ内にコピーされてきます。</p>
+<h1 id="ワンライナーを用意して仕上げ">ワンライナーを用意して仕上げ</h1>
+<p>protoが複数のパッケージに分散している場合など、いちいち <code>bazel run</code> していくのは面倒なのでワンライナーを用意しておきましょう。</p>
+<pre><code class="language-console" data-lang="console">$ bazel query 'attr(generator_function, proto_gen, //...)' | xargs -n1 bazel run
+</code></pre><p>これでリポジトリ内の <code>proto_gen</code> を全て実行することができます。
 このクエリ言語の強さもBazelの特徴です。</p>
-</div>
-<div class="section" id="protoc">
-<h2>全員が同じprotocを使える</h2>
-<p>最初に書いたようにここまで作ると <tt class="docutils literal">protoc</tt> までBazelが用意します。
+<h1 id="全員が同じprotocを使える">全員が同じprotocを使える</h1>
+<p>最初に書いたようにここまで作ると <code>protoc</code> までBazelが用意します。
 Goの場合はGoのランタイムもBazelが用意するので、なんとサンプルリポジトリのフルビルドに必要なのはBazelだけです。
 BazelがGoのランタイムもprotocもそのプラグインも全て用意します。</p>
 <p>全てBazelが用意してくれるというのは非常に楽で、Bazelをインストールしリポジトリを持ってくればビルドできます。
@@ -220,19 +194,16 @@ BazelがGoのランタイムもprotocもそのプラグインも全て用意し�
 リポジトリに長く関わっている人はソフトウェアの設計も把握しているので環境構築を一からやるのも難しくないでしょう。むしろ簡単というような感想になるはずです。
 しかし初めてそれに触れる人は何も分からないので先人たちが書いた手順書に従って環境構築をするしかないのです。
 Bazelはそういったコストも抽象化したプログラムに落とし込めるツールです。</p>
-</div>
-<div class="section" id="id10">
-<h2>まとめ</h2>
+<h1 id="まとめ">まとめ</h1>
 <p>Bazelでの扱いに少し苦労するProtocol Buffersの扱い方を紹介しました。
-サンドボックス内でファイルを生成し、それを救出することでリポジトリへソースコードをコピーしています。これによりIDEで補完を行えるようになりますし、 <tt class="docutils literal">go test</tt> でテストを実行することもできるようになります。
-<tt class="docutils literal">go test</tt> でテストの実行ができるとGoLandから簡単にテストが実行できたりと開発効率の向上につながることでしょう。</p>
+サンドボックス内でファイルを生成し、それを救出することでリポジトリへソースコードをコピーしています。これによりIDEで補完を行えるようになりますし、 <code>go test</code> でテストを実行することもできるようになります。
+<code>go test</code> でテストの実行ができるとGoLandから簡単にテストが実行できたりと開発効率の向上につながることでしょう。</p>
 <p>今回サンドボックス内で生成したファイルをサンドボックスから取り出すビルドルールを書いたので多少の修正でProtocol Buffers以外にも使えるかもしれません。</p>
 <p>Goのコア側でこのようなサンドボックスに入ったソースコードの情報をexposeするツールが開発中のようです。
 そちらが動作するようになりIDEがサポートしてくれればそちらへ移行する方がスマートではありますが現状はリポジトリへソースコードをコピーしてくる他ありません。</p>
 <p>（ビルドルールの詳細な書き方については解説しません。特にインターフェースについてはどんどん変わっていくためその時のバージョンに合わせてオフィシャルドキュメントを見る方がいいと思います。
 Bazel独特のフェーズの動作についてはいつか解説します。）</p>
-</div>
-</div>
+
   </section>
   <footer>
     

@@ -59,61 +59,40 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>Homecluster は Intel NUC を3台で構成していて、ここにコントロールプレーンも同居していました。
+    <p>Homecluster は Intel NUC を3台で構成していて、ここにコントロールプレーンも同居していました。
 しかしこの構成はNUCがそこまで安価ではない故にコントロールプレーンが冗長構成になっていませんでした。</p>
 <p>1台構成の場合、コントロールプレーンが入っているノードのアップグレードが難しい（長い時間オフラインになってしまう）という問題があります。
 当初よりコントロールプレーンを Raspberry Pi で構成しようというのは考えていたので、この度 Raspberry Pi によるコントロールプレーンの検証を始めました。</p>
 <p>今回使用したのは Raspberry Pi 4 Model B 4GB です。</p>
-<div class="section" id="raspberry-pi">
-<h2>Raspberry Piをコントロールプレーンにするポイント</h2>
-<div class="section" id="sd">
-<h3>性能の良いSDカードを使う</h3>
+<h1 id="raspberry-piをコントロールプレーンにするポイント">Raspberry Piをコントロールプレーンにするポイント</h1>
+<h2 id="性能の良いsdカードを使う">性能の良いSDカードを使う</h2>
 <p>性能が悪いSDカードを使うとetcdのクラスタで度々Leader changeが起きます。</p>
 <p>Leader changeが起きると各コントローラのLeader electionも再度行われるため、非常のパフォーマンスが悪くなります。</p>
 <p>そのため性能の良いSDカードを使うのは必須です。</p>
-<p>性能が良いSDカードかどうかは <a class="reference external" href="https://www.raspberrypi.org/blog/sd-card-speed-test/">公式のテストツール</a> でチェックすることができます。</p>
-</div>
-<div class="section" id="id2">
-<h3>ファンはつけておく</h3>
+<p>性能が良いSDカードかどうかは <a href="https://www.raspberrypi.org/blog/sd-card-speed-test/">公式のテストツール</a> でチェックすることができます。</p>
+<h2 id="ファンはつけておく">ファンはつけておく</h2>
 <p>Raspberry Pi 4 は発熱が大きくなっています。
 ファンレスだとアイドリングでもかなり高温になります。
 負荷をかけたら間違いなく動作クロックが下がるか、シャットダウンしてしまうでしょう。</p>
 <p>kube-apiserver がCPUを少し使うのでファンは必須です。</p>
 <p>ファンをつけていると温度は50度強で安定します。
 （どれくらいの温度の空気を吸い込めるかで少し変わります。ラズパイはスタックすることが多いと思うのでその場合はより下側の温度を気にしましょう）</p>
-</div>
-<div class="section" id="gbok">
-<h3>メモリは4GBでOK</h3>
+<h2 id="メモリは4gbでok">メモリは4GBでOK</h2>
 <p>8GBのモデルも発売されていますが、コントロールプレーンとして使うのであれば4GBモデルで問題ありません。</p>
 <p>実メモリで1GB程度を使っている程度なので8GBモデルは不要でした。
 （ノードが5台、Podが160、コンテナが200程度のクラスタ）</p>
-</div>
-<div class="section" id="cpu">
-<h3>CPU使用率</h3>
+<h2 id="cpu使用率">CPU使用率</h2>
 <p>CPUは kube-apiserver と etcd で常時25%くらいを使っています。</p>
 <p>SDカードの性能が悪い場合はio waitが出てくるのでそれで気がつくことができます。</p>
-<div class="figure">
-<img alt="cpu.png" src="cpu.png" />
-</div>
-</div>
-<div class="section" id="id3">
-<h3>メモリ使用量</h3>
+<p><img src="./cpu.png" alt="CPU"></p>
+<h2 id="メモリ使用量">メモリ使用量</h2>
 <p>1GB使っています。</p>
-<div class="figure">
-<img alt="memory.png" src="memory.png" />
-</div>
-</div>
-</div>
-<div class="section" id="poe-hat">
-<h2>PoE Hatが品切れ</h2>
+<p><img src="./memory.png" alt="Memory"></p>
+<h1 id="poe-hatが品切れ">PoE Hatが品切れ</h1>
 <p>Raspberry Piと一緒にPoE Hatも注文しました。</p>
 <p>しかしこちらは未だに入荷しません。
 せっかくなのでPoEにしてケーブル1本のスッキリ配線にしようと思ったのですが…</p>
-</div>
-</div>
+
   </section>
   <footer>
     

@@ -59,23 +59,20 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>これまでにいろいろなCIツールを試し・使い、自分でも運用してきましたが満足できるツールはありませんでした。</p>
+    <p>これまでにいろいろなCIツールを試し・使い、自分でも運用してきましたが満足できるツールはありませんでした。</p>
 <p>これまでに試したり使ったツールは</p>
-<ul class="simple">
+<ul>
 <li>Jenkins</li>
 <li>Drone</li>
 <li>Concourse CI</li>
 </ul>
 <p>に加えてジョブスケジューラとして</p>
-<ul class="simple">
+<ul>
 <li>Rundeck</li>
 </ul>
 <p>などです。</p>
 <p>いずれのツールでもCIパイプラインの定義に次のような課題があり、それを解決しているものはありませんでした。</p>
-<ul class="simple">
+<ul>
 <li>パイプラインの定義がシェルスクリプトになりがち</li>
 <li>パイプライン自体のテストができない</li>
 <li>手元でパイプラインを再現できない（全てのツールではない）</li>
@@ -83,34 +80,27 @@
 </ul>
 <p>自分のリポジトリは全て Bazel をビルドツールとしているため、 Bazel に特化したCIツールがあるとこれらの問題を解決できるかもしれないと考え、
 自分で作り事にしました。</p>
-<div class="section" id="ci">
-<h2>自作CIツール</h2>
-<div class="section" id="id1">
-<h3>自作以外の選択肢</h3>
-<p>Bazel プロジェクト関連は Buildkite <a class="footnote-reference" href="#buildkite" id="id2">[1]</a> を使っていることが多いようです。</p>
-</div>
-<div class="section" id="id3">
-<h3>要件</h3>
-<ul class="simple">
+<h1 id="自作ciツール">自作CIツール</h1>
+<h2 id="自作以外の選択肢">自作以外の選択肢</h2>
+<p>Bazel プロジェクト関連は <a href="https://buildkite.com/">Buildkite</a> を使っていることが多いようです。</p>
+<h2 id="要件">要件</h2>
+<ul>
 <li>Kubernetesクラスタ上で全て動作すること</li>
 <li>WebHook をトリガーにビルドを開始できること</li>
 <li>テストだけではなくタスクランナーとしても機能すること</li>
 <li>設定ファイルとして yaml は使わない</li>
 </ul>
-</div>
-<div class="section" id="id4">
-<h3>スコープ外</h3>
+<h2 id="スコープ外">スコープ外</h2>
 <p>以下は初期の実装スコープから外しました。</p>
-<ul class="simple">
-<li>Bazel serverを常時起動しない<ul>
+<ul>
+<li>Bazel serverを常時起動しない
+<ul>
 <li>analyzeフェーズをして待機できるのでビルドの高速化が見込める</li>
 </ul>
 </li>
 <li>Remote Build Execution (RBE)は使わない</li>
 </ul>
-</div>
-<div class="section" id="id5">
-<h3>ポイント</h3>
+<h2 id="ポイント">ポイント</h2>
 <p>全ての起点に Bazel を使っています。
 Bazelを利用することでパイプラインが（Bazel利用者にとっては）整理された状態にできます。</p>
 <p>また任意のシェルスクリプトをパイプラインに差し込むことはできないようにしています。
@@ -118,15 +108,11 @@ Bazelを利用することでパイプラインが（Bazel利用者にとって�
 <p>これによりローカルでもリモートでも環境の差異が <strong>少なくなります。</strong>
 （残念ながら完全になくすことはできませんが、 Bazel のおかげでリモートで起きた問題をローカルでも再現しやすいだろうということが見込まれます）</p>
 <p>設定ファイルとして yaml を使わないというのも過去の反省からです。
-yaml ファイルだと何が設定できるのか分からないというのとデータ構造による &quot;設定ファイル&quot; になってしまうので今回は避けました。</p>
-</div>
-<div class="section" id="overview">
-<h3>Overview</h3>
-<div class="figure">
-<img alt="overview.png" src="overview.png" />
-</div>
+yaml ファイルだと何が設定できるのか分からないというのとデータ構造による &ldquo;設定ファイル&rdquo; になってしまうので今回は避けました。</p>
+<h2 id="overview">Overview</h2>
+<p><img src="./overview.png" alt="Overview"></p>
 <p>（画像は別タブで開いて原寸大で見てください）</p>
-<ol class="arabic simple">
+<ol>
 <li>GitHub から WebHook をAPIサーバーで受け取ります</li>
 <li>MySQL にビルド履歴のレコードを作成します</li>
 <li>ビルドの設定に従いKubernetesのJobオブジェクトを作成します</li>
@@ -134,35 +120,18 @@ yaml ファイルだと何が設定できるのか分からないというのと
 <li>Commit Statusをビルド結果に応じてセットします</li>
 </ol>
 <p>API は HTTP サーバーと kubernetes controller の2つが1つになったサービスになっているのが特徴です。</p>
-</div>
-<div class="section" id="id6">
-<h3>ビルドの設定ファイル</h3>
-<p>ビルドパイプラインも Bazel のターゲットの一つで、ルールとして <a class="reference external" href="https://github.com/f110/mono/blob/82f8ffaa8aa1aeee2ecd74ab17892499da3b36f3/build/job.bzl#L4-L18">定義されています。</a></p>
+<h2 id="ビルドの設定ファイル">ビルドの設定ファイル</h2>
+<p>ビルドパイプラインも Bazel のターゲットの一つで、ルールとして <a href="https://github.com/f110/mono/blob/82f8ffaa8aa1aeee2ecd74ab17892499da3b36f3/build/job.bzl#L4-L18">定義されています。</a></p>
 <p>ルールの中身は何も実装されていないので Bazel で直接実行しても何も生成されません。
-このルールから <a class="reference external" href="https://github.com/f110/sandbox/blob/ec73883492860c5ac5e75ee475ad435d94fc7165/BUILD.bazel#L10-L17">定義されたターゲット</a> がビルドパイプラインとなります。</p>
+このルールから <a href="https://github.com/f110/sandbox/blob/ec73883492860c5ac5e75ee475ad435d94fc7165/BUILD.bazel#L10-L17">定義されたターゲット</a> がビルドパイプラインとなります。</p>
 <p>なので Bazel を使い慣れた人でなければどのように使っていいか分からないでしょう。
 一方使い慣れた人にとっては手に馴染んだ道具でビルドパイプラインも同様に定義できるので分かりやすいのではないでしょうか。</p>
 <p>特定のルールから定義されたターゲット一覧を取り出すために各リポジトリで以下のクエリを Bazel で実行しています。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> bazel cquery <span class="s1">'kind(job, //...)'</span> --output jsonproto <span class="m">2</span>&gt; /dev/null
-</pre>
-</div>
-<div class="section" id="id9">
-<h3>スクリーンショット</h3>
+<pre><code class="language-console" data-lang="console">$ bazel cquery 'kind(job, //...)' --output jsonproto 2&gt; /dev/null
+</code></pre><h2 id="スクリーンショット">スクリーンショット</h2>
 <p>実際の画面は認証プロキシの背後にあり、自分以外がアクセスできないので以下にスクリーンショットを貼っておきます。</p>
-<img alt="screenshot.png" src="screenshot.png" />
-</div>
-</div>
-<div class="section" id="id10">
-<h2>参考リンク</h2>
-<table class="docutils footnote" frame="void" id="buildkite" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>Buildkite <a class="reference external" href="https://buildkite.com/">https://buildkite.com/</a></td></tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="./screenshot.png" alt="Screenshot"></p>
+
   </section>
   <footer>
     

@@ -3,12 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://f110.jp/tags/bazel/</loc>
-    <lastmod>2020-10-10T17:47:04+09:00</lastmod>
+    <loc>https://f110.jp/</loc>
+    <lastmod>2020-11-01T21:15:29+09:00</lastmod>
   </url>
   
   <url>
-    <loc>https://f110.jp/</loc>
+    <loc>https://f110.jp/posts/y-mobile-on-ipad-air/</loc>
+    <lastmod>2020-11-01T21:15:29+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/posts/</loc>
+    <lastmod>2020-11-01T21:15:29+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/bazel/</loc>
     <lastmod>2020-10-10T17:47:04+09:00</lastmod>
   </url>
   
@@ -19,11 +29,6 @@
   
   <url>
     <loc>https://f110.jp/posts/gocon-20-sendai/</loc>
-    <lastmod>2020-10-10T17:47:04+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/posts/</loc>
     <lastmod>2020-10-10T17:47:04+09:00</lastmod>
   </url>
   

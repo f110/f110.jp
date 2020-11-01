@@ -57,29 +57,23 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>最近Factorioにすごいハマってて毎日プレイしてる。
+    <p>最近Factorioにすごいハマってて毎日プレイしてる。
 やりすぎて1週間で仕事をしてる時間よりFactorioをプレイしてる時間の方が長いこともあるくらい。</p>
 <p>Factorioは公式がマルチプレイ用のサーバーを提供してくれていて、自分でマルチプレイのサーバーを用意することができます。
 一人で遊んでても面白くてずっとプレイできるんだけどゲームというのは誰かと一緒にプレイするともっと面白いのでマルチプレイのサーバーを動かしてプレイしてる。</p>
 <p>幸いうちにはk8sクラスタがあってこれが24時間稼働しているのとFactorioのコミュニティがdockerコンテナをメンテしてくれているのでk8sで動かしています。</p>
-<div class="section" id="id1">
-<h2>マニフェスト</h2>
-<p><a class="reference external" href="https://github.com/helm/charts/tree/master/stable/factorio">Helm Chart</a> はあえて使っていなくて自分でマニフェストを書いています。</p>
-<pre class="code literal-block">
-factorio
+<h1 id="マニフェスト">マニフェスト</h1>
+<p><a href="https://github.com/helm/charts/tree/master/stable/factorio">Helm Chart</a> はあえて使っていなくて自分でマニフェストを書いています。</p>
+<pre><code>factorio
 ├── base
-│&nbsp;&nbsp; ├── kustomization.yaml
-│&nbsp;&nbsp; ├── service.yaml
-│&nbsp;&nbsp; └── statefulset.yaml
+│   ├── kustomization.yaml
+│   ├── service.yaml
+│   └── statefulset.yaml
 └── map-name
     ├── kustomization.yaml
     ├── server-adminlist.json
     └── server-settings.json
-</pre>
-<p>複数のマップデータを持てるようにする（マップごとに別のプロセスを起動しないといけない）ためにbaseとそれぞれのマップでディレクトリを分けていて
+</code></pre><p>複数のマップデータを持てるようにする（マップごとに別のプロセスを起動しないといけない）ためにbaseとそれぞれのマップでディレクトリを分けていて
 kustomizeでマニフェストをビルドするようにしています。</p>
 <p>ServiceとStatefulSetだけで動く単純なアプリケーションで何かが起きると一時的に不通になることはあり得る構成。
 ただこれはゲームサーバーが分散する仕組みを持っていないので許容するしかないという現状です。</p>
@@ -87,39 +81,24 @@ kustomizeでマニフェストをビルドするようにしています。</p>
 <p>グローバルからのアクセスはUDPだけ通していて今のところは直接到達出来るようになっています。
 これだとFactorioのプロセスに脆弱性があった場合に侵入を許しやすくなってしまうので将来的には認証の仕組みを入れる予定です。
 この認証の仕組みはFactorioのゲームパスワードとは違って、そもそもプレイする人以外（信頼したユーザー以外）のパケットを受け取らないようにします。</p>
-</div>
-<div class="section" id="id2">
-<h2>マップの永続化</h2>
+<h1 id="マップの永続化">マップの永続化</h1>
 <p>マップデータは当然永続化しないといけなくてゲームサーバーの再起動などで失われることがあるととても悲しくなります。</p>
 <p>我が家のk8sクラスターはPersistentVolumeが使えるのでそれで永続化されておりブロックストレージも3つの複製があります。
 この複製は全て自宅の中にあるので全ノードを消失するような事故が起きるとデータを失いますが、1ノードくらいの消失であればまったく問題ありません。
 1台くらい壊れても残りのマシンでサービスが継続できます。</p>
-</div>
-<div class="section" id="id3">
-<h2>パフォーマンス</h2>
+<h1 id="パフォーマンス">パフォーマンス</h1>
 <p>Factorioのマルチプレイのサーバーは必要なリソースが少なくてまったくCPUもメモリも使いません。
 おそらくRaspberry Piのような計算資源が潤沢ではないノードだったとしても問題なくプレイできるでしょう。
 うちのクラスターは最大2コアのマシンしかありませんが全く問題ありません。
 一応2コアでLimitをかけていますが1コア（1000m）でも全く問題ないです。
 メモリも512MBあれば十分です。</p>
-<div class="figure">
-<object data="cpu.svg" style="width: 100%;" type="image/svg+xml">
-cpu.svg</object>
-</div>
-<pre class="code literal-block">
-avg(irate(container_cpu_usage_seconds_total{namespace=&quot;factorio&quot;,container=&quot;factorio&quot;}[5m])) by (container)
-</pre>
-<div class="figure">
-<object data="mem.svg" style="width: 100%;" type="image/svg+xml">
-mem.svg</object>
-</div>
-<pre class="code literal-block">
-max(container_memory_usage_bytes{namespace=&quot;factorio&quot;,container=&quot;factorio&quot;}) by (container)
-</pre>
-<p>非常にエコなゲームサーバーでとても良くできています。</p>
-<p>なお上記のグラフを作成したスクリプトはそれぞれGitHubにPushしてあります。 <a class="reference external" href="https://github.com/f110/site/blob/master/content/posts/factorio-headless/cpu.py">CPU</a> / <a class="reference external" href="https://github.com/f110/site/blob/master/content/posts/factorio-headless/mem.py">Mem</a></p>
-</div>
-</div>
+<p><img src="./cpu.svg" alt="CPU"></p>
+<pre><code>avg(irate(container_cpu_usage_seconds_total{namespace=&quot;factorio&quot;,container=&quot;factorio&quot;}[5m])) by (container)
+</code></pre><p><img src="./mem.svg" alt="Memory"></p>
+<pre><code>max(container_memory_usage_bytes{namespace=&quot;factorio&quot;,container=&quot;factorio&quot;}) by (container)
+</code></pre><p>非常にエコなゲームサーバーでとても良くできています。</p>
+<p>なお上記のグラフを作成したスクリプトはそれぞれGitHubにPushしてあります。 <a href="https://github.com/f110/site/blob/master/content/posts/factorio-headless/cpu.py">CPU</a> / <a href="https://github.com/f110/site/blob/master/content/posts/factorio-headless/mem.py">Mem</a></p>
+
   </section>
   <footer>
     

@@ -59,121 +59,77 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p><strong>追記(2020/04/21)</strong></p>
+    <p><strong>追記(2020/04/21)</strong></p>
 <p>下記の手順ではUniFi Controllerでプロビジョニングを設定すると多くの設定が消えます。</p>
-<p>UniFi Controllerと共存を目指す場合は <a class="reference external" href="../wireguard-and-unifi-controller">次のポスト</a> も参照してください。</p>
+<p>UniFi Controllerと共存を目指す場合は <a href="../wireguard-and-unifi-controller">次のポスト</a> も参照してください。</p>
 <p><strong>追記ここまで</strong></p>
 <p>自宅には信用できない経路を使わざる負えない時用にVPNを張れるようにしています。
-今まではUniFi Security Gatewayが持っているVPN機能（L2TP over IPSec）を使っていたのですが、これを <a class="reference external" href="https://www.wireguard.com/">WireGuard</a> も使えるようにしました。</p>
-<div class="section" id="id2">
-<h2>前提</h2>
-<div class="section" id="id3">
-<h3>使ってるハードウェア</h3>
-<ul class="simple">
+今まではUniFi Security Gatewayが持っているVPN機能（L2TP over IPSec）を使っていたのですが、これを <a href="https://www.wireguard.com/">WireGuard</a> も使えるようにしました。</p>
+<h1 id="前提">前提</h1>
+<h2 id="使ってるハードウェア">使ってるハードウェア</h2>
+<ul>
 <li>UniFi Security Gateway</li>
 <li>UniFi nanoHD</li>
 <li>UniFi Switch 8 60W</li>
 </ul>
-</div>
-<div class="section" id="id4">
-<h3>やりたいこと</h3>
-<ul class="simple">
+<h2 id="やりたいこと">やりたいこと</h2>
+<ul>
 <li><strong>全てのトラフィックを</strong> VPN経由にする</li>
 <li>内部ネットワークと通信できる</li>
 <li>Guestネットワークとは通信できない</li>
 </ul>
-</div>
-<div class="section" id="id5">
-<h3>仕様</h3>
-<ul class="simple">
-<li>クライアントのレンジは <tt class="docutils literal">192.168.12.0/24</tt></li>
+<h2 id="仕様">仕様</h2>
+<ul>
+<li>クライアントのレンジは <code>192.168.12.0/24</code></li>
 <li>通信するポートは 51820</li>
 </ul>
-</div>
-</div>
-<div class="section" id="id6">
-<h2>インストール</h2>
-<p>EdgeRoute向けのパッケージをビルドしてくれている人がいるのでそれをありがたく使います。 <a class="reference external" href="https://github.com/Lochnair/vyatta-wireguard">github.com/Lochnair/vyatta-wireguard</a></p>
+<h1 id="インストール">インストール</h1>
+<p>EdgeRoute向けのパッケージをビルドしてくれている人がいるのでそれをありがたく使います。 <a href="https://github.com/Lochnair/vyatta-wireguard">github.com/Lochnair/vyatta-wireguard</a></p>
 <p>最新版をUniFi Security Gateay（以下USG）まで持っていってインストールします。</p>
-<pre class="code console literal-block">
-<span class="go">usg$ sudo dpkg -i wireguard-ugw3-0.0.20191219-2.deb</span>
-</pre>
-</div>
-<div class="section" id="id7">
-<h2>設定</h2>
-<div class="section" id="id8">
-<h3>秘密鍵と公開鍵の生成</h3>
-<pre class="code console literal-block">
-<span class="go">usg$ wg genkey | tee /config/auth/wg.key | wg pubkey &gt; /config/auth/wg.public</span>
-</pre>
-</div>
-<div class="section" id="id9">
-<h3>インターフェースの設定</h3>
-<p>WireGuardのPeer（クライアント）は <tt class="docutils literal">192.168.12.0/24</tt> のレンジを使うことにします。</p>
-<pre class="code console literal-block">
-<span class="go">usg$ configure
+<pre><code class="language-console" data-lang="console">usg$ sudo dpkg -i wireguard-ugw3-0.0.20191219-2.deb
+</code></pre><h1 id="設定">設定</h1>
+<h2 id="秘密鍵と公開鍵の生成">秘密鍵と公開鍵の生成</h2>
+<pre><code>usg$ wg genkey | tee /config/auth/wg.key | wg pubkey &gt; /config/auth/wg.public
+</code></pre><h2 id="インターフェースの設定">インターフェースの設定</h2>
+<p>WireGuardのPeer（クライアント）は <code>192.168.12.0/24</code> のレンジを使うことにします。</p>
+<pre><code class="language-console" data-lang="console">usg$ configure
 usg$ set interfaces wireguard wg0 address 192.168.12.1/24
 usg$ set interfaces wireguard wg0 listen-port 51820
 usg$ set interfaces wireguard wg0 route-allowed-ips true
-usg$ set interfaces wireguard wg0 private-key /config/auth/wg.key</span>
-</pre>
-</div>
-<div class="section" id="peer">
-<span id="configure-peer"></span><h3>Peer（クライアント）の設定</h3>
+usg$ set interfaces wireguard wg0 private-key /config/auth/wg.key
+</code></pre><h2 id="peerクライアントの設定">Peer（クライアント）の設定</h2>
 <p>ここではまずクライアント側で秘密鍵と公開鍵を生成してそれを設定します。</p>
-<pre class="code console literal-block">
-<span class="go">usg$ set interfaces wireguard wg0 peer bwqE81/MNgb/D6klMd+AFGGB3FXBVRv1RC+p8JTk6wE= endpoint [your vpn host or ip]:51820
-usg$ set interfaces wireguard wg0 peer bwqE81/MNgb/D6klMd+AFGGB3FXBVRv1RC+p8JTk6wE= allowed-ips 1921.168.12.2/32</span>
-</pre>
-</div>
-<div class="section" id="firewall">
-<h3>firewallの設定</h3>
+<pre><code class="language-console" data-lang="console">usg$ set interfaces wireguard wg0 peer bwqE81/MNgb/D6klMd+AFGGB3FXBVRv1RC+p8JTk6wE= endpoint [your vpn host or ip]:51820
+usg$ set interfaces wireguard wg0 peer bwqE81/MNgb/D6klMd+AFGGB3FXBVRv1RC+p8JTk6wE= allowed-ips 1921.168.12.2/32
+</code></pre><h2 id="firewallの設定">firewallの設定</h2>
 <p>USGの外からUDP/5120に届いたパケットを許可する。</p>
-<pre class="code console literal-block">
-<span class="go">usg$ set firewall name WAN_LOCAL rule 20 action accept
+<pre><code class="language-console" data-lang="console">usg$ set firewall name WAN_LOCAL rule 20 action accept
 usg$ set firewall name WAN_LOCAL rule 20 protocol udp
 usg$ set firewall name WAN_LOCAL rule 20 description 'WireGuard'
-usg$ set firewall name WAN_LOCAL rule 20 destination port 51820</span>
-</pre>
-<p>SNATする。インターネットに出れるようにするために必要です。</p>
-<pre class="code console literal-block">
-<span class="go">usg$ set firewall group network-group wireguard_network description &quot;Remote WireGuard (VPN) subnets&quot;
+usg$ set firewall name WAN_LOCAL rule 20 destination port 51820
+</code></pre><p>SNATする。インターネットに出れるようにするために必要です。</p>
+<pre><code class="language-console" data-lang="console">usg$ set firewall group network-group wireguard_network description &quot;Remote WireGuard (VPN) subnets&quot;
 usg$ set firewall group network-group wireguard_network network 192.168.12.0/24
 usg$ set service nat rule 5001 description &quot;MASQ wireguard_network to WAN&quot;
 usg$ set service nat rule 5001 log disable
 usg$ set service nat rule 5001 outbound-interface eth0
 usg$ set service nat rule 5001 protocol all
 usg$ set service nat rule 5001 source group network-group wireguard_network
-usg$ set service nat rule 5001 type masquerade</span>
-</pre>
-<p>Guestネットワークと通信できないようにする。</p>
-<pre class="code console literal-block">
-<span class="go">usg$ set firewall name GUEST_IN rule 20 description &quot;drop packet to wireguard network&quot;
+usg$ set service nat rule 5001 type masquerade
+</code></pre><p>Guestネットワークと通信できないようにする。</p>
+<pre><code class="language-console" data-lang="console">usg$ set firewall name GUEST_IN rule 20 description &quot;drop packet to wireguard network&quot;
 usg$ set firewall name GUEST_IN rule 20 action drop
-usg$ set firewall name GUEST_IN rule 20 destination group network-group wireguard_network</span>
-</pre>
-</div>
-<div class="section" id="id10">
-<h3>保存</h3>
-<pre class="code console literal-block">
-<span class="go">usg$ commit
+usg$ set firewall name GUEST_IN rule 20 destination group network-group wireguard_network
+</code></pre><h2 id="保存">保存</h2>
+<pre><code class="language-console" data-lang="console">usg$ commit
 usg$ save
-usg$ exit</span>
-</pre>
-</div>
-</div>
-<div class="section" id="id11">
-<h2>クライアント側の設定</h2>
-<div class="section" id="macos">
-<h3>macOS</h3>
-<p><a class="reference external" href="https://apps.apple.com/us/app/wireguard/id1451685025">Mac App Store の WireGuardクライアント</a> を入れます。</p>
+usg$ exit
+</code></pre><h1 id="クライアント側の設定">クライアント側の設定</h1>
+<h2 id="macos">macOS</h2>
+<p><a href="https://apps.apple.com/us/app/wireguard/id1451685025">Mac App Store の WireGuardクライアント</a> を入れます。</p>
 <p>新しいTunnelを追加して以下を書いてSaveします。</p>
-<p>この時、サーバーのPublicKeyが必要になるのでUSGから手に入れておきます。 <tt class="docutils literal">usg$ cat /config/auth/wg.public</tt></p>
-<pre class="code literal-block" id="peer-conf">
-[Interface]
+<p>この時、サーバーのPublicKeyが必要になるのでUSGから手に入れておきます。 <code>usg$ cat /config/auth/wg.public</code></p>
+<pre><code>[Interface]
 PrivateKey = &lt;Generated private key&gt;
 Address = 192.168.12.2/32
 DNS = 192.168.12.1
@@ -182,43 +138,30 @@ DNS = 192.168.12.1
 PublicKey = &lt;Server's Public key&gt;
 AllowedIPs = 0.0.0.0/0
 Endpoint = [your vpn host or ip]:51820
-</pre>
-<p><tt class="docutils literal">AllowedIPs</tt> を <tt class="docutils literal">0.0.0.0/0</tt> とすることで全てのトラフィックがVPNに流れます。</p>
-</div>
-<div class="section" id="id12">
-<h3>モバイル</h3>
+</code></pre><p><code>AllowedIPs</code> を <code>0.0.0.0/0</code> とすることで全てのトラフィックがVPNに流れます。</p>
+<h2 id="モバイル">モバイル</h2>
 <p>iOS、Androidともに公式のストアからWireGuardのアプリをインストールすることが出来ます。</p>
 <p>モバイルでも上記のような設定をすることにはなるのですが、これを手書きするのは大変なので代替手段が用意されています。
 もちろん手書きでも設定はできるので最初の疎通テストなどは手書きで頑張ってもいいでしょう。実際頑張りました。</p>
 <p>手書きをする場合は双方のPublic Keyを交換する必要があるので何らかの手段で交換してください。
 自分はDropboxにテキストファイルを置いて交換しました。</p>
 <p>他のデバイスではこの方法は面倒なのでQRコードを使って設定します。</p>
-<pre class="code console literal-block">
-<span class="go">usg$ wg genkey | tee peer-privatekey | wg pubkey &gt; peer-publickey</span>
-</pre>
-<p><tt class="docutils literal"><span class="pre">peer-publickey</span></tt> を使って Peer の設定をUSG側で行います。 <a class="reference external" href="#configure-peer">Peerの設定</a></p>
-<p>Private KeyとPublic Keyを適当なマシンに持ってきて <a class="reference external" href="#peer-conf">設定ファイル</a> を書きます。</p>
-<pre class="code console literal-block">
-<span class="gp">$</span> sudo apt install -y qrencode
-<span class="gp">$</span> qrencode -t ansiutf8 &lt; peer.conf
-</pre>
-<p>で表示されたQRコードをクライアントアプリで読み取れば設定が完了します。</p>
-</div>
-</div>
-<div class="section" id="id15">
-<h2>最後に</h2>
+<pre><code class="language-console" data-lang="console">usg$ wg genkey | tee peer-privatekey | wg pubkey &gt; peer-publickey
+</code></pre><p><code>peer-publickey</code> を使って Peer の設定をUSG側で行います。</p>
+<p>Private KeyとPublic Keyを適当なマシンに持ってきて設定ファイルを書きます。</p>
+<pre><code class="language-console" data-lang="console">$ sudo apt install -y qrencode
+$ qrencode -t ansiutf8 &lt; peer.conf
+</code></pre><p>で表示されたQRコードをクライアントアプリで読み取れば設定が完了します。</p>
+<h1 id="最後に">最後に</h1>
 <p>これで快適なVPN生活になることを期待しています。</p>
 <p>今はFree WiFiを使う機会がないのでVPNも不要なのですが。</p>
-</div>
-<div class="section" id="id16">
-<h2>参考</h2>
-<ul class="simple">
-<li><a class="reference external" href="https://github.com/Lochnair/vyatta-wireguard">https://github.com/Lochnair/vyatta-wireguard</a></li>
-<li><a class="reference external" href="https://wiki.archlinux.org/index.php/WireGuard">https://wiki.archlinux.org/index.php/WireGuard</a></li>
-<li><a class="reference external" href="https://grh.am/2018/wireguard-setup-guide-for-ios/">https://grh.am/2018/wireguard-setup-guide-for-ios/</a></li>
+<h1 id="参考">参考</h1>
+<ul>
+<li><a href="https://github.com/Lochnair/vyatta-wireguard">https://github.com/Lochnair/vyatta-wireguard</a></li>
+<li><a href="https://wiki.archlinux.org/index.php/WireGuard">https://wiki.archlinux.org/index.php/WireGuard</a></li>
+<li><a href="https://grh.am/2018/wireguard-setup-guide-for-ios/">https://grh.am/2018/wireguard-setup-guide-for-ios/</a></li>
 </ul>
-</div>
-</div>
+
   </section>
   <footer>
     

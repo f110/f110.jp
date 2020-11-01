@@ -57,399 +57,325 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>本エントリは <a class="reference external" href="https://medium.com/mixi-developers/bazel%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9%E8%A9%B0%E3%82%81%E5%90%88%E3%82%8F%E3%81%9B-f6784c7bb874">オリジナル</a> の一部を再編集して掲載しています。 (2020/03/31)</p>
-<p><a class="reference external" href="../monorepo-with-bazel">前の記事</a> ではBazelについて簡単に紹介しました。
+    <p>本エントリは <a href="https://medium.com/mixi-developers/bazel%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9%E8%A9%B0%E3%82%81%E5%90%88%E3%82%8F%E3%81%9B-f6784c7bb874">オリジナル</a> の一部を再編集して掲載しています。 (2020/03/31)</p>
+<p><a href="../monorepo-with-bazel">前の記事</a> ではBazelについて簡単に紹介しました。
 ここでは更に1歩、Bazelの使い方に踏み込んでみたいと思います。</p>
 <p>自分のリポジトリに含まれている色々なツール等をビルドしてshipするにあたって分かりづらかったりした点を中心に説明したいと思います。
 すべてを網羅できているわけではありませんし、あくまで自分のリポジトリの頻出パターンなので皆さんのリポジトリでは違った点で悩むかもしれません。
 Bazelを使い始めようという時に思い出して見ていただけるとよいかもしれません。</p>
 <p>今回もサンプルコードは前回と同じリポジトリに置いてあります。</p>
-<p><a class="reference external" href="https://github.com/f110/bazel-example">https://github.com/f110/bazel-example</a></p>
-<div class="section" id="id3">
-<h2>コンテナを作る</h2>
-<p>サンプルリポジトリの <tt class="docutils literal">helloworld1</tt> はコンテナの作成もできるようになっています。</p>
-<pre class="code python literal-block">
-<span class="ln">1 </span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;io_bazel_rules_docker//go:image.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;go_image&quot;</span><span class="p">)</span>
-<span class="ln">2 </span>
-<span class="ln">3 </span><span class="n">go_image</span><span class="p">(</span>
-<span class="ln">4 </span>    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span>
-<span class="ln">5 </span>    <span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;:helloworld1&quot;</span><span class="p">,</span>
-<span class="ln">6 </span>    <span class="n">pure</span> <span class="o">=</span> <span class="s2">&quot;on&quot;</span><span class="p">,</span>
-<span class="ln">7 </span>    <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">],</span>
-<span class="ln">8 </span><span class="p">)</span>
-</pre>
-<p>このようなルールを書いて（ <tt class="docutils literal">WORKSPACE</tt> でrules_dockerの定義をしておく必要はあります）</p>
-<pre class="code shell literal-block">
-$ bazel build //tools/helloworld1:image.tar
-</pre>
-<p>とビルドすればコンテナのtarファイルができあがります。 <strong>ターゲット名に.tarをつけるのがポイントです。</strong></p>
+<p><a href="https://github.com/f110/bazel-example">https://github.com/f110/bazel-example</a></p>
+<h1 id="コンテナを作る">コンテナを作る</h1>
+<p>サンプルリポジトリの <code>helloworld1</code> はコンテナの作成もできるようになっています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;@io_bazel_rules_docker//go:image.bzl&#34;</span>, <span style="color:#e6db74">&#34;go_image&#34;</span>)
+
+go_image(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;image&#34;</span>,
+    binary <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;:helloworld1&#34;</span>,
+    pure <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;on&#34;</span>,
+    visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:public&#34;</span>],
+)
+</code></pre></div><p>このようなルールを書いて（ <code>WORKSPACE</code> でrules_dockerの定義をしておく必要はあります）</p>
+<pre><code class="language-console" data-lang="console">$ bazel build //tools/helloworld1:image.tar
+</code></pre><p>とビルドすればコンテナのtarファイルができあがります。 <strong>ターゲット名に.tarをつけるのがポイントです。</strong></p>
 <p>手元のdockerなどで実行したい場合は作成されたtarファイルをロードすればいいだけです。</p>
-<pre class="code shell literal-block">
-$ docker load -i ./bazel-bin/tools/helloworld1/image.tar
-</pre>
-<p>このコンテナはコンパイルされたバイナリしか入っていません。
+<pre><code class="language-console" data-lang="console">$ docker load -i ./bazel-bin/tools/helloworld1/image.tar
+</code></pre><p>このコンテナはコンパイルされたバイナリしか入っていません。
 busyboxすら入っていないため直接デバッグするのは難しいです。</p>
 <p>busyboxを入れたコンテナもビルドすることは可能なので動いてるコンテナを直接デバッグする必要があればbusybox入りのイメージをビルドするのがいいと思います。</p>
-</div>
-<div class="section" id="push">
-<h2>コンテナのPush</h2>
+<h1 id="コンテナのpush">コンテナのPush</h1>
 <p>コンテナを作成できればそのままPushも行いたいですよね？</p>
-<pre class="code python literal-block">
-<span class="ln"> 1 </span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;io_bazel_rules_docker//container:container.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;container_push&quot;</span><span class="p">)</span>
-<span class="ln"> 2 </span>
-<span class="ln"> 3 </span><span class="n">container_push</span><span class="p">(</span>
-<span class="ln"> 4 </span>    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;push&quot;</span><span class="p">,</span>
-<span class="ln"> 5 </span>    <span class="nb">format</span> <span class="o">=</span> <span class="s2">&quot;Docker&quot;</span><span class="p">,</span>
-<span class="ln"> 6 </span>    <span class="n">image</span> <span class="o">=</span> <span class="s2">&quot;:image&quot;</span><span class="p">,</span>
-<span class="ln"> 7 </span>    <span class="n">registry</span> <span class="o">=</span> <span class="s2">&quot;asia.gcr.io&quot;</span><span class="p">,</span>
-<span class="ln"> 8 </span>    <span class="n">repository</span> <span class="o">=</span> <span class="s2">&quot;example/example&quot;</span><span class="p">,</span>
-<span class="ln"> 9 </span>    <span class="n">tag</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{BUILD_TIMESTAMP}</span><span class="s2">&quot;</span><span class="p">,</span>
-<span class="ln">10 </span><span class="p">)</span>
-</pre>
-<p>と BUILD.bazel に書いておけば</p>
-<pre class="code shell literal-block">
-$ bazel run //tools/helloworld1:push
-</pre>
-<p>だけでコンテナの作成からPushまで一度に行えます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;@io_bazel_rules_docker//container:container.bzl&#34;</span>, <span style="color:#e6db74">&#34;container_push&#34;</span>)
+
+container_push(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;push&#34;</span>,
+    format <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Docker&#34;</span>,
+    image <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;:image&#34;</span>,
+    registry <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;asia.gcr.io&#34;</span>,
+    repository <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;example/example&#34;</span>,
+    tag <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;{BUILD_TIMESTAMP}&#34;</span>,
+)
+</code></pre></div><p>と BUILD.bazel に書いておけば</p>
+<pre><code class="language-console" data-lang="console">$ bazel run //tools/helloworld1:push
+</code></pre><p>だけでコンテナの作成からPushまで一度に行えます。</p>
 <p>ご想像通り、もしコンテナに同梱されるバイナリがビルドされていなければビルドも行われます。</p>
 <p>イメージのタグがタイムスタンプになるため場合によっては使いづらいかもしれません。（実際ちょっと使いづらいと思っています）
 その場合はイメージをsha256のハッシュで指定すると良いでしょう。</p>
 <p>ビルドごとにちゃんと同一のソースコードから同一のバイナリが生成されるようになっていれば何度コンテナを作成してもソースコードが変更されていなければイメージのハッシュは変わらないはずです。</p>
-</div>
-<div class="section" id="id4">
-<h2>複数のファイルを一つのコンテナにする</h2>
+<h1 id="複数のファイルを一つのコンテナにする">複数のファイルを一つのコンテナにする</h1>
 <p>複数の実行ファイルを一つのコンテナに入れ実行時にコマンドを渡したり、実行ファイルの動作に必要なファイルをコンテナに含めることもよくあることでしょう。
 そんなコンテナもそれほど難しくなく作れます。</p>
-<pre class="code python literal-block">
-<span class="ln"> 1 </span><span class="n">go_binary</span><span class="p">(</span>
-<span class="ln"> 2 </span>    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;helloworld1&quot;</span><span class="p">,</span>
-<span class="ln"> 3 </span>    <span class="n">embed</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;:go_default_library&quot;</span><span class="p">],</span>
-<span class="ln"> 4 </span>    <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">],</span>
-<span class="ln"> 5 </span><span class="p">)</span>
-<span class="ln"> 6 </span>
-<span class="ln"> 7 </span><span class="n">go_binary</span><span class="p">(</span>
-<span class="ln"> 8 </span>    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;helloworld2&quot;</span><span class="p">,</span>
-<span class="ln"> 9 </span>    <span class="n">embed</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;:go_default_library&quot;</span><span class="p">],</span>
-<span class="ln">10 </span>    <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">],</span>
-<span class="ln">11 </span><span class="p">)</span>
-</pre>
-<p>このようにバイナリが2つあったとしましょう。</p>
-<pre class="code python literal-block">
-<span class="ln"> 1 </span><span class="n">pkg_tar</span><span class="p">(</span>
-<span class="ln"> 2 </span>    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;bin&quot;</span><span class="p">,</span>
-<span class="ln"> 3 </span>    <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span>
-<span class="ln"> 4 </span>        <span class="s2">&quot;:helloworld1&quot;</span><span class="p">,</span>
-<span class="ln"> 5 </span>        <span class="s2">&quot;:helloworld2&quot;</span><span class="p">,</span>
-<span class="ln"> 6 </span>    <span class="p">],</span>
-<span class="ln"> 7 </span><span class="p">)</span>
-<span class="ln"> 8 </span>
-<span class="ln"> 9 </span><span class="n">container_image</span><span class="p">(</span>
-<span class="ln">10 </span>    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span>
-<span class="ln">11 </span>    <span class="n">base</span> <span class="o">=</span> <span class="s2">&quot;&#64;com_google_distroless_base//image&quot;</span><span class="p">,</span>
-<span class="ln">12 </span>    <span class="n">tars</span> <span class="o">=</span> <span class="p">[</span>
-<span class="ln">13 </span>        <span class="s2">&quot;:bin&quot;</span><span class="p">,</span>
-<span class="ln">14 </span>    <span class="p">],</span>
-<span class="ln">15 </span><span class="p">)</span>
-</pre>
-<p><tt class="docutils literal">pkg_tar</tt> で一つのtarにまとめてからそれを <tt class="docutils literal">container_image</tt> でコンテナにすれば2つのバイナリが一つのコンテナに入ります。
-この例だと <tt class="docutils literal">helloworld1</tt> と <tt class="docutils literal">helloworld2</tt> というファイルがルート直下にできてしまうのでパスを変えたいこともあるかもしれません。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">go_binary(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helloworld1&#34;</span>,
+    embed <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;:go_default_library&#34;</span>],
+    visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:public&#34;</span>],
+)
+
+go_binary(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helloworld2&#34;</span>,
+    embed <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;:go_default_library&#34;</span>],
+    visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:public&#34;</span>],
+)
+</code></pre></div><p>このようにバイナリが2つあったとしましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">pkg_tar(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bin&#34;</span>,
+    deps <span style="color:#f92672">=</span> [
+        <span style="color:#e6db74">&#34;:helloworld1&#34;</span>,
+        <span style="color:#e6db74">&#34;:helloworld2&#34;</span>,
+    ],
+)
+
+container_image(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;image&#34;</span>,
+    base <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;@com_google_distroless_base//image&#34;</span>,
+    tars <span style="color:#f92672">=</span> [
+        <span style="color:#e6db74">&#34;:bin&#34;</span>,
+    ],
+)
+</code></pre></div><p><code>pkg_tar</code> で一つのtarにまとめてからそれを <code>container_image</code> でコンテナにすれば2つのバイナリが一つのコンテナに入ります。
+この例だと <code>helloworld1</code> と <code>helloworld2</code> というファイルがルート直下にできてしまうのでパスを変えたいこともあるかもしれません。
 （実際大体パスは変えます）</p>
 <p>その場合は</p>
-<pre class="code python literal-block">
-<span class="ln">1 </span><span class="n">pkg_tar</span><span class="p">(</span>
-<span class="ln">2 </span>    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;bin&quot;</span><span class="p">,</span>
-<span class="ln">3 </span>    <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span>
-<span class="ln">4 </span>        <span class="s2">&quot;:helloworld1&quot;</span><span class="p">,</span>
-<span class="ln">5 </span>        <span class="s2">&quot;:helloworld2&quot;</span><span class="p">,</span>
-<span class="ln">6 </span>    <span class="p">],</span>
-<span class="ln">7 </span>    <span class="n">package_dir</span> <span class="o">=</span> <span class="s2">&quot;/usr/local/bin&quot;</span><span class="p">,</span>
-<span class="ln">8 </span><span class="p">)</span>
-</pre>
-<p><tt class="docutils literal">package_dir</tt> を指定すればそのパス以下になります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">pkg_tar(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bin&#34;</span>,
+    deps <span style="color:#f92672">=</span> [
+        <span style="color:#e6db74">&#34;:helloworld1&#34;</span>,
+        <span style="color:#e6db74">&#34;:helloworld2&#34;</span>,
+    ],
+    package_dir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/usr/local/bin&#34;</span>,
+)
+</code></pre></div><p><code>package_dir</code> を指定すればそのパス以下になります。</p>
 <p>複数のパスに同時に別々のファイルを置くことは出来ません。
-つまりディレクトリごとに <tt class="docutils literal">pkg_tar</tt> を定義していく必要があります。</p>
+つまりディレクトリごとに <code>pkg_tar</code> を定義していく必要があります。</p>
 <p>これは最初とっつきにくいかもしれません。
 しかしBazelの特徴であるサンドボックス化とキャッシュはここでも効くので再ビルドする際などは変更があるディレクトリのtarファイルだけ再作成されます。</p>
-</div>
-<div class="section" id="id5">
-<h2>複雑なコンテナを作る</h2>
+<h1 id="複雑なコンテナを作る">複雑なコンテナを作る</h1>
 <p>複雑といってもバイナリだけではなくその動作に必要なライブラリを含める場合です。</p>
-<p>Distroless <a class="footnote-reference" href="#distroless" id="id6">[1]</a> のbaseイメージを使ってそれに必要なパッケージを追加していくような形でコンテナを作ります。</p>
-<pre class="code python literal-block">
-<span class="ln">1 </span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;bazel_tools//tools/build_defs/repo:git.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;git_repository&quot;</span><span class="p">)</span>
-<span class="ln">2 </span>
-<span class="ln">3 </span><span class="n">git_repository</span><span class="p">(</span>
-<span class="ln">4 </span>    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;com_google_distroless&quot;</span><span class="p">,</span>
-<span class="ln">5 </span>    <span class="n">remote</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/GoogleContainerTools/distroless.git&quot;</span><span class="p">,</span>
-<span class="ln">6 </span>    <span class="n">commit</span> <span class="o">=</span> <span class="s2">&quot;432c6f934f6c615142489650d22250c34dc88ebd&quot;</span>
-<span class="ln">7 </span><span class="p">)</span>
-</pre>
-<p>を <tt class="docutils literal">WORKSPACE</tt> ファイルに記述してリポジトリを取り込みます。</p>
-<pre class="code python literal-block">
-<span class="ln"> 1 </span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;com_google_distroless//package_manager:package_manager.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;dpkg_list&quot;</span><span class="p">,</span> <span class="s2">&quot;dpkg_src&quot;</span><span class="p">,</span> <span class="s2">&quot;package_manager_repositories&quot;</span><span class="p">)</span>
-<span class="ln"> 2 </span>
-<span class="ln"> 3 </span><span class="n">package_manager_repositories</span><span class="p">()</span>
-<span class="ln"> 4 </span>
-<span class="ln"> 5 </span><span class="n">dpkg_src</span><span class="p">(</span>
-<span class="ln"> 6 </span>   <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;debian_stretch&quot;</span><span class="p">,</span>
-<span class="ln"> 7 </span>   <span class="n">arch</span> <span class="o">=</span> <span class="s2">&quot;amd64&quot;</span><span class="p">,</span>
-<span class="ln"> 8 </span>   <span class="n">distro</span> <span class="o">=</span> <span class="s2">&quot;stretch&quot;</span><span class="p">,</span>
-<span class="ln"> 9 </span>   <span class="n">sha256</span> <span class="o">=</span> <span class="s2">&quot;9e7870c3c3b5b0a7f8322c323a3fa641193b1eee792ee7e2eedb6eeebf9969f3&quot;</span><span class="p">,</span>
-<span class="ln">10 </span>   <span class="n">snapshot</span> <span class="o">=</span> <span class="s2">&quot;20181019T145930Z&quot;</span><span class="p">,</span>
-<span class="ln">11 </span>   <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://snapshot.debian.org/archive&quot;</span><span class="p">,</span>
-<span class="ln">12 </span><span class="p">)</span>
-<span class="ln">13 </span>
-<span class="ln">14 </span><span class="n">dpkg_src</span><span class="p">(</span>
-<span class="ln">15 </span>   <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;debian_stretch_backports&quot;</span><span class="p">,</span>
-<span class="ln">16 </span>   <span class="n">arch</span> <span class="o">=</span> <span class="s2">&quot;amd64&quot;</span><span class="p">,</span>
-<span class="ln">17 </span>   <span class="n">distro</span> <span class="o">=</span> <span class="s2">&quot;stretch-backports&quot;</span><span class="p">,</span>
-<span class="ln">18 </span>   <span class="n">sha256</span> <span class="o">=</span> <span class="s2">&quot;3ddd744c8560dcc03dcd339bc043af54547201780a51fa541916ee083ccbdac4&quot;</span><span class="p">,</span>
-<span class="ln">19 </span>   <span class="n">snapshot</span> <span class="o">=</span> <span class="s2">&quot;20181019T145930Z&quot;</span><span class="p">,</span>
-<span class="ln">20 </span>   <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://snapshot.debian.org/archive&quot;</span><span class="p">,</span>
-<span class="ln">21 </span><span class="p">)</span>
-<span class="ln">22 </span>
-<span class="ln">23 </span><span class="n">dpkg_src</span><span class="p">(</span>
-<span class="ln">24 </span>   <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;debian_stretch_security&quot;</span><span class="p">,</span>
-<span class="ln">25 </span>   <span class="n">package_prefix</span> <span class="o">=</span> <span class="s2">&quot;https://snapshot.debian.org/archive/debian-security/20181019T145930Z/&quot;</span><span class="p">,</span>
-<span class="ln">26 </span>   <span class="n">packages_gz_url</span> <span class="o">=</span> <span class="s2">&quot;https://snapshot.debian.org/archive/debian-security/20181019T145930Z/dists/stretch/updates/main/binary-amd64/Packages.gz&quot;</span><span class="p">,</span>
-<span class="ln">27 </span>   <span class="n">sha256</span> <span class="o">=</span> <span class="s2">&quot;c212bcbde4e22d243d0238faed7b9f3eb05c708f7ba7937e2bed562c8de71cc9&quot;</span><span class="p">,</span>
-<span class="ln">28 </span><span class="p">)</span>
-<span class="ln">29 </span>
-<span class="ln">30 </span><span class="n">dpkg_list</span><span class="p">(</span>
-<span class="ln">31 </span>   <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;package_bundle&quot;</span><span class="p">,</span>
-<span class="ln">32 </span>   <span class="n">packages</span> <span class="o">=</span> <span class="p">[</span>
-<span class="ln">33 </span>       <span class="s2">&quot;busybox-static&quot;</span><span class="p">,</span>
-<span class="ln">34 </span>       <span class="s2">&quot;rsync&quot;</span><span class="p">,</span>
-<span class="ln">35 </span>       <span class="c1"># ここに必要なパッケージを列挙する</span>
-<span class="ln">36 </span>   <span class="p">],</span>
-<span class="ln">37 </span>   <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span>
-<span class="ln">38 </span>       <span class="s2">&quot;&#64;debian_stretch_security//file:Packages.json&quot;</span><span class="p">,</span>
-<span class="ln">39 </span>       <span class="s2">&quot;&#64;debian_stretch_backports//file:Packages.json&quot;</span><span class="p">,</span>
-<span class="ln">40 </span>       <span class="s2">&quot;&#64;debian_stretch//file:Packages.json&quot;</span><span class="p">,</span>
-<span class="ln">41 </span>   <span class="p">],</span>
-<span class="ln">42 </span><span class="p">)</span>
-</pre>
-<p>というような感じで必要なパッケージを取得してきます。
-これも <tt class="docutils literal">WORKSPACE</tt> ファイルに記述しておきます。</p>
+<p><a href="https://github.com/GoogleContainerTools/distroless">Distroless</a> のbaseイメージを使ってそれに必要なパッケージを追加していくような形でコンテナを作ります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;@bazel_tools//tools/build_defs/repo:git.bzl&#34;</span>, <span style="color:#e6db74">&#34;git_repository&#34;</span>)
+
+git_repository(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;com_google_distroless&#34;</span>,
+    remote <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://github.com/GoogleContainerTools/distroless.git&#34;</span>,
+    commit <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;432c6f934f6c615142489650d22250c34dc88ebd&#34;</span>
+)
+</code></pre></div><p>を <code>WORKSPACE</code> ファイルに記述してリポジトリを取り込みます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;@com_google_distroless//package_manager:package_manager.bzl&#34;</span>, <span style="color:#e6db74">&#34;dpkg_list&#34;</span>, <span style="color:#e6db74">&#34;dpkg_src&#34;</span>, <span style="color:#e6db74">&#34;package_manager_repositories&#34;</span>)
+
+package_manager_repositories()
+
+dpkg_src(
+   name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;debian_stretch&#34;</span>,
+   arch <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;amd64&#34;</span>,
+   distro <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;stretch&#34;</span>,
+   sha256 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;9e7870c3c3b5b0a7f8322c323a3fa641193b1eee792ee7e2eedb6eeebf9969f3&#34;</span>,
+   snapshot <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;20181019T145930Z&#34;</span>,
+   url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://snapshot.debian.org/archive&#34;</span>,
+)
+
+dpkg_src(
+   name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;debian_stretch_backports&#34;</span>,
+   arch <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;amd64&#34;</span>,
+   distro <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;stretch-backports&#34;</span>,
+   sha256 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;3ddd744c8560dcc03dcd339bc043af54547201780a51fa541916ee083ccbdac4&#34;</span>,
+   snapshot <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;20181019T145930Z&#34;</span>,
+   url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://snapshot.debian.org/archive&#34;</span>,
+)
+
+dpkg_src(
+   name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;debian_stretch_security&#34;</span>,
+   package_prefix <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://snapshot.debian.org/archive/debian-security/20181019T145930Z/&#34;</span>,
+   packages_gz_url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://snapshot.debian.org/archive/debian-security/20181019T145930Z/dists/stretch/updates/main/binary-amd64/Packages.gz&#34;</span>,
+   sha256 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;c212bcbde4e22d243d0238faed7b9f3eb05c708f7ba7937e2bed562c8de71cc9&#34;</span>,
+)
+
+dpkg_list(
+   name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;package_bundle&#34;</span>,
+   packages <span style="color:#f92672">=</span> [
+       <span style="color:#e6db74">&#34;busybox-static&#34;</span>,
+       <span style="color:#e6db74">&#34;rsync&#34;</span>,
+       <span style="color:#75715e"># ここに必要なパッケージを列挙する</span>
+   ],
+   sources <span style="color:#f92672">=</span> [
+       <span style="color:#e6db74">&#34;@debian_stretch_security//file:Packages.json&#34;</span>,
+       <span style="color:#e6db74">&#34;@debian_stretch_backports//file:Packages.json&#34;</span>,
+       <span style="color:#e6db74">&#34;@debian_stretch//file:Packages.json&#34;</span>,
+   ],
+)
+</code></pre></div><p>というような感じで必要なパッケージを取得してきます。
+これも <code>WORKSPACE</code> ファイルに記述しておきます。</p>
 <p>これで下準備は完了しているので次に実際にコンテナを作ります。
-以下は <tt class="docutils literal">BUILD</tt> ファイルに記述します。</p>
-<pre class="code python literal-block">
-<span class="ln"> 1 </span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;io_bazel_rules_docker//container:container.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;container_image&quot;</span><span class="p">)</span>
-<span class="ln"> 2 </span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;package_bundle//file:packages.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;packages&quot;</span><span class="p">)</span>
-<span class="ln"> 3 </span>
-<span class="ln"> 4 </span><span class="n">container_image</span><span class="p">(</span>
-<span class="ln"> 5 </span>   <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span>
-<span class="ln"> 6 </span>   <span class="n">base</span> <span class="o">=</span> <span class="s2">&quot;&#64;com_google_distroless_base//image&quot;</span><span class="p">,</span>
-<span class="ln"> 7 </span>   <span class="n">debs</span> <span class="o">=</span> <span class="p">[</span>
-<span class="ln"> 8 </span>       <span class="n">packages</span><span class="p">[</span><span class="s2">&quot;busybox-static&quot;</span><span class="p">],</span>
-<span class="ln"> 9 </span>       <span class="n">packages</span><span class="p">[</span><span class="s2">&quot;rsync&quot;</span><span class="p">],</span>
-<span class="ln">10 </span>       <span class="c1"># 他にコンテナに含めたいファイルがある場合はここに追記する</span>
-<span class="ln">11 </span>   <span class="p">],</span>
-<span class="ln">12 </span>   <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">],</span>
-<span class="ln">13 </span><span class="p">)</span>
-</pre>
-<div class="section" id="dockerfile">
-<h3>Dockerfileの代替になるか</h3>
-<p>このようにパッケージを追加したイメージも作れますが <tt class="docutils literal">Dockerfile</tt> の代替とするのは難しいなと感じています。</p>
+以下は <code>BUILD</code> ファイルに記述します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;@io_bazel_rules_docker//container:container.bzl&#34;</span>, <span style="color:#e6db74">&#34;container_image&#34;</span>)
+load(<span style="color:#e6db74">&#34;@package_bundle//file:packages.bzl&#34;</span>, <span style="color:#e6db74">&#34;packages&#34;</span>)
+
+container_image(
+   name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;image&#34;</span>,
+   base <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;@com_google_distroless_base//image&#34;</span>,
+   debs <span style="color:#f92672">=</span> [
+       packages[<span style="color:#e6db74">&#34;busybox-static&#34;</span>],
+       packages[<span style="color:#e6db74">&#34;rsync&#34;</span>],
+       <span style="color:#75715e"># 他にコンテナに含めたいファイルがある場合はここに追記する</span>
+   ],
+   visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:public&#34;</span>],
+)
+</code></pre></div><h2 id="dockerfileの代替になるか">Dockerfileの代替になるか</h2>
+<p>このようにパッケージを追加したイメージも作れますが <code>Dockerfile</code> の代替とするのは難しいなと感じています。</p>
 <p>いくつも依存パッケージがあるようなコンテナの場合、非常に定義が煩雑になります。
-<tt class="docutils literal">Dockerfile</tt> であれば一行 <tt class="docutils literal">RUN</tt> を書けば済むところが何十倍も定義を書かないといけないです。</p>
+<code>Dockerfile</code> であれば一行 <code>RUN</code> を書けば済むところが何十倍も定義を書かないといけないです。</p>
 <p>それでもBazelでコンテナを作った方が確実ではあると思います。
 Bazelは誰のローカルで実行してもCI上で実行しても同じ定義ファイルからは同じコンテナイメージができます。
 またコンテナの作成にはdockerは不要です。
 一方docker buildした場合は実行した時間によって結果は違いますし、dockerの状態によっても結果が大きく変わってしまいます。</p>
-<p>そんなデメリットがあってもBazelですべてのイメージを作るのは大変で <tt class="docutils literal">Dockerfile</tt> を使っているものがいくつもあります。</p>
-</div>
-</div>
-<div class="section" id="id7">
-<h2>パッケージを作る</h2>
-<p>サンプルリポジトリには <tt class="docutils literal">mysqld_exporter</tt> のdebパッケージを作るルールも同梱しています。</p>
+<p>そんなデメリットがあってもBazelですべてのイメージを作るのは大変で <code>Dockerfile</code> を使っているものがいくつもあります。</p>
+<h1 id="パッケージを作る">パッケージを作る</h1>
+<p>サンプルリポジトリには <code>mysqld_exporter</code> のdebパッケージを作るルールも同梱しています。</p>
 <p>このようにバイナリがリリースされていてそのバイナリをdebパッケージとして詰め込むだけであれば非常に簡単です。</p>
 <p>サンプルリポジトリでは</p>
-<pre class="code shell literal-block">
-$ bazel build //debian_packages/mysqld_exporter:package
-</pre>
-<p>で <tt class="docutils literal"><span class="pre">bazel-bin/debian_packages/mysqld_exporter/mysqld-exporter_0.11.0-1_amd64.deb</span></tt> ができあがります。</p>
+<pre><code class="language-console" data-lang="console">$ bazel build //debian_packages/mysqld_exporter:package
+</code></pre><p>で <code>bazel-bin/debian_packages/mysqld_exporter/mysqld-exporter_0.11.0-1_amd64.deb</code> ができあがります。</p>
 <p>パッケージとして使うにはこれ以外のファイルも入れたくなるでしょう。
 もちろんそれも上述の方法を応用して可能です。</p>
-</div>
-<div class="section" id="id8">
-<h2>テストスイートを自作してテストをする</h2>
+<h1 id="テストスイートを自作してテストをする">テストスイートを自作してテストをする</h1>
 <p>自分のリポジトリでは設定ファイルのテストスイートを自作してそれを利用してCIもしています。
 CIではテストスイートのビルドから対象となる設定ファイルを食わせて実行するところまでのすべてをBazelで行います。</p>
 <p>これを実現するために必要なものは</p>
-<ol class="arabic simple">
+<ol>
 <li>テストスイートの実装</li>
 <li>テストスイートを実行するための定義</li>
 <li>テスト対象の設定ファイルを定義する</li>
 </ol>
 <p>の3つです。</p>
 <p>テストスイートの実装は引数で設定ファイルを受け取り、テストした結果に応じてexit codeが変わるものであればいいです。</p>
-<p>テストスイートを実行するための定義が通常のビルド用の <tt class="docutils literal">BUILD.bazel</tt> ファイルを書いたりする時とは違います。</p>
-<p>以下のようなファイルを <tt class="docutils literal">def.bzl</tt> として作ります。</p>
-<p>（このコードも <a class="reference external" href="https://github.com/f110/bazel-example">https://github.com/f110/bazel-example</a> の <tt class="docutils literal"><span class="pre">test-suite</span></tt> と <tt class="docutils literal">config</tt> ディレクトリのそれぞれに入っています）</p>
-<pre class="code python literal-block">
-<span class="ln"> 1 </span><span class="k">def</span> <span class="nf">_example_config_test_impl</span><span class="p">(</span><span class="n">ctx</span><span class="p">):</span>
-<span class="ln"> 2 </span>    <span class="n">src</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">src</span>
-<span class="ln"> 3 </span>    <span class="n">kicker</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">declare_file</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_kicker.sh&quot;</span> <span class="o">%</span> <span class="n">ctx</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="ln"> 4 </span>    <span class="n">ctx</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">expand_template</span><span class="p">(</span>
-<span class="ln"> 5 </span>        <span class="n">template</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_wrapper_template</span><span class="p">,</span>
-<span class="ln"> 6 </span>        <span class="n">output</span> <span class="o">=</span> <span class="n">kicker</span><span class="p">,</span>
-<span class="ln"> 7 </span>        <span class="n">substitutions</span> <span class="o">=</span> <span class="p">{</span>
-<span class="ln"> 8 </span>            <span class="s2">&quot;</span><span class="si">{executable_binary}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">ctx</span><span class="o">.</span><span class="n">executable</span><span class="o">.</span><span class="n">_test_suite</span><span class="o">.</span><span class="n">short_path</span><span class="p">,</span>
-<span class="ln"> 9 </span>            <span class="s2">&quot;</span><span class="si">{config_file}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">src</span><span class="o">.</span><span class="n">short_path</span><span class="p">,</span>
-<span class="ln">10 </span>        <span class="p">},</span>
-<span class="ln">11 </span>        <span class="n">is_executable</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="ln">12 </span>    <span class="p">)</span>
-<span class="ln">13 </span>    <span class="n">runfiles</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">runfiles</span><span class="p">(</span><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">kicker</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">executable</span><span class="o">.</span><span class="n">_test_suite</span><span class="p">,</span> <span class="n">src</span><span class="p">])</span>
-<span class="ln">14 </span>    <span class="k">return</span> <span class="p">[</span><span class="n">DefaultInfo</span><span class="p">(</span><span class="n">executable</span> <span class="o">=</span> <span class="n">kicker</span><span class="p">,</span> <span class="n">runfiles</span> <span class="o">=</span> <span class="n">runfiles</span><span class="p">)]</span>
-<span class="ln">15 </span>
-<span class="ln">16 </span><span class="n">example_config_test</span> <span class="o">=</span> <span class="n">rule</span><span class="p">(</span>
-<span class="ln">17 </span>    <span class="n">implementation</span> <span class="o">=</span> <span class="n">_example_config_test_impl</span><span class="p">,</span>
-<span class="ln">18 </span>    <span class="n">test</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="ln">19 </span>    <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span>
-<span class="ln">20 </span>        <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">allow_single_file</span> <span class="o">=</span> <span class="kc">True</span><span class="p">),</span>
-<span class="ln">21 </span>        <span class="s2">&quot;_test_suite&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">label</span><span class="p">(</span>
-<span class="ln">22 </span>            <span class="n">default</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="s2">&quot;//test-suite/example-suite&quot;</span><span class="p">),</span>
-<span class="ln">23 </span>            <span class="n">executable</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="ln">24 </span>            <span class="n">cfg</span> <span class="o">=</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span>
-<span class="ln">25 </span>        <span class="p">),</span>
-<span class="ln">26 </span>        <span class="s2">&quot;_wrapper_template&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">label</span><span class="p">(</span>
-<span class="ln">27 </span>            <span class="n">allow_single_file</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="ln">28 </span>            <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;kicker.tpl&quot;</span><span class="p">,</span>
-<span class="ln">29 </span>        <span class="p">)</span>
-<span class="ln">30 </span>    <span class="p">},</span>
-<span class="ln">31 </span><span class="p">)</span>
-</pre>
-<p><tt class="docutils literal">exmaple_config_test</tt> を定義します。
-これには実際に実行される際に何が行われるか関数として定義され <tt class="docutils literal">example_config_test</tt> に指定できる属性値も定義されます。</p>
+<p>テストスイートを実行するための定義が通常のビルド用の <code>BUILD.bazel</code> ファイルを書いたりする時とは違います。</p>
+<p>以下のようなファイルを <code>def.bzl</code> として作ります。</p>
+<p>（このコードも <a href="https://github.com/f110/bazel-example">https://github.com/f110/bazel-example</a> の <code>test-suite</code> と <code>config</code> ディレクトリのそれぞれに入っています）</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">_example_config_test_impl</span>(ctx):
+    src <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>file<span style="color:#f92672">.</span>src
+    kicker <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>declare_file(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">_kicker.sh&#34;</span> <span style="color:#f92672">%</span> ctx<span style="color:#f92672">.</span>label<span style="color:#f92672">.</span>name)
+    ctx<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>expand_template(
+        template <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>file<span style="color:#f92672">.</span>_wrapper_template,
+        output <span style="color:#f92672">=</span> kicker,
+        substitutions <span style="color:#f92672">=</span> {
+            <span style="color:#e6db74">&#34;{executable_binary}&#34;</span>: ctx<span style="color:#f92672">.</span>executable<span style="color:#f92672">.</span>_test_suite<span style="color:#f92672">.</span>short_path,
+            <span style="color:#e6db74">&#34;{config_file}&#34;</span>: src<span style="color:#f92672">.</span>short_path,
+        },
+        is_executable <span style="color:#f92672">=</span> True,
+    )
+    runfiles <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>runfiles(files <span style="color:#f92672">=</span> [kicker, ctx<span style="color:#f92672">.</span>executable<span style="color:#f92672">.</span>_test_suite, src])
+    <span style="color:#66d9ef">return</span> [DefaultInfo(executable <span style="color:#f92672">=</span> kicker, runfiles <span style="color:#f92672">=</span> runfiles)]
+
+example_config_test <span style="color:#f92672">=</span> rule(
+    implementation <span style="color:#f92672">=</span> _example_config_test_impl,
+    test <span style="color:#f92672">=</span> True,
+    attrs <span style="color:#f92672">=</span> {
+        <span style="color:#e6db74">&#34;src&#34;</span>: attr<span style="color:#f92672">.</span>label(allow_single_file <span style="color:#f92672">=</span> True),
+        <span style="color:#e6db74">&#34;_test_suite&#34;</span>: attr<span style="color:#f92672">.</span>label(
+            default <span style="color:#f92672">=</span> Label(<span style="color:#e6db74">&#34;//test-suite/example-suite&#34;</span>),
+            executable <span style="color:#f92672">=</span> True,
+            cfg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;target&#34;</span>,
+        ),
+        <span style="color:#e6db74">&#34;_wrapper_template&#34;</span>: attr<span style="color:#f92672">.</span>label(
+            allow_single_file <span style="color:#f92672">=</span> True,
+            default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kicker.tpl&#34;</span>,
+        )
+    },
+)
+</code></pre></div><p><code>exmaple_config_test</code> を定義します。
+これには実際に実行される際に何が行われるか関数として定義され <code>example_config_test</code> に指定できる属性値も定義されます。</p>
 <p>テストスイートを実行する際には直接バイナリを実行するのではなく、シェルスクリプトを作りそれを実行するようにしています。
 これは引数を渡してバイナリを実行するというのが提供されていなかったのでこのようにしています。</p>
-<p><tt class="docutils literal">runfile</tt> という変数に動作に必要なファイルのリストを作り <tt class="docutils literal">DefaultInfo()</tt> の引数で渡しています。
-ここでは <tt class="docutils literal">kicker</tt> シェルスクリプト、 <tt class="docutils literal">ctx.executable._test_suite</tt> テストスイートのバイナリ、 <tt class="docutils literal">src</tt> テスト対象のファイル、の3つを渡します。
+<p><code>runfile</code> という変数に動作に必要なファイルのリストを作り <code>DefaultInfo()</code> の引数で渡しています。
+ここでは <code>kicker</code> シェルスクリプト、 <code>ctx.executable._test_suite</code> テストスイートのバイナリ、 <code>src</code> テスト対象のファイル、の3つを渡します。
 これらのファイルがサンドボックスの中に入るためここで必要なファイルを列挙しておく必要があります。</p>
 <p>シェルスクリプトのテンプレートとなるkicker.tplは以下のように単純にバイナリに引数をつけて実行するだけです。</p>
-<pre class="code bash literal-block">
-<span class="ln">1 </span><span class="ch">#!/bin/bash
-</span><span class="ln">2 </span><span class="ch"></span><span class="nb">exec</span> <span class="o">{</span>executable_binary<span class="o">}</span> <span class="o">{</span>config_file<span class="o">}</span>
-</pre>
-<p>最後にこの2つのファイルの <tt class="docutils literal">BUILD.bazel</tt> を用意します。</p>
-<pre class="code python literal-block">
-<span class="ln"> 1 </span><span class="n">filegroup</span><span class="p">(</span>
-<span class="ln"> 2 </span>    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;all_rules&quot;</span><span class="p">,</span>
-<span class="ln"> 3 </span>    <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">],</span>
-<span class="ln"> 4 </span><span class="p">)</span>
-<span class="ln"> 5 </span>
-<span class="ln"> 6 </span><span class="n">exports_files</span><span class="p">(</span>
-<span class="ln"> 7 </span>    <span class="p">[</span><span class="s2">&quot;kicker.tpl&quot;</span><span class="p">],</span>
-<span class="ln"> 8 </span>    <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">],</span>
-<span class="ln"> 9 </span><span class="p">)</span>
-</pre>
-<p>ここまで用意できれば、最後はテスト対象の設定ファイルを定義するだけです。</p>
-<pre class="code python literal-block">
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;//test-suite/example-suite/rules:def.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;example_config_test&quot;</span><span class="p">)</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#!/bin/bash
+</span><span style="color:#75715e"></span>exec <span style="color:#f92672">{</span>executable_binary<span style="color:#f92672">}</span> <span style="color:#f92672">{</span>config_file<span style="color:#f92672">}</span>
+</code></pre></div><p>最後にこの2つのファイルの <code>BUILD.bazel</code> を用意します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">filegroup(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;all_rules&#34;</span>,
+    visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:public&#34;</span>],
+)
 
-<span class="n">example_config_test</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
-    <span class="n">src</span> <span class="o">=</span> <span class="s2">&quot;success.conf&quot;</span>
-<span class="p">)</span>
-</pre>
-<p>サンプルのリポジトリであれば</p>
-<pre class="code shell literal-block">
-$ bazel <span class="nb">test</span> //config/...
-</pre>
-<p>でテストができることを確認できます。
-<tt class="docutils literal">config</tt> ディレクトリの <tt class="docutils literal">success.conf</tt> を <tt class="docutils literal">[]</tt> に編集して再度テストするとテストが失敗する様子も見ることが出来ます。</p>
-</div>
-<div class="section" id="go">
-<h2>Go の静的ファイル埋め込み</h2>
+exports_files(
+    [<span style="color:#e6db74">&#34;kicker.tpl&#34;</span>],
+    visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:public&#34;</span>],
+)
+</code></pre></div><p>ここまで用意できれば、最後はテスト対象の設定ファイルを定義するだけです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;//test-suite/example-suite/rules:def.bzl&#34;</span>, <span style="color:#e6db74">&#34;example_config_test&#34;</span>)
+
+example_config_test(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;test&#34;</span>,
+    src <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;success.conf&#34;</span>
+)
+</code></pre></div><p>サンプルのリポジトリであれば</p>
+<pre><code class="language-console" data-lang="console">$ bazel test //config/...
+</code></pre><p>でテストができることを確認できます。
+<code>config</code> ディレクトリの <code>success.conf</code> を <code>[]</code> に編集して再度テストするとテストが失敗する様子も見ることが出来ます。</p>
+<h1 id="go-の静的ファイル埋め込み">Go の静的ファイル埋め込み</h1>
 <p>Go でバイナリにリソースを埋め込むというのもBazelで出来ます。
 ただしBazelはリソースを埋め込んだソースファイルを生成するだけですので、実際にそれを利用したソフトウェアを構築するにはそれ以外の部分でも工夫が必要なこともあります。</p>
 <p>例えばChat Botにも休日を与えるため祝日のデータがCSV形式で埋め込まれています。（なおこのCSVは内閣府大臣官房総務課が配布しているものを利用しています）</p>
-<pre class="code python literal-block">
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;io_bazel_rules_go//extras:embed_data.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;go_embed_data&quot;</span><span class="p">)</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;@io_bazel_rules_go//extras:embed_data.bzl&#34;</span>, <span style="color:#e6db74">&#34;go_embed_data&#34;</span>)
 
-<span class="n">go_embed_data</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;embed&quot;</span><span class="p">,</span>
-    <span class="n">srcs</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;//bot/data/holiday&quot;</span><span class="p">,</span>
-    <span class="p">],</span>
-    <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">],</span>
-<span class="p">)</span>
+go_embed_data(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;embed&#34;</span>,
+    srcs <span style="color:#f92672">=</span> [
+        <span style="color:#e6db74">&#34;//bot/data/holiday&#34;</span>,
+    ],
+    visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:public&#34;</span>],
+)
 
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;io_bazel_rules_go//go:def.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;go_library&quot;</span><span class="p">)</span>
+load(<span style="color:#e6db74">&#34;@io_bazel_rules_go//go:def.bzl&#34;</span>, <span style="color:#e6db74">&#34;go_library&#34;</span>)
 
-<span class="n">go_library</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;embed_data&quot;</span><span class="p">,</span>
-    <span class="n">srcs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;:embed&quot;</span><span class="p">],</span>
-    <span class="n">importpath</span> <span class="o">=</span> <span class="s2">&quot;github.com/f110/bazel-example/bot/assets&quot;</span><span class="p">,</span>
-    <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:private&quot;</span><span class="p">],</span>
-<span class="p">)</span>
+go_library(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;embed_data&#34;</span>,
+    srcs <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;:embed&#34;</span>],
+    importpath <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;github.com/f110/bazel-example/bot/assets&#34;</span>,
+    visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:private&#34;</span>],
+)
 
-<span class="n">go_library</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;go_default_library&quot;</span><span class="p">,</span>
-    <span class="n">srcs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dummy.go&quot;</span><span class="p">],</span>  <span class="c1"># keep</span>
-    <span class="n">embed</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;:embed_data&quot;</span><span class="p">],</span>  <span class="c1"># keep</span>
-    <span class="n">importpath</span> <span class="o">=</span> <span class="s2">&quot;github.com/f110/bazel-example/bot/assets&quot;</span><span class="p">,</span>
-    <span class="n">visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">],</span>
-<span class="p">)</span>
-</pre>
-<p>go_embed_data で go-bindata を用いて任意のファイルを埋め込んだソースコードが生成できます。
+go_library(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;go_default_library&#34;</span>,
+    srcs <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;dummy.go&#34;</span>],  <span style="color:#75715e"># keep</span>
+    embed <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;:embed_data&#34;</span>],  <span style="color:#75715e"># keep</span>
+    importpath <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;github.com/f110/bazel-example/bot/assets&#34;</span>,
+    visibility <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;//visibility:public&#34;</span>],
+)
+</code></pre></div><p>go_embed_data で go-bindata を用いて任意のファイルを埋め込んだソースコードが生成できます。
 ただしそれだけだとサンドボックス内で生成されてしまい、IDE等ではコンパイルエラーになります。
-そこで定義だけの <tt class="docutils literal">no_bazel.go</tt> を作っておきます。</p>
-<pre class="code literal-block">
-var Data = map[string][]byte{}
-</pre>
-<p>しかしこの <tt class="docutils literal">no_bazel.go</tt> はビルドからは除外したいです。
-ですがgazelleを使って <tt class="docutils literal">BUILD.bazel</tt> を生成していると勝手にビルド対象に含まれてしまいます。
+そこで定義だけの <code>no_bazel.go</code> を作っておきます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">Data</span> = <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>][]<span style="color:#66d9ef">byte</span>{}
+</code></pre></div><p>しかしこの <code>no_bazel.go</code> はビルドからは除外したいです。
+ですがgazelleを使って <code>BUILD.bazel</code> を生成していると勝手にビルド対象に含まれてしまいます。
 そこでgazelleの <strong># keep がある行は変更しない</strong> という機能をうまく利用します。</p>
 <p>上記のサンプルコードの場合は2箇所利用しています。
-一度gazelleで <tt class="docutils literal">BUILD.bazel</tt> を生成した後、no_bazel.goを削除し # keep をつけたりするといいでしょう。</p>
-<div class="section" id="id9">
-<h3>テンプレートファイルの場合</h3>
+一度gazelleで <code>BUILD.bazel</code> を生成した後、no_bazel.goを削除し # keep をつけたりするといいでしょう。</p>
+<h2 id="テンプレートファイルの場合">テンプレートファイルの場合</h2>
 <p>前述の方法でテンプレートファイル自体はバイナリに埋め込めますがそれでは開発時に不便です。
 開発時は多少遅くてもリクエストのたびにテンプレートをコンパイルしてレンダリングしてくれたほうがテンプレートの修正が簡単に行えるので大変便利です。</p>
 <p>そこで基本的に開発時は埋め込まれたテンプレートを使わず、埋め込むべきファイルのパスを設定ファイルで指定してリクエストのたびにファイルを読み込むようにしています。</p>
 <p>これはBazelを使わない場合も同様に似たようなものを実装する必要があるので皆さんも何度か実装されたことがあるかもしれません。</p>
-</div>
-</div>
-<div class="section" id="remote-cache">
-<h2>番外：Remote Cache</h2>
+<h1 id="番外remote-cache">番外：Remote Cache</h1>
 <p>サンドボックスでビルドやテストが実行されるBazelは生成物をキャッシュすることができます。
 ローカルで2回目以降のビルドにかかる時間がすごく短いのはこのキャッシュのおかげでもあります。</p>
 <p>そしてこのキャッシュはリモートサーバーで共有することができます。</p>
-<pre class="code shell literal-block">
-$ bazel <span class="nb">test</span> --remote_http_cache<span class="o">=</span>http://bazel-cache //...
-</pre>
-<p>と引数にキャッシュサーバーのアドレスを渡すだけなので簡単に始められます。</p>
+<pre><code class="language-console" data-lang="console">$ bazel test --remote_http_cache=http://bazel-cache //...
+</code></pre><p>と引数にキャッシュサーバーのアドレスを渡すだけなので簡単に始められます。</p>
 <p>キャッシュサーバーはNginxで提供されるWebDAVとキャッシュされたオブジェクトのクローラーの2つから成り立ちます。</p>
 <p>クローラーはキャッシュの領域が減ると古いオブジェクトから目標とする容量まで削除します。
 このクローラーは動作が複雑ではなかったのでサクッと自作しました。</p>
-</div>
-<div class="section" id="id10">
-<h2>まとめ</h2>
+<h1 id="まとめ">まとめ</h1>
 <p>Bazelを使ってコンテナやパッケージを作ったり、テストスイートとそれによるテストの実行方法について簡単に紹介しました。
 ソフトウェアのビルドにとどまらずテストやパッケージングも一つのツールで完結することができます。</p>
 <p>Bazelは実際に自分のリポジトリで使ってみると拡張性の高さを体感することができますし、ここで紹介したものはBazelの力のほんの一部でしかないことに気がつくかもしれません。
 今までの方法と大きく違う面も多く慣れないうちは戸惑うこともあるかと思いますが、Bazel流のやり方の理解が進むと良さが分かってくるかと思います。
-勘所が掴めると <tt class="docutils literal">rules_*</tt> のSkylarkを理解するのも簡単になってきます。
-自分のやりたいことを実現する直接的な方法が分からなくても <tt class="docutils literal">rules_*</tt> を参考にすることができます。</p>
+勘所が掴めると <code>rules_*</code> のSkylarkを理解するのも簡単になってきます。
+自分のやりたいことを実現する直接的な方法が分からなくても <code>rules_*</code> を参考にすることができます。</p>
 <p>Bazelをリポジトリ全体のビルドツールとして利用していくには主要なコミッターが最低一人はBazel流のやり方に合わせていける人である必要があると思います。
 そういった点で導入の障壁の高さや学習コストの問題はあるかもしれません。
 そのため、まだ誰にでもおすすめできるツールではないですが興味がある人はチャレンジしてみてください！</p>
-</div>
-<div class="section" id="id11">
-<h2>リンク</h2>
-<table class="docutils footnote" frame="void" id="distroless" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id6">[1]</a></td><td>&quot;Distroless&quot; Docker Images <a class="reference external" href="https://github.com/GoogleContainerTools/distroless">https://github.com/GoogleContainerTools/distroless</a></td></tr>
-</tbody>
-</table>
-</div>
-</div>
+
   </section>
   <footer>
     

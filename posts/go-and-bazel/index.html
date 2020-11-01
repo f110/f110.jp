@@ -57,178 +57,152 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>本エントリは <a class="reference external" href="https://medium.com/mixi-developers/go-project-with-bazel-ad807ba19f5c">オリジナル</a> のコピーです。</p>
-<p>以前、 <a class="reference external" href="https://medium.com/mixi-developers/bazelとモノレポ-b901ffba61ce">モノレポ構成にしてビルドツールとしてBazelを利用している</a> ことを紹介しました。</p>
-<p>そのBazelは10月10日にとうとう1.0を <a class="reference external" href="https://blog.bazel.build/2019/10/10/bazel-1.0.html">リリースしました！</a>
+    <p>本エントリは <a href="https://medium.com/mixi-developers/go-project-with-bazel-ad807ba19f5c">オリジナル</a> のコピーです。</p>
+<p>以前、 <a href="https://medium.com/mixi-developers/bazel%E3%81%A8%E3%83%A2%E3%83%8E%E3%83%AC%E3%83%9D-b901ffba61ce">モノレポ構成にしてビルドツールとしてBazelを利用している</a> ことを紹介しました。</p>
+<p>そのBazelは10月10日にとうとう1.0を <a href="https://blog.bazel.build/2019/10/10/bazel-1.0.html">リリースしました！</a>
 バージョン1.0に到達したというニュースは日本語のニュースサイトでも掲載されるなど、多少注目を浴びたようです。</p>
 <p>そこで今回はGoのプロジェクトのビルドツールとしてBazelを利用する例をご紹介します。
 GoのプロジェクトではGNU makeをビルドツールとして使われていることが多いと思いますが、一度Bazelに慣れてしまうと手放せないツールになります（なっています）。
 導入を検討する際のなにかの参考になりそうなTipsをいくつかご紹介します。</p>
-<div class="section" id="bazelgo">
-<h2>BazelをGoのプロジェクトで使うことのメリット</h2>
-<ol class="arabic simple">
-<li>Bazel がすべてを用意してくれるので最悪 <tt class="docutils literal">go</tt> コマンドが入ってなくてもビルドできる。</li>
+<h1 id="bazelをgoのプロジェクトで使うことのメリット">BazelをGoのプロジェクトで使うことのメリット</h1>
+<ol>
+<li>Bazel がすべてを用意してくれるので最悪 <code>go</code> コマンドが入ってなくてもビルドできる。</li>
 <li>コンテナとしてshipする際に非常に軽量なイメージをdockerを使わずにビルドできる</li>
 <li>debやrpmパッケージ自体もクロスコンパイルできる（macOSからbazelだけでdebパッケージが作れます）</li>
 </ol>
-</div>
-<div class="section" id="build">
-<h2>BUILDファイルの生成</h2>
+<h1 id="buildファイルの生成">BUILDファイルの生成</h1>
 <p>BazelはBUILDファイルにビルドに必要な情報がすべて書かれています。
 依存関係や必要なファイルもすべて記述する必要があります。
 これは一見面倒に見えますが、Goのプロジェクトの場合はソースコードを解析して自動生成することが可能です。
 （実際、全てを手で書こうと思うとかなり面倒です。なので基本的には自動生成してしまうのがいいと思います。）</p>
-<p>これには <a class="reference external" href="https://github.com/bazelbuild/bazel-gazelle">gazelle</a> を使います。
+<p>これには <a href="https://github.com/bazelbuild/bazel-gazelle">gazelle</a> を使います。
 導入方法はシンプルなのでREADMEの通りにWORKSPACEファイルを作るだけです。</p>
 <p>以下にWORKSPACEファイルの例を示しますが、 Bazel も gazelle も rules_go もアップデートが早いプロジェクトですので最新のREADMEを確認してください。</p>
-<pre class="code python literal-block">
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;bazel_tools//tools/build_defs/repo:http.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;http_archive&quot;</span><span class="p">)</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;@bazel_tools//tools/build_defs/repo:http.bzl&#34;</span>, <span style="color:#e6db74">&#34;http_archive&#34;</span>)
 
-<span class="n">http_archive</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;io_bazel_rules_go&quot;</span><span class="p">,</span>
-    <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/v0.20.1/rules_go-v0.20.1.tar.gz&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;https://github.com/bazelbuild/rules_go/releases/download/v0.20.1/rules_go-v0.20.1.tar.gz&quot;</span><span class="p">,</span>
-    <span class="p">],</span>
-    <span class="n">sha256</span> <span class="o">=</span> <span class="s2">&quot;842ec0e6b4fbfdd3de6150b61af92901eeb73681fd4d185746644c338f51d4c0&quot;</span><span class="p">,</span>
-<span class="p">)</span>
+http_archive(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;io_bazel_rules_go&#34;</span>,
+    urls <span style="color:#f92672">=</span> [
+        <span style="color:#e6db74">&#34;https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/v0.20.1/rules_go-v0.20.1.tar.gz&#34;</span>,
+        <span style="color:#e6db74">&#34;https://github.com/bazelbuild/rules_go/releases/download/v0.20.1/rules_go-v0.20.1.tar.gz&#34;</span>,
+    ],
+    sha256 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;842ec0e6b4fbfdd3de6150b61af92901eeb73681fd4d185746644c338f51d4c0&#34;</span>,
+)
 
-<span class="n">http_archive</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;bazel_gazelle&quot;</span><span class="p">,</span>
-    <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/bazel-gazelle/releases/download/v0.19.0/bazel-gazelle-v0.19.0.tar.gz&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.19.0/bazel-gazelle-v0.19.0.tar.gz&quot;</span><span class="p">,</span>
-    <span class="p">],</span>
-    <span class="n">sha256</span> <span class="o">=</span> <span class="s2">&quot;41bff2a0b32b02f20c227d234aa25ef3783998e5453f7eade929704dcff7cd4b&quot;</span><span class="p">,</span>
-<span class="p">)</span>
+http_archive(
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bazel_gazelle&#34;</span>,
+    urls <span style="color:#f92672">=</span> [
+        <span style="color:#e6db74">&#34;https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/bazel-gazelle/releases/download/v0.19.0/bazel-gazelle-v0.19.0.tar.gz&#34;</span>,
+        <span style="color:#e6db74">&#34;https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.19.0/bazel-gazelle-v0.19.0.tar.gz&#34;</span>,
+    ],
+    sha256 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;41bff2a0b32b02f20c227d234aa25ef3783998e5453f7eade929704dcff7cd4b&#34;</span>,
+)
 
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;io_bazel_rules_go//go:deps.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;go_register_toolchains&quot;</span><span class="p">,</span> <span class="s2">&quot;go_rules_dependencies&quot;</span><span class="p">)</span>
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;bazel_gazelle//:deps.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;gazelle_dependencies&quot;</span><span class="p">)</span>
+load(<span style="color:#e6db74">&#34;@io_bazel_rules_go//go:deps.bzl&#34;</span>, <span style="color:#e6db74">&#34;go_register_toolchains&#34;</span>, <span style="color:#e6db74">&#34;go_rules_dependencies&#34;</span>)
+load(<span style="color:#e6db74">&#34;@bazel_gazelle//:deps.bzl&#34;</span>, <span style="color:#e6db74">&#34;gazelle_dependencies&#34;</span>)
 
-<span class="n">go_rules_dependencies</span><span class="p">()</span>
+go_rules_dependencies()
 
-<span class="n">go_register_toolchains</span><span class="p">()</span>
+go_register_toolchains()
 
-<span class="n">gazelle_dependencies</span><span class="p">()</span>
-</pre>
-</div>
-<div class="section" id="id3">
-<h2>依存ライブラリ</h2>
+gazelle_dependencies()
+</code></pre></div><h1 id="依存ライブラリ">依存ライブラリ</h1>
 <p>依存ライブラリを管理する方法は2つあります。
 一つは依存ライブラリの管理まで Bazel に任せてしまう方法、もう一つは vendor として一緒にコミットしてこれまでと同じ方法でビルドする方法です。</p>
 <p>自分は後者のvendorとしてしまう方法が好みでよくこちらの方法を使っています。</p>
-<p>前者の方法は <tt class="docutils literal">go.mod</tt> ファイルからBazelによる依存関係の定義を生成します。
+<p>前者の方法は <code>go.mod</code> ファイルからBazelによる依存関係の定義を生成します。
 これも gazelle でできますが、エディタからテストを走らせる際とBazelでビルドする際で2つのキャッシュを保存することになってしまいます。（Bazelのキャッシュディレクトリの中とGoのキャッシュの2つ）
-<tt class="docutils literal">go.mod</tt> ファイルがベースになっているのでこの2つは同じではありますが、少し気持ち悪いと感じてしまいます。</p>
-<p><tt class="docutils literal">go.mod</tt> からBazelの依存関係の定義へ変換する場合は <tt class="docutils literal">gazelle</tt> の <tt class="docutils literal"><span class="pre">update-repos</span></tt> を使います。</p>
-<pre class="code python literal-block">
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;bazel_gazelle//:def.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;gazelle&quot;</span><span class="p">)</span>
+<code>go.mod</code> ファイルがベースになっているのでこの2つは同じではありますが、少し気持ち悪いと感じてしまいます。</p>
+<p><code>go.mod</code> からBazelの依存関係の定義へ変換する場合は <code>gazelle</code> の <code>update-repos</code> を使います。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;@bazel_gazelle//:def.bzl&#34;</span>, <span style="color:#e6db74">&#34;gazelle&#34;</span>)
 
-<span class="c1"># gazelle:prefix github.com/example/project</span>
-<span class="n">gazelle</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;gazelle&quot;</span><span class="p">)</span>
-</pre>
-<p>このようなBUILD.bazelをWORKSPACEと同じ階層に置いておけば</p>
-<pre class="code shell literal-block">
-$ bazel run //:gazelle -- update-repos -from_file<span class="o">=</span>go.mod
-</pre>
-<p><tt class="docutils literal"><span class="pre">update-repos</span></tt> を引数に <tt class="docutils literal">run</tt> することでWORKSPACEファイルを自動で更新することができます。</p>
+<span style="color:#75715e"># gazelle:prefix github.com/example/project</span>
+gazelle(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;gazelle&#34;</span>)
+</code></pre></div><p>このようなBUILD.bazelをWORKSPACEと同じ階層に置いておけば</p>
+<pre><code class="language-console" data-lang="console">$ bazel run //:gazelle -- update-repos -from_file=go.mod
+</code></pre><p><code>update-repos</code> を引数に <code>run</code> することでWORKSPACEファイルを自動で更新することができます。</p>
 <p>一方 vendoring する場合はこの特殊操作をすることなく</p>
-<pre class="code shell literal-block">
-$ go mod vendor
+<pre><code class="language-console" data-lang="console">$ go mod vendor
 $ bazel run //:gazelle -- update
-</pre>
-<p>でBUILD.bazelファイルの更新のみを行うだけで済みます。</p>
-<p>ただし <tt class="docutils literal">go mod vendor</tt> コマンドはBUILD.bazelを削除しないため、依存しているライブラリでもBazelを使っている場合はコンフリクトするかもしれません。
-（例えば <tt class="docutils literal"><span class="pre">grpc-gateway</span></tt> 等はコンフリクトするので <tt class="docutils literal">gazelle update</tt> する前に BUILD.bazel を一掃しておいた方がいいです）</p>
-</div>
-<div class="section" id="vendorgo">
-<h2>vendorディレクトリを作るGoのランタイム</h2>
+</code></pre><p>でBUILD.bazelファイルの更新のみを行うだけで済みます。</p>
+<p>ただし <code>go mod vendor</code> コマンドはBUILD.bazelを削除しないため、依存しているライブラリでもBazelを使っている場合はコンフリクトするかもしれません。
+（例えば <code>grpc-gateway</code> 等はコンフリクトするので <code>gazelle update</code> する前に BUILD.bazel を一掃しておいた方がいいです）</p>
+<h1 id="vendorディレクトリを作るgoのランタイム">vendorディレクトリを作るGoのランタイム</h1>
 <p>Goでプログラムを書かれるほぼすべての方がGoの処理系を何らかの方法でインストールしていると思います。
-なので <tt class="docutils literal">go</tt> コマンドがどのバージョンなのかは個人の環境によって違う可能性が高いです。
+なので <code>go</code> コマンドがどのバージョンなのかは個人の環境によって違う可能性が高いです。
 vendorディレクトリを作る時などにこのバージョン違いの影響を受けることを避けるため、vendorディレクトリは Bazel がダウンロードしてきたランタイムを使うようにしています。</p>
-<pre class="code python literal-block">
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;io_bazel_rules_go//go:def.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;go_context&quot;</span><span class="p">,</span> <span class="s2">&quot;go_rule&quot;</span><span class="p">)</span>
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;&#64;bazel_skylib//lib:shell.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;shell&quot;</span><span class="p">)</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;@io_bazel_rules_go//go:def.bzl&#34;</span>, <span style="color:#e6db74">&#34;go_context&#34;</span>, <span style="color:#e6db74">&#34;go_rule&#34;</span>)
+load(<span style="color:#e6db74">&#34;@bazel_skylib//lib:shell.bzl&#34;</span>, <span style="color:#e6db74">&#34;shell&#34;</span>)
 
-<span class="k">def</span> <span class="nf">_go_vendor</span><span class="p">(</span><span class="n">ctx</span><span class="p">):</span>
-    <span class="n">go</span> <span class="o">=</span> <span class="n">go_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">declare_file</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.sh&quot;</span><span class="p">)</span>
-    <span class="n">substitutions</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;&#64;&#64;GO&#64;&#64;&quot;</span><span class="p">:</span> <span class="n">shell</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">go</span><span class="o">.</span><span class="n">path</span><span class="p">),</span>
-        <span class="s2">&quot;&#64;&#64;GAZELLE&#64;&#64;&quot;</span><span class="p">:</span> <span class="n">shell</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">executable</span><span class="o">.</span><span class="n">_gazelle</span><span class="o">.</span><span class="n">short_path</span><span class="p">),</span>
-    <span class="p">}</span>
-    <span class="n">ctx</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">expand_template</span><span class="p">(</span>
-        <span class="n">template</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_template</span><span class="p">,</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">out</span><span class="p">,</span>
-        <span class="n">substitutions</span> <span class="o">=</span> <span class="n">substitutions</span><span class="p">,</span>
-        <span class="n">is_executable</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">runfiles</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">runfiles</span><span class="p">(</span><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">go</span><span class="o">.</span><span class="n">go</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">executable</span><span class="o">.</span><span class="n">_gazelle</span><span class="p">])</span>
-    <span class="k">return</span> <span class="p">[</span>
-        <span class="n">DefaultInfo</span><span class="p">(</span>
-            <span class="n">runfiles</span> <span class="o">=</span> <span class="n">runfiles</span><span class="p">,</span>
-            <span class="n">executable</span> <span class="o">=</span> <span class="n">out</span><span class="p">,</span>
-        <span class="p">),</span>
-    <span class="p">]</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">_go_vendor</span>(ctx):
+    go <span style="color:#f92672">=</span> go_context(ctx)
+    out <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>declare_file(ctx<span style="color:#f92672">.</span>label<span style="color:#f92672">.</span>name <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.sh&#34;</span>)
+    substitutions <span style="color:#f92672">=</span> {
+        <span style="color:#e6db74">&#34;@@GO@@&#34;</span>: shell<span style="color:#f92672">.</span>quote(go<span style="color:#f92672">.</span>go<span style="color:#f92672">.</span>path),
+        <span style="color:#e6db74">&#34;@@GAZELLE@@&#34;</span>: shell<span style="color:#f92672">.</span>quote(ctx<span style="color:#f92672">.</span>executable<span style="color:#f92672">.</span>_gazelle<span style="color:#f92672">.</span>short_path),
+    }
+    ctx<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>expand_template(
+        template <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>file<span style="color:#f92672">.</span>_template,
+        output <span style="color:#f92672">=</span> out,
+        substitutions <span style="color:#f92672">=</span> substitutions,
+        is_executable <span style="color:#f92672">=</span> True,
+    )
+    runfiles <span style="color:#f92672">=</span> ctx<span style="color:#f92672">.</span>runfiles(files <span style="color:#f92672">=</span> [go<span style="color:#f92672">.</span>go, ctx<span style="color:#f92672">.</span>executable<span style="color:#f92672">.</span>_gazelle])
+    <span style="color:#66d9ef">return</span> [
+        DefaultInfo(
+            runfiles <span style="color:#f92672">=</span> runfiles,
+            executable <span style="color:#f92672">=</span> out,
+        ),
+    ]
 
-<span class="n">go_vendor</span> <span class="o">=</span> <span class="n">go_rule</span><span class="p">(</span>
-    <span class="n">implementation</span> <span class="o">=</span> <span class="n">_go_vendor</span><span class="p">,</span>
-    <span class="n">executable</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;_template&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">label</span><span class="p">(</span>
-            <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;//build/rules/go:vendor.bash&quot;</span><span class="p">,</span>
-            <span class="n">allow_single_file</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;_gazelle&quot;</span><span class="p">:</span> <span class="n">attr</span><span class="o">.</span><span class="n">label</span><span class="p">(</span>
-            <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;&#64;bazel_gazelle//cmd/gazelle&quot;</span><span class="p">,</span>
-            <span class="n">executable</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="n">cfg</span> <span class="o">=</span> <span class="s2">&quot;host&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
-    <span class="p">},</span>
-<span class="p">)</span>
-</pre>
-<p>これがビルドルールで</p>
-<pre class="code bash literal-block">
-<span class="ch">#!/usr/bin/env bash
-</span>
-<span class="nv">GO</span><span class="o">=</span>&#64;&#64;GO&#64;&#64;
-<span class="nv">GAZELLE_PATH</span><span class="o">=</span>&#64;&#64;GAZELLE&#64;&#64;
+go_vendor <span style="color:#f92672">=</span> go_rule(
+    implementation <span style="color:#f92672">=</span> _go_vendor,
+    executable <span style="color:#f92672">=</span> True,
+    attrs <span style="color:#f92672">=</span> {
+        <span style="color:#e6db74">&#34;_template&#34;</span>: attr<span style="color:#f92672">.</span>label(
+            default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;//build/rules/go:vendor.bash&#34;</span>,
+            allow_single_file <span style="color:#f92672">=</span> True,
+        ),
+        <span style="color:#e6db74">&#34;_gazelle&#34;</span>: attr<span style="color:#f92672">.</span>label(
+            default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;@bazel_gazelle//cmd/gazelle&#34;</span>,
+            executable <span style="color:#f92672">=</span> True,
+            cfg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;host&#34;</span>,
+        ),
+    },
+)
+</code></pre></div><p>これがビルドルールで</p>
+<pre><code>#!/usr/bin/env bash
 
-<span class="nv">RUNFILES</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>
-<span class="nv">GO_RUNTIME</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$RUNFILES</span><span class="s2">&quot;</span>/<span class="s2">&quot;</span><span class="nv">$GO</span><span class="s2">&quot;</span>
-<span class="nv">GAZELLE</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$RUNFILES</span><span class="s2">&quot;</span>/<span class="s2">&quot;</span><span class="nv">$GAZELLE_PATH</span><span class="s2">&quot;</span>
+GO=@@GO@@
+GAZELLE_PATH=@@GAZELLE@@
 
-<span class="nb">cd</span> <span class="s2">&quot;</span><span class="nv">$BUILD_WORKSPACE_DIRECTORY</span><span class="s2">&quot;</span>
-<span class="s2">&quot;</span><span class="nv">$GO_RUNTIME</span><span class="s2">&quot;</span> mod tidy
-<span class="s2">&quot;</span><span class="nv">$GO_RUNTIME</span><span class="s2">&quot;</span> mod vendor
+RUNFILES=$(pwd)
+GO_RUNTIME=&quot;$RUNFILES&quot;/&quot;$GO&quot;
+GAZELLE=&quot;$RUNFILES&quot;/&quot;$GAZELLE_PATH&quot;
+
+cd &quot;$BUILD_WORKSPACE_DIRECTORY&quot;
+&quot;$GO_RUNTIME&quot; mod tidy
+&quot;$GO_RUNTIME&quot; mod vendor
 find vendor -name BUILD.bazel -delete
-<span class="s2">&quot;</span><span class="nv">$GAZELLE</span><span class="s2">&quot;</span> update
-</pre>
-<p>これがルールから実行されるシェルスクリプトのテンプレートです。
+&quot;$GAZELLE&quot; update
+</code></pre><p>これがルールから実行されるシェルスクリプトのテンプレートです。
 Bazelのビルドルールを書くことに慣れてない場合、よくわからないかもしれません。
 しかし内部でやっていることはそんなに難しくありません。</p>
-<ol class="arabic simple">
-<li><tt class="docutils literal">go</tt> コマンドのパスを手に入れる（bazelのキャッシュディレクトリのどこかに入っている <tt class="docutils literal">go</tt> コマンドです）</li>
+<ol>
+<li><code>go</code> コマンドのパスを手に入れる（bazelのキャッシュディレクトリのどこかに入っている <code>go</code> コマンドです）</li>
 <li>gazelleのパスを手に入れる</li>
-<li>それらのパスをテンプレートに埋め込み、 <tt class="docutils literal">go</tt> と <tt class="docutils literal">gazelle</tt> を実行する</li>
+<li>それらのパスをテンプレートに埋め込み、 <code>go</code> と <code>gazelle</code> を実行する</li>
 </ol>
 <p>これだけです。
-<tt class="docutils literal">go</tt> と <tt class="docutils literal">gazelle</tt> が生成したシェルスクリプトの実行に必要だと定義されているため、Bazelはもしこれらのバイナリがまだなければコンパイルやインターネットからの取得を行います。</p>
+<code>go</code> と <code>gazelle</code> が生成したシェルスクリプトの実行に必要だと定義されているため、Bazelはもしこれらのバイナリがまだなければコンパイルやインターネットからの取得を行います。</p>
 <p>通常、Bazelからシェルスクリプトを実行した場合、サンドボックスの中で実行されます。
 そのままだと期待通り動作しないため、コマンドを実行する前にサンドボックスからescapeしています。</p>
 <p>これらのファイルをよしなに配置しておき、それをロードすれば</p>
-<pre class="code python literal-block">
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;//build/rules/go:vendor.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;go_vendor&quot;</span><span class="p">)</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">load(<span style="color:#e6db74">&#34;//build/rules/go:vendor.bzl&#34;</span>, <span style="color:#e6db74">&#34;go_vendor&#34;</span>)
 
-<span class="n">go_vendor</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;vendor&quot;</span><span class="p">)</span>
-</pre>
-<p>このような定義を書いておくだけで <tt class="docutils literal">bazel run <span class="pre">//:vendor</span></tt> で <tt class="docutils literal">go mod vendor</tt> が実行されBazelのビルドファイルもアップデートされます。</p>
-</div>
-<div class="section" id="id4">
-<h2>すべてをBazelでやろうとしない</h2>
+go_vendor(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;vendor&#34;</span>)
+</code></pre></div><p>このような定義を書いておくだけで <code>bazel run //:vendor</code> で <code>go mod vendor</code> が実行されBazelのビルドファイルもアップデートされます。</p>
+<h1 id="すべてをbazelでやろうとしない">すべてをBazelでやろうとしない</h1>
 <p>ですが、すべてをBazelでやろうとするとうまくできないことがありフラストレーションがたまるかもしれません。</p>
 <p>Goのソースコードを編集するにはIDEなりが便利だったりしますが、エディタとBazelの連携はまだまだだと思います。
 GoLand等ではテストを書いてる際、ワンクリックで編集してる部分のテストだけを実行できると思いますがここに更にBazelを組み合わせるのは現状は難しいように思います。</p>
@@ -238,31 +212,26 @@ GoLand等ではテストを書いてる際、ワンクリックで編集して�
 <p>一方生成物をリポジトリに含めずにBazelがビルドする際に定義ファイルから生成される状態にしておけば、最新ビルドが一つ前のコミットの定義ファイルを使っていたという事故は防ぐことができます。</p>
 <p>生成物をリポジトリに含めると、リポジトリに入っているファイルの更新を忘れるという問題が起きますがこれはリポジトリへのPushをフックしてファイル生成を自動化し勝手にコミットするようにすることで解決できます。
 （決してローカルリポジトリにフックを設定することを強要してはいけません。必ずリモート側で勝手にやってしまうようにしましょう）</p>
-</div>
-<div class="section" id="id5">
-<h2>テストの書き方</h2>
+<h1 id="テストの書き方">テストの書き方</h1>
 <p>Bazelはユニットテストを実行するのは得意です。
 ですが、インテグレーションテストを実行するには工夫が必要です。
 なので導入初期はなるべくユニットテストのみを書くようにした方がいいです。
 Bazelのビルドルールなどを書くことに慣れてきた・抵抗がなくなってきた時に初めてインテグレーションテストの実行を考えるといいと思います。</p>
 <p>Bazel流のインテグレーションテストの実行は必要なミドルウェアもBazelを通して準備することだと考えています。
 これを実現するには</p>
-<ol class="arabic simple">
+<ol>
 <li>依存ミドルウェアの取得とビルド（各プラットフォームと各バージョンにも対応できるとより良い）</li>
 <li>ミドルウェアのパスをテストスイートに何らかの方法で渡す</li>
 <li>テストスイート内でミドルウェアを実行して使い終わったら終了する</li>
 </ol>
 <p>というようなことが必要になるでしょう。</p>
-</div>
-<div class="section" id="id6">
-<h2>一度は使ってみてほしいBazel</h2>
+<h1 id="一度は使ってみてほしいbazel">一度は使ってみてほしいBazel</h1>
 <p>Bazelは導入するために多くのことを学ぶ必要があります。</p>
 <p>もし、会社などですでにBazelを使われているリポジトリがあればそういうものを参考にして個人的なリポジトリに導入してみたりするのがいいでしょう。
 会社であればそれを導入した人に直接話しを聞いたりできるかと思うのでそうやって学ぶというのも一つの手です。</p>
 <p>OSSにもBazelを採用しているプロジェクトがいっぱいあるのでgithubには参考にできるようなものがたくさんあります。
 Bazelにやらせたいと思っていることを実現しているプロジェクトを探して真似してみたりするとルールの書き方が分かってくると思います。</p>
-</div>
-</div>
+
   </section>
   <footer>
     

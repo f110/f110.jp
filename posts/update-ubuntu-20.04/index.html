@@ -55,43 +55,36 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>普段使っているデスクトップPC（Ryzen Threadripper 2950X）にはSSDが物理的に2枚刺さってて1つ目にはLinuxが、2つ目にはWindowsがインストールされています。</p>
+    <p>普段使っているデスクトップPC（Ryzen Threadripper 2950X）にはSSDが物理的に2枚刺さってて1つ目にはLinuxが、2つ目にはWindowsがインストールされています。</p>
 <p>LinuxはずっとUbuntuを使っていて18.04(Bionic Beaver)を使っています。
 20.04(Focal Fossa)がリリースされたのでアップデートしました。</p>
 <p>18.04（以下bionic）の時にあった主な不具合は以下。</p>
-<ol class="arabic simple">
+<ol>
 <li>gnome-shell のCPU使用率が高い</li>
 <li>sensorsが表示するCPUコア温度が実際の温度から+27℃されている</li>
 </ol>
 <p>1 はCPUのパワーに任せて無視、2 も実使用上は問題にならないので無視していました。</p>
-<p>20.04（以下focal）へのアップデートは <tt class="docutils literal"><span class="pre">do-release-upgrade</span></tt> で行います。</p>
-<pre class="code shell literal-block">
-$ sudo apt update <span class="o">&amp;&amp;</span> sudo apt upgrade
-$ sudo <span class="k">do</span>-release-upgrade -d
-</pre>
-<p>これで必要なパッケージは全てアップデートされるので後は再起動するだけです。</p>
-<p>GPUにnVidiaのものを使っているので <tt class="docutils literal"><span class="pre">do-release-upgrade</span></tt> 後にnvidiaのドライバは再度インストールする必要があります。
+<p>20.04（以下focal）へのアップデートは <code>do-release-upgrade</code> で行います。</p>
+<pre><code class="language-console" data-lang="console">$ sudo apt update &amp;&amp; sudo apt upgrade
+$ sudo do-release-upgrade -d
+</code></pre><p>これで必要なパッケージは全てアップデートされるので後は再起動するだけです。</p>
+<p>GPUにnVidiaのものを使っているので <code>do-release-upgrade</code> 後にnvidiaのドライバは再度インストールする必要があります。
 ドライバをインストールするまで解像度がすごく低く作業しづらいですが頑張ってインストールします。</p>
 <p>focalにアップデートしてbionicにあった2つの大きな問題は解決しました。</p>
 <p>以下、アップデート後にそれに伴って個別に対応した点です。</p>
-<ol class="arabic simple">
+<ol>
 <li>nvidiaドライバーのインストール</li>
 <li>vimプラグインの再インストール</li>
 <li>Go 1.14でビルドしていたものを1.14.1で再ビルド</li>
 </ol>
 <p>現時点のfocalのカーネルは</p>
-<pre class="code shell literal-block">
-$ uname --kernel-release
-<span class="m">5</span>.4.0-28-generic
-</pre>
-<p>5.4.0-28 ですが、このkernelには 5.4.30 までが <a class="reference external" href="https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1870571">取り込まれています。</a></p>
-<p>なのでGo 1.14.1にすることでも <a class="reference external" href="https://github.com/golang/go/issues/37436">Signal Vector問題</a> は緩和されます。</p>
-<p>focalのOpenSSHは8.2なので FIDO/U2F 対応が <a class="reference external" href="https://www.openssh.com/txt/release-8.2">入っています。</a>
+<pre><code>$ uname --kernel-release
+5.4.0-28-generic
+</code></pre><p>5.4.0-28 ですが、このkernelには 5.4.30 までが <a href="https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1870571">取り込まれています。</a></p>
+<p>なのでGo 1.14.1にすることでも <a href="https://github.com/golang/go/issues/37436">Signal Vector問題</a> は緩和されます。</p>
+<p>focalのOpenSSHは8.2なので FIDO/U2F 対応が <a href="https://www.openssh.com/txt/release-8.2">入っています。</a>
 これについては後ほど試してみようと思います。</p>
-</div>
+
   </section>
   <footer>
     

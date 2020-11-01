@@ -57,68 +57,40 @@
   </header>
   
   <section id="js-article" class="p-article__body">
-    <div class="document">
-
-
-<p>BazelでGoの依存ライブラリを管理する方法は2つあります。</p>
-<ol class="arabic simple">
+    <p>BazelでGoの依存ライブラリを管理する方法は2つあります。</p>
+<ol>
 <li>go.mod からWORKSPACEファイルを生成する</li>
 <li>vendorディレクトリを使う</li>
 </ol>
-<p>以前はリポジトリに <tt class="docutils literal">go.mod</tt> ファイルが1つしかない（単一モジュール構成のリポジトリ）の場合は前者を、
-複数の <tt class="docutils literal">go.mod</tt> ファイルがある場合は後者の方法を取るのがいいと思っていました。</p>
+<p>以前はリポジトリに <code>go.mod</code> ファイルが1つしかない（単一モジュール構成のリポジトリ）の場合は前者を、
+複数の <code>go.mod</code> ファイルがある場合は後者の方法を取るのがいいと思っていました。</p>
 <p>しかし最近は常に後者を選択する方がいいと思っています。</p>
-<div class="section" id="id1">
-<h2>見えない依存</h2>
-<p>Bazel で Go をビルドする際は rules_go <a class="footnote-reference" href="#rulesgo" id="id2">[1]</a> と gazelle <a class="footnote-reference" href="#gazelle" id="id3">[2]</a> を利用していることでしょう。</p>
-<p>rules_go 自身が <a class="reference external" href="https://github.com/bazelbuild/rules_go/blob/4a42b4092abdc60d14419a79afaec3659fbceb26/go/workspace.rst#go-rules-dependencies">依存しているライブラリ</a> もBazelによって管理されるため同じライブラリに自分のソフトウェアが依存している場合は競合します。
+<h1 id="見えない依存">見えない依存</h1>
+<p>Bazel で Go をビルドする際は <a href="https://github.com/bazelbuild/rules_go">rules_go</a> と <a href="https://github.com/bazelbuild/bazel-gazelle">gazelle</a> を利用していることでしょう。</p>
+<p>rules_go 自身が <a href="https://github.com/bazelbuild/rules_go/blob/4a42b4092abdc60d14419a79afaec3659fbceb26/go/workspace.rst#go-rules-dependencies">依存しているライブラリ</a> もBazelによって管理されるため同じライブラリに自分のソフトウェアが依存している場合は競合します。
 うまく競合しなかった場合は問題ありません。その時は幸せに利用できます。</p>
 <p>ですが、競合して2つのバージョンを保持しないといけなくなった場合、 gazelle でそれを扱うのは突然難しくなりますし、そうなっていることを gazelle に伝える必要があります。
-本来であれば <tt class="docutils literal">go.mod</tt> ファイルを <tt class="docutils literal">go get</tt> コマンドなどで更新してそこから依存ライブラリの定義ファイルを自動生成するだけで使えるはずですがこの場合においてはそれはできません。</p>
-<div class="section" id="id5">
-<h3>増える依存</h3>
+本来であれば <code>go.mod</code> ファイルを <code>go get</code> コマンドなどで更新してそこから依存ライブラリの定義ファイルを自動生成するだけで使えるはずですがこの場合においてはそれはできません。</p>
+<h2 id="増える依存">増える依存</h2>
 <p>rules_go で単純な Go のアプリケーションをビルドするだけではなく、ProtobufやgRPCを扱っている場合はさらに依存が増えます。</p>
-<p><a class="reference external" href="https://github.com/bazelbuild/rules_go/blob/4a42b4092abdc60d14419a79afaec3659fbceb26/go/workspace.rst#grpc-dependencies">gRPCの依存ライブラリ</a> を追加すると準公式ライブラリへの依存がさらに増えます。</p>
-<p>他にも <tt class="docutils literal">github.com/golang/protobuf</tt> への依存もあったりと、自分のソフトウェアと共有したくないものがいくつもあります。</p>
-<div class="section" id="golang-org-x">
-<h4>余談: golang.org/x/ の立ち位置</h4>
-<p><tt class="docutils literal">golang.org/x/net</tt> や <tt class="docutils literal">golang.org/x/text</tt> は果たして準公式ライブラリなのでしょうか？
-これらの <tt class="docutils literal"><span class="pre">golang.org/x/...</span></tt> のライブラリは実はGoのコアと一緒に <a class="reference external" href="https://github.com/golang/go/tree/master/src/vendor/golang.org/x">配布されています。</a></p>
+<p><a href="https://github.com/bazelbuild/rules_go/blob/4a42b4092abdc60d14419a79afaec3659fbceb26/go/workspace.rst#grpc-dependencies">gRPCの依存ライブラリ</a> を追加すると準公式ライブラリへの依存がさらに増えます。</p>
+<p>他にも <code>github.com/golang/protobuf</code> への依存もあったりと、自分のソフトウェアと共有したくないものがいくつもあります。</p>
+<h3 id="余談-golangorgx-の立ち位置">余談: golang.org/x/ の立ち位置</h3>
+<p><code>golang.org/x/net</code> や <code>golang.org/x/text</code> は果たして準公式ライブラリなのでしょうか？
+これらの <code>golang.org/x/...</code> のライブラリは実はGoのコアと一緒に <a href="https://github.com/golang/go/tree/master/src/vendor/golang.org/x">配布されています。</a></p>
 <p>これを見ると実質標準ライブラリと言えるかもしれません。ただこの依存はGoのコア用なので使うことを期待してはいけません。</p>
-</div>
-</div>
-<div class="section" id="id7">
-<h3>なぜ共有したくないのか</h3>
+<h2 id="なぜ共有したくないのか">なぜ共有したくないのか</h2>
 <p>rules_go のバージョンアップでこれらのライブラリも更新されます。</p>
 <p>すると場合によっては自分のソフトウェアのビルドが壊れます。</p>
 <p>自分が使いたいバージョンのライブラリを使えないということも起こります。
 go コマンドで実行している場合はうまく動くのにBazelでビルドしようとするとビルドができないといった事態になります。</p>
-</div>
-</div>
-<div class="section" id="vendor">
-<h2>vendorしちゃう</h2>
+<h1 id="vendorしちゃう">vendorしちゃう</h1>
 <p>この問題もvendoringすると起きません。</p>
 <p>gazelleは適切にvendorディレクトリへの依存をハンドリングできるので、自分のソフトウェアが使うライブラリは全てvendorディレクトリに入れておくと確実にビルドできます。
 また rules_go のアップデートでビルドを壊すことがありません。</p>
 <p>ということで Polyrepo 構成のリポジトリであっても最近はvendorを使うようになりました。
-vendorするルールを非常によく使うようになったのでそれぞれのリポジトリで同じルールを書かずに <a class="reference external" href="https://github.com/f110/rules_extras/blob/master/go/vendor.bzl">共通ルールとして切り出して</a> 利用しています。</p>
-</div>
-<div class="section" id="id9">
-<h2>リンク</h2>
-<table class="docutils footnote" frame="void" id="rulesgo" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>Go rules for Bazel <a class="reference external" href="https://github.com/bazelbuild/rules_go">https://github.com/bazelbuild/rules_go</a></td></tr>
-</tbody>
-</table>
-<table class="docutils footnote" frame="void" id="gazelle" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>Bazel build file generator for Bazel Project <a class="reference external" href="https://github.com/bazelbuild/bazel-gazelle">https://github.com/bazelbuild/bazel-gazelle</a></td></tr>
-</tbody>
-</table>
-</div>
-</div>
+vendorするルールを非常によく使うようになったのでそれぞれのリポジトリで同じルールを書かずに <a href="https://github.com/f110/rules_extras/blob/master/go/vendor.bzl">共通ルールとして切り出して</a> 利用しています。</p>
+
   </section>
   <footer>
     
