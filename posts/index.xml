@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sun, 01 Nov 2020 21:15:29 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 07 Nov 2020 12:08:36 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>UniFi Switch Gen2を買った</title>
+      <link>https://f110.jp/posts/unifi-switch-gen2/</link>
+      <pubDate>Sat, 07 Nov 2020 12:08:36 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/unifi-switch-gen2/</guid>
+      <description>クラスタのノードが増えてしまって8ポートのスイッチでは完全に足りなくなってしまったので16ポートのスイッチを買った。 買ったのは UniFi Switch 16 PoE Uni</description>
+    </item>
     
     <item>
       <title>iPad Air4をワイモバイルで使う</title>

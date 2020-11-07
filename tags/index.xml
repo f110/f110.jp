@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 10 Oct 2020 17:47:04 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 07 Nov 2020 12:08:36 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>UniFi</title>
+      <link>https://f110.jp/tags/unifi/</link>
+      <pubDate>Sat, 07 Nov 2020 12:08:36 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/unifi/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Bazel</title>
@@ -72,15 +81,6 @@
       <pubDate>Sun, 26 Jul 2020 13:04:05 +0900</pubDate>
       
       <guid>https://f110.jp/tags/wfh/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>UniFi</title>
-      <link>https://f110.jp/tags/unifi/</link>
-      <pubDate>Tue, 26 May 2020 23:35:29 +0900</pubDate>
-      
-      <guid>https://f110.jp/tags/unifi/</guid>
       <description></description>
     </item>
     

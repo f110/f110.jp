@@ -26,6 +26,31 @@
 
     gtag('config', 'UA-37357730-2');
   </script>
+
+  <style>
+  body {counter-reset: section;}
+  #js-article h1 {counter-reset: subsection;}
+  #js-article h2 {counter-reset: subsubsection;}
+  #js-article h1:before {
+    counter-increment: section;
+    content: counter(section) ". ";
+  }
+  #js-article h2:before {
+    counter-increment: subsection;
+    content: counter(section) "." counter(subsection) ". ";
+  }
+  #js-article h3:before {
+    counter-increment: subsubsection;
+    content: counter(section) "." counter(subsection) "." counter(subsubsection) ". ";
+  }
+  #table-of-contents ul {
+    counter-reset: item;
+  }
+  #table-of-contents li:before {
+    counter-increment: item;
+    content: counters(item, ".") ". ";
+  }
+  </style>
 </head>
 
 <body>
@@ -56,11 +81,31 @@
     </div>
   </header>
   
+  
+  <section id="table-of-contents">
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#minikubeではなく物理クラスタという選択">minikubeではなく物理クラスタという選択</a></li>
+    <li><a href="#ハードウェア">ハードウェア</a></li>
+    <li><a href="#ソフトウェア">ソフトウェア</a></li>
+    <li><a href="#ブートストラップ">ブートストラップ</a>
+      <ul>
+        <li><a href="#osのインストール">OSのインストール</a></li>
+        <li><a href="#swapを切る">Swapを切る</a></li>
+        <li><a href="#kubeadm-によるセットアップ">kubeadm によるセットアップ</a></li>
+        <li><a href="#calicoのインストール">Calicoのインストール</a></li>
+        <li><a href="#metallbのインストール">MetalLBのインストール</a></li>
+      </ul>
+    </li>
+    <li><a href="#動作確認">動作確認</a></li>
+    <li><a href="#ユーザー認証">ユーザー認証</a></li>
+  </ul>
+</nav>
+  </section>
+  
   <section id="js-article" class="p-article__body">
     <p>自宅の Kubernetes クラスタをどうやって構成するかという話。</p>
 <p>自宅クラスタ関連は <a href="/tags/homecluster">タグ</a> で一覧できるようにしています。</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
 <h1 id="minikubeではなく物理クラスタという選択">minikubeではなく物理クラスタという選択</h1>
 <p>minikubeではなく物理マシンを複数台用意してクラスタを構成しています。</p>
 <p>デスクトップマシンでは Kubernetes のAPIを使った開発をするために minikube を利用していますが、それとは別に24時間稼働する物理クラスタがあります。</p>

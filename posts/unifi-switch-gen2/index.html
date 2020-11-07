@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <title>Dockerを避ける</title>
-  <meta property="og:title" content="Dockerを避ける" />
-  <meta name="twitter:title" content="Dockerを避ける" />
+  <title>UniFi Switch Gen2を買った</title>
+  <meta property="og:title" content="UniFi Switch Gen2を買った" />
+  <meta name="twitter:title" content="UniFi Switch Gen2を買った" />
 
   <meta name="author" content="Fumihiro Ito"/>
   <meta property="og:site_name" content="f110&#39;s weblog" />
-  <meta property="og:url" content="https://f110.jp/posts/avoid-docker/" />
+  <meta property="og:url" content="https://f110.jp/posts/unifi-switch-gen2/" />
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
@@ -41,48 +41,38 @@
 
 <article class="p-article">
   <header>
-    <h1>Dockerを避ける</h1>
+    <h1>UniFi Switch Gen2を買った</h1>
     <div>
       <div class="c-time">
         Posted on
-        <time datetime="2020-04-01T00:00:00Z">
-          Apr 1, 2020
+        <time datetime="2020-11-07T12:08:36&#43;09:00">
+          Nov 7, 2020
         </time>
       </div>
       
-      <a href="https://f110.jp/tags/docker" class="c-tag">Docker</a>
-      
-      <a href="https://f110.jp/tags/containerd" class="c-tag">containerd</a>
+      <a href="https://f110.jp/tags/unifi" class="c-tag">UniFi</a>
       
     </div>
   </header>
   
   
   <section id="js-article" class="p-article__body">
-    <p>皆さんはdockerを使っていますか？使っていますよね？
-でもその使い方、本当にdockerじゃないとダメですか？</p>
-<h1 id="自分のdockerの使い方">自分のdockerの使い方</h1>
-<p>ほぼ <code>docker build</code> か <code>docker run --rm -it</code> しかしません。
-runする場合もOSのパッケージングを調べるだとかその程度です。</p>
-<p>この使い方にdockerは果たして必要なのでしょうか？</p>
-<h1 id="dockerはコンテナランタイムではない">dockerはコンテナランタイムではない</h1>
-<p>当初、dockerはコンテナランタイムでした。
-しかし今はもう違います。</p>
-<p>dockerはコンテナを扱うパッケージソフトウェアといえる立ち位置にいます。
-なのでbuildができたりpullができたりinspectができたりします。</p>
-<p>またLinuxだけではなくmacOSやWindowsの上で動くバージョンも提供されています。</p>
-<p>ちょっとコンテナを実行して中身を確認したいとか、ちょっとコマンドが使ってみたいくらいであればコンテナランタイムさえあれば十分です。</p>
-<p>なのに大きなソフトウェアであるdockerをインストールする必要があるでしょうか？
-もしdockerを使わずに困らないのであれば頑張ってdockerを入れる必要はないのです。</p>
-<h1 id="そこでcontainerd">そこでcontainerd</h1>
-<p>だったらdockerのランタイム部分のcontainerdだけを使えばいいです。
-ちょっとコンテナを走らせるくらいであればdockerを使わずに素のcontainerdを使っても特に問題ありません。</p>
-<p><code>docker build</code> はBazelで行うようにします。</p>
-<p>自宅で24時間起動しているマシンのうち1台はcontainerdのみをインストールしました。
-他のマシンはまだdockerが動いていますが、次にセットアップする時にcontainerdにしようと思っています。</p>
-<p>一方通常利用しているLinuxデスクトップマシンはdockerをインストールしたままです。
-<code>ctr</code> コマンドは使えるのでdockerをバイパスしてcontainerdを利用するようにしています。
-ただデスクトップマシンでコンテナを動かすことは稀なのでそもそもほとんどコンテナの操作はしません。</p>
+    <p>クラスタのノードが増えてしまって8ポートのスイッチでは完全に足りなくなってしまったので16ポートのスイッチを買った。</p>
+<p>買ったのは <a href="https://store.ui.com/collections/routing-switching/products/usw-16-poe">UniFi Switch 16 PoE</a></p>
+<p>UniFiのスイッチがちょうど1年くらい前にGen2にアップデートしたのは知ってて、 <a href="https://jp.store.ui.com">日本のストア</a> でも取り扱いをしてくれないかな〜？と首を長くして待っていたところ水曜日に追加されたので即購入した。
+おそらく日本のストアで最初に買った。</p>
+<p>スイッチなので入れ替えても特筆すべきことはなく、ただ単にポートが増えただけ。</p>
+<p>前面の液晶でスイッチの情報が見れたり、ポートごとのスループットが見れたりするのは便利そうだけど別に普段そんなに見ないかな…</p>
+<p>UniFi Dream Machine Proも欲しいので、Ubiquitiの日本法人さん、取り扱いよろしくおねがいします🙏</p>
+<p>合わせてUniFi Switch XG 6PoEもお願いします🙏</p>
+<h1 id="11ax対応access-point">11ax対応Access Point</h1>
+<p>USではEarly Accessで販売しているようなので製品になって更に日本で買えるようになるまではまだ時間がかかりそう。</p>
+<p>こっちも首を長くして待っています。</p>
+<p>AmpliFi Alienの日本での販売も待っています。</p>
+<h1 id="unifiは安定してて便利">UniFiは安定してて便利</h1>
+<p>UniFiは安定してて、特にSecurity GatewayからAccess Pointまで揃えるとコントローラで一括で管理できるしでとても便利。</p>
+<p>WFHで家のインターネットの重要性が更に上がっているのでコンシューマ製品を買って苦労するよりはこういった製品を買っちゃった方がいいと思う。</p>
+<p>今なら <a href="https://jp.store.ui.com/collections/routing-switching/products/unifi-dream-machine">Dream Machine</a> を買えばルーティングからアクセスポイントまで1台でカバーできるので大変お値打ち。</p>
 
   </section>
   <footer>
@@ -91,12 +81,11 @@ runする場合もOSのパッケージングを調べるだとかその程度で
       <div class="c-pagination__ctrl">
         <div class="c-pagination__newer">
           
-          <a href="https://f110.jp/posts/homecluster/">Newer</a>
           
         </div>
         <div class="c-pagination__older">
           
-          <a href="https://f110.jp/posts/vendoring-dependent-libraries/">Older</a>
+          <a href="https://f110.jp/posts/y-mobile-on-ipad-air/">Older</a>
           
         </div>
       </div>
