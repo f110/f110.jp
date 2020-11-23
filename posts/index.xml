@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 07 Nov 2020 12:08:36 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 23 Nov 2020 17:47:04 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>タグVLANに移行した</title>
+      <link>https://f110.jp/posts/move-to-tagged-vlan/</link>
+      <pubDate>Mon, 23 Nov 2020 17:47:04 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/move-to-tagged-vlan/</guid>
+      <description>自宅ネットワークのうち Kubernetes が動いているセグメントはコントローラでポート VLAN として設定して分離していた。 これのメリットはマシン側で特に設定が必要な</description>
+    </item>
     
     <item>
       <title>UniFi Switch Gen2を買った</title>
