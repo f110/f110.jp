@@ -27,30 +27,6 @@
     gtag('config', 'UA-37357730-2');
   </script>
 
-  <style>
-  body {counter-reset: section;}
-  #js-article h1 {counter-reset: subsection;}
-  #js-article h2 {counter-reset: subsubsection;}
-  #js-article h1:before {
-    counter-increment: section;
-    content: counter(section) ". ";
-  }
-  #js-article h2:before {
-    counter-increment: subsection;
-    content: counter(section) "." counter(subsection) ". ";
-  }
-  #js-article h3:before {
-    counter-increment: subsubsection;
-    content: counter(section) "." counter(subsection) "." counter(subsubsection) ". ";
-  }
-  #table-of-contents ul {
-    counter-reset: item;
-  }
-  #table-of-contents li:before {
-    counter-increment: item;
-    content: counters(item, ".") ". ";
-  }
-  </style>
 </head>
 
 <body>
