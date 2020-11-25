@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <title>Loadbalancer for kube-apiserver</title>
-  <meta property="og:title" content="Loadbalancer for kube-apiserver" />
-  <meta name="twitter:title" content="Loadbalancer for kube-apiserver" />
+  <title>Notionを使い始めた</title>
+  <meta property="og:title" content="Notionを使い始めた" />
+  <meta name="twitter:title" content="Notionを使い始めた" />
 
   <meta name="author" content="Fumihiro Ito"/>
   <meta property="og:site_name" content="f110&#39;s weblog" />
-  <meta property="og:url" content="https://f110.jp/posts/loadbalancer-for-kube-apiserver/" />
+  <meta property="og:url" content="https://f110.jp/posts/all-in-notion/" />
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
@@ -65,212 +65,59 @@
 
 <article class="p-article">
   <header>
-    <h1>Loadbalancer for kube-apiserver</h1>
+    <h1>Notionを使い始めた</h1>
     <div>
       <div class="c-time">
         Posted on
-        <time datetime="2020-08-18T00:33:16&#43;09:00">
-          Aug 18, 2020
+        <time datetime="2020-11-25T10:35:00&#43;09:00">
+          Nov 25, 2020
         </time>
-        2020-08-18 00:33:16 &#43;0900 &#43;0900
+        2020-11-25 10:35:00 &#43;0900 &#43;0900
       </div>
       
-      <a href="https://f110.jp/tags/kubernetes" class="c-tag">Kubernetes</a>
-      
-      <a href="https://f110.jp/tags/homecluster" class="c-tag">Homecluster</a>
+      <a href="https://f110.jp/tags/productivity" class="c-tag">Productivity</a>
       
     </div>
   </header>
   
   
   <section id="js-article" class="p-article__body">
-    <p>元々masterサーバーを1台で構築したKubernetesクラスターをHA構成に変更しようとしたので、作業のメモ。
-この記事ではetcdを1台構成のままkube-apiserverを複数台構成にしてロードバランサーの下に入れることを目指す。</p>
-<p>変更前は以下のようなシンプルな構成です。</p>
-<p><img src="./before.svg" alt="Before"></p>
-<p>これを以下のように構成することで kube-apiserver を冗長構成にします。</p>
-<p><img src="./after.svg" alt="After"></p>
-<h1 id="前提">前提</h1>
-<p>自分のクラスタを前提としています。したがって以下のようなクラスタです。</p>
-<ul>
-<li>kubeadm で構築したシングルmasterなクラスタ</li>
-<li>masterサーバーにはIPアドレスでアクセスしてる</li>
-<li>kube-apiserverは6443をListenしている</li>
-</ul>
-<h1 id="ゴール">ゴール</h1>
-<ul>
-<li>任意のホスト名でkube-apiserverにアクセスできるようになっている</li>
-<li>kube-apiserverを別のノードで起動した場合もサーバー側の設定ファイルの変更だけで利用できる状態になる</li>
-<li>複数台構成にした場合そのうち1台が落ちてもAPIにはアクセスできるようにする</li>
-</ul>
-<h1 id="ipアドレスとホスト名を決める">IPアドレスとホスト名を決める</h1>
-<p>まずはロードバランサーするIPアドレスを決めます。
-ここでは <code>192.168.0.2</code> をそのIPアドレスとします。</p>
-<p>このIPアドレスはホストに直接割り当てたりはしません。
-keepalived がヘルスチェックをし、適切にARPで上位へ広報します。</p>
-<p>またそのアドレスを解決できるホスト名は <code>cluster.f110.dev</code> とします。</p>
-<h1 id="kube-apiserverのサーバー証明書を更新する">kube-apiserverのサーバー証明書を更新する</h1>
-<p>最初にkube-apiserverのサーバー証明書のSANを更新します。</p>
-<p>kubeadmで証明書を再発行しkube-apiserverでリロードします。</p>
-<pre><code class="language-console" data-lang="console">$ kubectl -n kube-system get configmap kubeadm-config -o jsonpath='{.data.ClusterConfiguration}' &gt; kubeadm.yaml
-</code></pre><p>kubeadm.yaml をConfigMapから取得して <code>apiServer.certSANs</code> を変更します。
-IPアドレスとホスト名を定義しておきます。</p>
-<pre><code class="language-console" data-lang="console">$ sudo mv /etc/kubernetes/pki/apiserver.{crt,key} ~
-</code></pre><p>すでに証明書のファイルがあるとkubeadmが証明書を生成しないのでバックアップも兼ねて退避します。</p>
-<pre><code class="language-console" data-lang="console">$ sudo kubeadm init phase certs apiserver --config kubeadm.yaml
-</code></pre><p>kubeadm initからapiserverの証明書生成フェーズのみを実行することで新しい証明書を発行します。</p>
-<p>これでkube-apiserverを再起動し新しい証明書を読み込ませれば切り替えることができます。
-更新されたかどうかはサーバーに接続し証明書を見ることで確認できます。</p>
-<pre><code class="language-console" data-lang="console">$ openssl s_client -connect 192.168.0.1:6443 &lt; /dev/null | openssl x509 -in - -text -noout
-</code></pre><h1 id="keepalivedをセットアップする">keepalivedをセットアップする</h1>
-<p>keepalived はStatic Podとして動作させます。</p>
-<p>設定ファイルは <a href="https://github.com/kubernetes/kubeadm/blob/master/docs/ha-considerations.md">公式ドキュメント</a> を参考にします。</p>
-<p>設定ファイルの必要な部分を置換し適切に配置すれば動くでしょう。</p>
-<p>Static Podのマニフェストは以下です。
-これを <code>/etc/kubernetes/manifests/keepalived.yaml</code> として配置します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Pod
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: keepalived
-  <span style="color:#66d9ef">namespace</span>: kube-system
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">containers</span>:
-  - <span style="color:#66d9ef">image</span>: angelnu/keepalived
-    <span style="color:#66d9ef">name</span>: keepalived
-    <span style="color:#66d9ef">resources</span>: {}
-    <span style="color:#66d9ef">securityContext</span>:
-      <span style="color:#66d9ef">capabilities</span>:
-        <span style="color:#66d9ef">add</span>:
-        - NET_ADMIN
-        - NET_BROADCAST
-        - NET_RAW
-    <span style="color:#66d9ef">volumeMounts</span>:
-    - <span style="color:#66d9ef">mountPath</span>: /etc/keepalived/keepalived.conf
-      <span style="color:#66d9ef">name</span>: config
-    - <span style="color:#66d9ef">mountPath</span>: /etc/keepalived/check_apiserver.sh
-      <span style="color:#66d9ef">name</span>: check
-  <span style="color:#66d9ef">hostNetwork</span>: <span style="color:#66d9ef">true</span>
-  <span style="color:#66d9ef">volumes</span>:
-  - <span style="color:#66d9ef">hostPath</span>:
-      <span style="color:#66d9ef">path</span>: /etc/keepalived/keepalived.conf
-    <span style="color:#66d9ef">name</span>: config
-  - <span style="color:#66d9ef">hostPath</span>:
-      <span style="color:#66d9ef">path</span>: /etc/keepalived/check_apiserver.sh
-    <span style="color:#66d9ef">name</span>: check
-</code></pre></div><p>公式ドキュメントとイメージが違いますが、これはkeepalivedをRaspberry Pi上（arm）で動かすためなので、プロセスが動作すればこれでなくても問題ありません。</p>
-<h1 id="haproxyをセットアップする">haproxyをセットアップする</h1>
-<p>これも公式ドキュメントの設定ファイルを利用しますが、そのままでは都合が悪かったので少し手直しをしました。</p>
-<pre><code>#---------------------------------------------------------------------
-# Global settings
-#---------------------------------------------------------------------
-global
-    log /dev/log local0
-    log /dev/log local1 notice
-    daemon
+    <p>Notionに移行する前はメモに <a href="https://happenapps.com">Quiver</a> 、タスク管理に <a href="https://www.omnigroup.com/omnifocus/">OmniFocus</a> と <a href="https://asana.com">Asana</a> を使っていたがこれらを全部Notionへ移行した。</p>
+<p>それぞれ少しずつ不満があってQuiverはiOSアプリから編集出来ないのとAndroidにはアプリすらないので見ることすらできない。</p>
+<p>OmniFocus と Asana は割と良かったが2つを使い分けていたのはそれぞれフォーカスするエリアが異なり自分の使い方では分けざるおえなかった。
+OmniFocusはタスク一般といった感じで情報は主にタスクのタイトルのみ（それぞれにノートもかけるがそれの編集機能はメモ帳レベル）。Asanaは業務的なタスク管理には向いているがそれ以外はそこまで得意ではない。</p>
+<p>更にツールが増えていくと使い分けるのも面倒になってくるということで全てをNotionにした。</p>
+<p>実際はまずNotionを使ってみてかなり使い心地が良かったのでそれぞれを移行していった感じ。</p>
+<h2 id="notionの使い方">Notionの使い方</h2>
+<p>前述のように3つのツールを元々使っていたのでNotionでも画一的な使い方をしているわけではなくある程度ワークフローにフォーカスさせたデータベースなどを作っている。</p>
+<h3 id="業務的なタスク">業務的なタスク</h3>
+<p>これはJIRAを意識したデータベースを作っている。</p>
+<p>プロジェクトやタスクの前後関係・進捗などがプロパティで定義できるようになっていて、ページ自体にはそのタスクにまつわる情報やタスクを作成した理由等を書いている。</p>
+<p>WikiとGitHub IssueとJIRAをまとめた感じで、IssueとJIRAの間くらいの機能になっている。</p>
+<p>なおこの業務的なタスクのデータベースは仕事のものと趣味のものの2つがあり、それぞれ別で管理されている。
+仕事のものは会社で使っているものもあるのでそこまで手厚いプロパティを用意しているわけではなく自分がタスクを把握できればOKくらいのゆるい使い方をしている。</p>
+<h3 id="一般的なタスク管理">一般的なタスク管理</h3>
+<p>これは業務的なタスク管理よりはもっとシンプルにプロパティも少ない。</p>
+<p>主にページのタイトルでほぼ情報を管理しているようなもの。</p>
+<h3 id="wiki">Wiki</h3>
+<p>メモツールとして一つのデータベースを作っている。</p>
+<p>このデータベースは <a href="https://en.wikipedia.org/wiki/Zettelkasten">Zettelkasten</a> を概ね踏襲していて全ページがフラットな階層になっている。
+ここだけを切り出したサービスとしては <a href="https://scrapbox.io/product">Scrapbox</a> がかなり近い。</p>
+<p>最近 Backlink が実装されたことで更に使い勝手が良くなった。</p>
+<h3 id="ブックマーク">ブックマーク</h3>
+<p>ブックマークツールとしてもかなり有用でとても気持ちいい。</p>
+<p>ブックマーク用のデータベースというのを独立して作成しており、気になったページなどはそこに放り込むようにしている。このデータベースはただURLが並んでいるだけではなく、内容もページとして保存されている。</p>
+<p>なので使い込めば使い込むほど検索で情報がヒットするようになるだろうし、そのページがなくなったとしても情報自体にアクセスすることは可能になっている。</p>
+<p>これと同じことを昔はてブとEvernoteを連携して実現していたがそもそもEvernoteを使わなくなってしまったことで失われていた。</p>
+<h2 id="notionのまだまだなところ">Notionのまだまだなところ</h2>
+<h3 id="検索が若干弱い">検索が若干弱い</h3>
+<p>全体を通しても階層構造による整理というのをあまり行わないようにしているのでとにかくなんでも検索したい。</p>
+<p>が、検索が遅かったり複雑な条件のクエリを実行できないという問題がある。</p>
+<p>データベース内の検索もできることにはできるのだが、ここではAND条件すら使えない。</p>
+<h2 id="とはいえnotionはいい">とはいえNotionはいい</h2>
+<p>今は無料プランだが、将来的に使いたい機能が有料だったとしたら課金する。月1,000円くらいであれば躊躇なく課金できる。</p>
+<p>それくらい使い心地がいい。</p>
 
-#---------------------------------------------------------------------
-# common defaults that all the 'listen' and 'backend' sections will
-# use if not designated in their block
-#---------------------------------------------------------------------
-defaults
-    mode                    http
-    log                     global
-    option                  httplog
-    option                  dontlognull
-    option http-server-close
-    option forwardfor       except 127.0.0.0/8
-    option                  redispatch
-    retries                 1
-    timeout http-request    10s
-    timeout queue           20s
-    timeout connect         5s
-    timeout client          300s
-    timeout server          300s
-    timeout http-keep-alive 10s
-    timeout check           10s
-
-#---------------------------------------------------------------------
-# apiserver frontend which proxys to the masters
-#---------------------------------------------------------------------
-frontend apiserver
-    bind \*:443
-    mode tcp
-    option tcplog
-    default_backend apiserver
-
-frontend stats
-    bind \*:8404
-    stats enable
-    stats uri /stats
-    stats refresh 30s
-    stats admin if LOCALHOST
-
-#---------------------------------------------------------------------
-# round robin balancing for apiserver
-#---------------------------------------------------------------------
-backend apiserver
-    option httpchk GET /healthz
-    http-check expect status 200
-    mode tcp
-    balance     roundrobin
-    server whale1 192.168.0.2:6443 check check-ssl verify none
-</code></pre><p>公式ドキュメントからの変更点は以下</p>
-<ul>
-<li>タイムアウトを300秒に延長</li>
-<li>443をListenする</li>
-<li>8404でstatsを見れるようにする</li>
-<li>backendにはL4でロードバランスする</li>
-<li>healthcheckで証明書の検証はしない</li>
-</ul>
-<p>haproxyを動作させるStatic Podのマニフェストは以下。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Pod
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: haproxy
-  <span style="color:#66d9ef">namespace</span>: kube-system
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">containers</span>:
-  - <span style="color:#66d9ef">image</span>: haproxy:<span style="color:#ae81ff">2.2.2</span>
-    <span style="color:#66d9ef">name</span>: haproxy
-    <span style="color:#66d9ef">livenessProbe</span>:
-      <span style="color:#66d9ef">failureThreshold</span>: <span style="color:#ae81ff">8</span>
-      <span style="color:#66d9ef">tcpSocket</span>:
-        <span style="color:#66d9ef">host</span>: <span style="color:#ae81ff">127.0.0.1</span>
-        <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">443</span>
-    <span style="color:#66d9ef">volumeMounts</span>:
-    - <span style="color:#66d9ef">mountPath</span>: /usr/local/etc/haproxy/haproxy.cfg
-      <span style="color:#66d9ef">name</span>: haproxyconf
-      <span style="color:#66d9ef">readOnly</span>: <span style="color:#66d9ef">true</span>
-  <span style="color:#66d9ef">hostNetwork</span>: <span style="color:#66d9ef">true</span>
-  <span style="color:#66d9ef">volumes</span>:
-  - <span style="color:#66d9ef">hostPath</span>:
-      <span style="color:#66d9ef">path</span>: /etc/haproxy/haproxy.cfg
-      <span style="color:#66d9ef">type</span>: FileOrCreate
-    <span style="color:#66d9ef">name</span>: haproxyconf
-</code></pre></div><p>Liveness Probeを <code>tcpSocket</code> に変えてあります。</p>
-<h1 id="kubectlで動作確認">kubectlで動作確認</h1>
-<p>この時点でロードバランサー経由でkube-apiserverへアクセスできるか確認しておきましょう。</p>
-<h1 id="kube-apiserverの引数を修正する">kube-apiserverの引数を修正する</h1>
-<p><code>--advertise-address</code> をロードバランサーのIPアドレスに変更します。</p>
-<p>これはkubeadmでできればそうした方がいいでしょう。
-今回は手動で編集してしまいました。</p>
-<h1 id="各コンポーネントの接続先をホスト名にする">各コンポーネントの接続先をホスト名にする</h1>
-<p>kube-controller-manager や kube-scheduler は kubeconfig を利用し接続先を決めています。
-そのためこの kubeconfig を変更しなければロードバランサー経由のアクセスにはなりません。</p>
-<ul>
-<li><code>/etc/kubernetes/kubelet.conf</code></li>
-<li><code>/etc/kubernetes/controller-manager.conf</code></li>
-<li><code>/etc/kubernetes/scheduler.conf</code></li>
-</ul>
-<p>がそれぞれの kubeconfig なので修正しましょう。</p>
-<h1 id="コントローラーなどが正しく動作しているか確認する">コントローラーなどが正しく動作しているか確認する</h1>
-<p>自作やサードパーティのコントローラーが正しく動作しているか確認してください。</p>
-<p>多くの場合は InClusterConfig() を利用していると思います。
-その場合は <code>kubernetes.default.svc</code> を通してkube-apiserverへアクセスしているのでここからも正しくアクセスできる必要があります。</p>
-<p>上記で <code>--advertise-address</code> を変更していれば正しくアクセスできるようになっているはずです。</p>
-<p>アクセスできない場合は <code>Endpoints</code> を確認します。</p>
-<pre><code class="language-console" data-lang="console">$ kubectl get endpoints
-</code></pre>
   </section>
   <footer>
     
@@ -278,31 +125,16 @@ backend apiserver
       <div class="c-pagination__ctrl">
         <div class="c-pagination__newer">
           
-          <a href="https://f110.jp/posts/raspberry-pi-4-for-k8s-master/">Newer</a>
           
         </div>
         <div class="c-pagination__older">
           
-          <a href="https://f110.jp/posts/improve-working-env-at-home/">Older</a>
+          <a href="https://f110.jp/posts/move-to-tagged-vlan/">Older</a>
           
         </div>
       </div>
     </nav>
     
-
-<section class="p-related">
-  <h3>See Also</h3>
-  <ul id="slider" class="p-related__list">
-    
-    <li class="p-related__item js-related__item">
-      <a href="/posts/made-ci-tool/"
-        >
-        <span>CIツールを自作してる</span>
-      </a>
-    </li>
-    
-  </ul>
-</section>
 
 
     
