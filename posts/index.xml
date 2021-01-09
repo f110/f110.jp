@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 19 Dec 2020 17:06:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 09 Jan 2021 21:47:00 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>キーボードをHHKBに戻した</title>
+      <link>https://f110.jp/posts/back-to-hhkb/</link>
+      <pubDate>Sat, 09 Jan 2021 21:47:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/back-to-hhkb/</guid>
+      <description>先月 キーボードをKinesisにした が1ヶ月経たずにHHKBに戻ってきた。 どうもKinesisだと指が疲れる。年末年始のようにそこまで使って</description>
+    </item>
     
     <item>
       <title>キーボードをKinesisにした</title>

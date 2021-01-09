@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <title>キーボードをKinesisにした</title>
-  <meta property="og:title" content="キーボードをKinesisにした" />
-  <meta name="twitter:title" content="キーボードをKinesisにした" />
+  <title>キーボードをHHKBに戻した</title>
+  <meta property="og:title" content="キーボードをHHKBに戻した" />
+  <meta name="twitter:title" content="キーボードをHHKBに戻した" />
 
   <meta name="author" content="Fumihiro Ito"/>
   <meta property="og:site_name" content="f110&#39;s weblog" />
-  <meta property="og:url" content="https://f110.jp/posts/switched-back-to-kinesis-advantage2/" />
+  <meta property="og:url" content="https://f110.jp/posts/back-to-hhkb/" />
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
@@ -41,12 +41,12 @@
 
 <article class="p-article">
   <header>
-    <h1>キーボードをKinesisにした</h1>
+    <h1>キーボードをHHKBに戻した</h1>
     <div>
       <div class="c-time">
         Posted on
-        <time datetime="2020-12-19T17:06:00&#43;09:00">
-          2020/12/19
+        <time datetime="2021-01-09T21:47:00&#43;09:00">
+          2021/01/09
         </time>
       </div>
       
@@ -55,51 +55,31 @@
   
   
   <section id="js-article" class="p-article__body">
-    <p>ここ1年くらいは <a href="https://happyhackingkb.com/jp/products/hybrid_types/">HHKB Professional HYBRID Type-S</a> を使っていた。
-1年くらい前にHHKBを買ったのは前からHHKBは欲しかったんだけど、日本語配列+黒+静音という組み合わせがなかったから。
-HHKBが新しくなってこの組み合わせのモデルがあるということで迷わず買った。</p>
-<p>このキーボードはかなり気に入っているので2台持ってて、1台は自宅用もう1台は会社用として買った。
-が、3月以降はずっとフルリモートなので会社用は必要なく家で眠ってる状態になってる。</p>
-<p>で、HHKBを今年はずっと使ってきたんだけども久しぶりにKinesis Advantage2を引っ張り出し使い始めた。</p>
-<h3 id="なぜhhkbを使っていたのか">なぜHHKBを使っていたのか</h3>
-<p>これには2つ理由があり</p>
-<ol>
-<li>打ち心地が大変好み</li>
-<li>PC2台に簡単に接続できる</li>
-</ol>
-<p>打ち心地は静電容量式のスイッチと勝負できるものがなく、大変気持ちが良い。
-タイピングが気持ちいいというのは重要で、キーボードを打たないと仕事にならないのでそこが気持ちいいとストレスにならない。</p>
-<p>PC2台と接続できるのもかなり便利である。
-仕事をする時は会社のPCで、仕事が終われば自分のマシンを使うわけなので切り替える必要がある。机の上にそれぞれのPCに対応したキーボードを置いておくのは邪魔なのでやりたくない。
-また机の上に2つキーボードあると姿勢が中途半端になってしまい、腰や背中を痛める原因になる。</p>
-<p>HHKBでキーボードの切り替えは、片方をBluetooth接続、もう片方を有線接続していてショートカットで切り替えていた。
-自分のマシンはデスクトップだがBluetooth接続はできるのでどちらもBluetooth接続にすれば机の上からケーブルを1本減らせるので良かったのだが自分のマシンはほぼLinuxで使っているので無線接続は不安なので有線接続にしていた。</p>
-<h3 id="hhkbの有線接続はまだバグってる">HHKBの有線接続はまだバグってる</h3>
-<p>有線と無線接続を切り替えて使っていたので有線接続のバグを発見した。</p>
-<p>これはPFUに報告して、向こうでも再現したようだが現時点のファームウェアではまだ修正されていない（なお報告して再現したのは3月。もう9ヶ月も直せていないよう）</p>
-<p>USBから給電が途切れないタイプのポートに接続している場合、有線接続のままOSを終了すると無線接続等に切り替えることができなくなる。
-この状態からの復旧方法としてはケーブルを1回抜くことである。そうするとキーボード側も一旦シャットダウンし、再度電源ボタンを長押しすれば電源を入れられる。</p>
-<p>おそらくこのバグはファームウェアがこういった接続先を考慮できていなく、また終了時のステート遷移の処理が甘いのが原因だろう。</p>
-<p>他にもワークアラウンドはあって、有線接続のままPCをシャットダウンしなければいい。
-OSがシャットダウンしきる前に無線接続に切り替えたらこの問題は起きない。</p>
-<h3 id="なぜkinesisに戻したのか">なぜKinesisに戻したのか</h3>
-<p>そんな理由はなく、半分は気分、もう半分は自作キーボードの画像を何枚か見たのでまたこの形のキーボードを使いたくなったから。つまり100%気分である。</p>
-<p>自作キーボードは極一部を除いてフラットなキー配置だが、Kinesisのこのお碗型のキー配置はとても良い。
-最小の移動でどのキーにも届くし、一般的なキーボードに比べて一行多く押せるキーが多いのも特徴。（Zの行より下にキーがあり、ここも人差し指から小指で押すことができる。矢印キーなどが配置されている）</p>
-<p>自作キーボードはDactyl Keyboardなら作ってみたいと思っているが3Dプリンターは持ってないのでケースを購入する必要があり、そうすると$350とかなのでKinesisでいいか、となる。（Kinesis Advantage2は$349、国内代理店から買うと43,000円程）</p>
-<h3 id="pcの切り替え">PCの切り替え</h3>
-<p>KinesisにはUSBケーブルが1本しか生えてないので工夫する必要がある。</p>
-<p>そこで <a href="https://www.elecom.co.jp/products/KM-A22BBK.html">サンワサプライのPC切替器</a> を買った。ボタンを押せばUSBの接続先が切り替わるという代物でPCの切り替えはこれで問題なさそうである。</p>
-<h3 id="日本語配列から英語配列">日本語配列から英語配列</h3>
-<p>実は日本語配列と英語配列を混ぜて使うのは問題ない。</p>
-<p>元来日本語配列派（一番下の行のキーが日本語配列の方が多いので。英語配列のキーボードは基本的に買う気がない）なのでMacBook Proの内蔵キーボードもJIS配列だし、HHKBも日本語配列を買っている。
-Kinesisは英語配列しかないので英語配列で使っているが、両方の配列を交互に使っても特に問題ない。
-どちらかしか使えないという人が多いらしいが、別に自分はどちらでも良いし両方を同時に使うことができる。</p>
-<h3 id="ショートカット問題">ショートカット問題</h3>
-<p>Kinesisは親指で押せるキーが多いのでそれと組み合わせたショートカットを設定したい。
-元々HHKBでもLinuxではxkbで少しキーマップをいじっていたのでKinesis用の設定を作った。</p>
-<p>他にIDEのショートカットも便利だと思う配置がHHKBとは異なる部分がある。
-これはKinesis用のキーマップを作って切り替えることで対応した。</p>
+    <p>先月 <a href="https://f110.jp/posts/switched-back-to-kinesis-advantage2/">キーボードをKinesisにした</a> が1ヶ月経たずにHHKBに戻ってきた。</p>
+<p>どうもKinesisだと指が疲れる。年末年始のようにそこまで使ってない時は問題ないが、仕事で使うようになったら夜に指の疲れを感じるようになった。
+おそらくKinesisのスイッチだと底打ちしてしまっていて、不必要な衝撃が伝わっているのだと思う。</p>
+<p>翌日には回復しているのでいまのところ深刻な問題には至ってないが、この先にはそうなる未来が見えたので早めにHHKBに戻ってきた。</p>
+<p>戻ってきて感じるのはスイッチの押し心地が最高だということ。</p>
+<p>初めて買った良いキーボードがRealforceだったのもあり、やはり静電容量スイッチの押し心地が最高である。（今でもそのRealforceは持っている。何年も使ってないけども）</p>
+<h2 id="kinesisのようなエルゴノミクスキーボードが使いたくなったら">Kinesisのようなエルゴノミクスキーボードが使いたくなったら</h2>
+<p>Kinesisのようなお碗型のエルゴノミクスキーボードはキー配置はとてもいい。
+スイッチの問題が解決するのであればそちらを使いたいと思ってる。</p>
+<p>Kinesis社がHHKBと同じスイッチでキーボードを作ってくれれば良いのだがそれはまずないだろう。</p>
+<p>ということで代わりになりそうな方法を探してみた。
+市場には要求を完全に満たせそうなキーボードはないので自作するしかなさそうである。</p>
+<h3 id="スイッチ">スイッチ</h3>
+<p>Kinesisが合わないと思われるポイントが赤軸であることなので、赤軸とはベクトルが違うスイッチを使ったものを探す or 自作キーボードで使うことで改善するかもしれない。</p>
+<p>例えば Input Club Hako Violet はもしかしたら良い候補かもしれない（が、一切触ったことがないので分からない）</p>
+<h3 id="the-dactyl-keyboard">The Dactyl Keyboard</h3>
+<p><a href="https://github.com/adereth/dactyl-keyboard">https://github.com/adereth/dactyl-keyboard</a></p>
+<p>Kinesisのようにお碗型にキーが配置されている自作キーボード。</p>
+<p>筐体は3Dプリントする必要がある。
+なお自分でプリントせずに購入すると筐体だけで$300くらいするのでKinesisの方が最終的には安かったりするかもしれない。</p>
+<h3 id="lalboard">lalboard</h3>
+<p><a href="https://github.com/JesusFreke/lalboard">https://github.com/JesusFreke/lalboard</a></p>
+<p>そもそも自作するならこれくらい特殊なものを作るほうがよさそうである。
+DataHandは実際に触ったことはないが、動画を見る限りかなり良さそうな感じがする。</p>
+<p>ただ、DataHand自体が現代では生産されていないということは製品として流通させるには何か欠点を抱えていたのかもしれない。</p>
 
   </section>
   <footer>
@@ -108,12 +88,11 @@ Kinesisは英語配列しかないので英語配列で使っているが、両�
       <div class="c-pagination__ctrl">
         <div class="c-pagination__newer">
           
-          <a href="https://f110.jp/posts/back-to-hhkb/">Newer</a>
           
         </div>
         <div class="c-pagination__older">
           
-          <a href="https://f110.jp/posts/notion-as-the-editor-for-blog/">Older</a>
+          <a href="https://f110.jp/posts/switched-back-to-kinesis-advantage2/">Older</a>
           
         </div>
       </div>
