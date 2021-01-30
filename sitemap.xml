@@ -4,21 +4,36 @@
   
   <url>
     <loc>https://f110.jp/</loc>
-    <lastmod>2021-01-27T13:05:00+09:00</lastmod>
+    <lastmod>2021-01-30T14:41:00+09:00</lastmod>
   </url>
   
   <url>
-    <loc>https://f110.jp/tags/home-network/</loc>
-    <lastmod>2021-01-27T13:05:00+09:00</lastmod>
+    <loc>https://f110.jp/tags/go/</loc>
+    <lastmod>2021-01-30T14:41:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/posts/do-not-break-compatibility-in-the-minor-version/</loc>
+    <lastmod>2021-01-30T14:41:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/grpc/</loc>
+    <lastmod>2021-01-30T14:41:00+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/posts/</loc>
-    <lastmod>2021-01-27T13:05:00+09:00</lastmod>
+    <lastmod>2021-01-30T14:41:00+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/tags/</loc>
+    <lastmod>2021-01-30T14:41:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/home-network/</loc>
     <lastmod>2021-01-27T13:05:00+09:00</lastmod>
   </url>
   
@@ -79,11 +94,6 @@
   
   <url>
     <loc>https://f110.jp/tags/bazel/</loc>
-    <lastmod>2020-10-10T17:47:04+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/go/</loc>
     <lastmod>2020-10-10T17:47:04+09:00</lastmod>
   </url>
   
@@ -224,11 +234,6 @@
   
   <url>
     <loc>https://f110.jp/posts/bazel-with-grpc-go/</loc>
-    <lastmod>2020-03-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/grpc/</loc>
     <lastmod>2020-03-30T00:00:00+00:00</lastmod>
   </url>
   
