@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 30 Jan 2021 14:41:00 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 02 Feb 2021 19:52:00 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>パスワードマネージャーを1Passwordに戻した</title>
+      <link>https://f110.jp/posts/back-to-1password/</link>
+      <pubDate>Tue, 02 Feb 2021 19:52:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/back-to-1password/</guid>
+      <description>2020年1月頃からパスワードマネージャに Enpass を使っていたが、最近 1Password に戻した。 なぜ Enpass を使っていたのか そもそも2018年くらいまでは 1Password を長らく使</description>
+    </item>
     
     <item>
       <title>Go moduleはマイナーバージョンで互換性を壊してはいけない</title>
