@@ -3,17 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://f110.jp/</loc>
-    <lastmod>2021-03-11T22:04:00+09:00</lastmod>
+    <loc>https://f110.jp/posts/upgrade-macos-to-bigsur/</loc>
+    <lastmod>2021-03-22T02:34:00+09:00</lastmod>
   </url>
   
   <url>
-    <loc>https://f110.jp/tags/monorepo/</loc>
-    <lastmod>2021-03-11T22:04:00+09:00</lastmod>
+    <loc>https://f110.jp/</loc>
+    <lastmod>2021-03-22T02:34:00+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/posts/</loc>
+    <lastmod>2021-03-22T02:34:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/monorepo/</loc>
     <lastmod>2021-03-11T22:04:00+09:00</lastmod>
   </url>
   

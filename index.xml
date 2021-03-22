@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 11 Mar 2021 22:04:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 22 Mar 2021 02:34:00 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>BigSurにアップデートした</title>
+      <link>https://f110.jp/posts/upgrade-macos-to-bigsur/</link>
+      <pubDate>Mon, 22 Mar 2021 02:34:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/upgrade-macos-to-bigsur/</guid>
+      <description>そろそろ良いだろうということで BigSur にアップデートをした。 大体いつも macOS のアップデートは半年から一年程寝かせてから適用しているので、大体いつものス</description>
+    </item>
     
     <item>
       <title>モノレポの構成</title>
