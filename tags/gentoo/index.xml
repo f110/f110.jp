@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gentoo on f110&#39;s weblog</title>
+    <link>https://f110.jp/tags/gentoo/</link>
+    <description>Recent content in Gentoo on f110&#39;s weblog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
+    <lastBuildDate>Thu, 29 Apr 2021 13:17:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://f110.jp/tags/gentoo/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Gentoo Linuxに移行した</title>
+      <link>https://f110.jp/posts/move-to-gentoo-linux/</link>
+      <pubDate>Thu, 29 Apr 2021 13:17:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/move-to-gentoo-linux/</guid>
+      <description>メインで使っているマシンは長らく Ubuntu を使っていたのだが今回 Gentoo Linux に移行した。 現時点でデフォルトで起動する OS が Gentoo に切り替えられるくらいにはなったの</description>
+    </item>
+    
+  </channel>
+</rss>

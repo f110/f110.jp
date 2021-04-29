@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Mon, 22 Mar 2021 02:34:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 29 Apr 2021 13:17:00 +0900</lastBuildDate>
     
 	<atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Gentoo Linuxに移行した</title>
+      <link>https://f110.jp/posts/move-to-gentoo-linux/</link>
+      <pubDate>Thu, 29 Apr 2021 13:17:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/move-to-gentoo-linux/</guid>
+      <description>メインで使っているマシンは長らく Ubuntu を使っていたのだが今回 Gentoo Linux に移行した。 現時点でデフォルトで起動する OS が Gentoo に切り替えられるくらいにはなったの</description>
+    </item>
     
     <item>
       <title>BigSurにアップデートした</title>
