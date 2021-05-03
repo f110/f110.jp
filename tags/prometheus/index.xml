@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Fri, 03 Apr 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://f110.jp/tags/prometheus/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 03 Apr 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://f110.jp/tags/prometheus/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Prometheusにあるメトリクスでグラフを描く</title>
       <link>https://f110.jp/posts/visualize-metrics-from-prometheus/</link>

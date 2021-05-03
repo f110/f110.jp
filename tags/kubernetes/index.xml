@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sun, 23 Aug 2020 00:55:44 +0900</lastBuildDate>
-    
-	<atom:link href="https://f110.jp/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 23 Aug 2020 00:55:44 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Raspberry Pi 4 for k8s&#39;s control plane</title>
       <link>https://f110.jp/posts/raspberry-pi-4-for-k8s-master/</link>

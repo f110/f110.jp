@@ -13,7 +13,7 @@
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
-  <meta name="generator" content="Hugo 0.69.0-DEV" />
+  <meta name="generator" content="Hugo 0.76.5" />
   <meta name="Hatena::Bookmark" content="nocomment" />
 
   <link rel="stylesheet" href="https://f110.jp/css/style.css" />
@@ -101,48 +101,48 @@ $ set protocols bgp 64512 neighbor 192.168.100.3 remote-as 64513
 <pre><code class="language-console" data-lang="console">$ show ip bgp neighbor
 </code></pre><h1 id="metallb側">MetalLB側</h1>
 <p>ConfigMapにMetalLBが使用するアドレスのレンジが書かれているのでこれを変更します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: ConfigMap
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">namespace</span>: metallb-system
-  <span style="color:#66d9ef">name</span>: config
-<span style="color:#66d9ef">data</span>:
-  <span style="color:#66d9ef">config</span>: <span style="color:#e6db74">|
-</span><span style="color:#e6db74">    address-pools:</span>
-      - <span style="color:#66d9ef">name</span>: default
-        <span style="color:#66d9ef">protocol</span>: layer2
-        <span style="color:#66d9ef">addresses</span>:
-          - <span style="color:#ae81ff">192.168.100.128</span>/<span style="color:#ae81ff">25</span>
-      - <span style="color:#66d9ef">name</span>: bgp
-        <span style="color:#66d9ef">protocol</span>: bgp
-        <span style="color:#66d9ef">addresses</span>:
-          - <span style="color:#ae81ff">192.168.101.0</span>/<span style="color:#ae81ff">24</span>
-        <span style="color:#66d9ef">auto-assign</span>: <span style="color:#66d9ef">false</span>
-        <span style="color:#66d9ef">avoid-buggy-ips</span>: <span style="color:#66d9ef">true</span>
-    <span style="color:#66d9ef">peers</span>:
-      - <span style="color:#66d9ef">peer-address</span>: <span style="color:#ae81ff">192.168.1.1</span>
-        <span style="color:#66d9ef">peer-asn</span>: <span style="color:#ae81ff">64512</span>
-        <span style="color:#66d9ef">my-asn</span>: <span style="color:#ae81ff">64513</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">metallb-system</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config</span>
+<span style="color:#f92672">data</span>:
+  <span style="color:#f92672">config</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    address-pools:
+</span><span style="color:#e6db74">      - name: default
+</span><span style="color:#e6db74">        protocol: layer2
+</span><span style="color:#e6db74">        addresses:
+</span><span style="color:#e6db74">          - 192.168.100.128/25
+</span><span style="color:#e6db74">      - name: bgp
+</span><span style="color:#e6db74">        protocol: bgp
+</span><span style="color:#e6db74">        addresses:
+</span><span style="color:#e6db74">          - 192.168.101.0/24
+</span><span style="color:#e6db74">        auto-assign: false
+</span><span style="color:#e6db74">        avoid-buggy-ips: true
+</span><span style="color:#e6db74">    peers:
+</span><span style="color:#e6db74">      - peer-address: 192.168.1.1
+</span><span style="color:#e6db74">        peer-asn: 64512
+</span><span style="color:#e6db74">        my-asn: 64513</span>    
 </code></pre></div><p><code>address-pools</code> に <code>protocol: bgp</code> な要素を追加するのと <code>peers</code> に自分とピアの設定をしておきます。</p>
 <p>後はこれをapplyすればMetalLBのコントローラが自動的に読み込み直します。</p>
 <p>BGPのレンジは <code>auto-assign: false</code> なので明示しない限り使われません。</p>
 <h1 id="動作テスト">動作テスト</h1>
 <p>まずはServiceを作ります。</p>
 <p>既存の動作しているServiceの定義を持ってきて修正を加えるのがいいと思います。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Service
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: test
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">type</span>: LoadBalancer
-  <span style="color:#66d9ef">loadBalancerIP</span>: <span style="color:#ae81ff">192.168.101.32</span>
-  <span style="color:#66d9ef">ports</span>:
-  - <span style="color:#66d9ef">name</span>: http
-    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">80</span>
-    <span style="color:#66d9ef">protocol</span>: TCP
-    <span style="color:#66d9ef">targetPort</span>: <span style="color:#ae81ff">4002</span>
-  <span style="color:#66d9ef">selector</span>:
-    <span style="color:#66d9ef">app</span>: proxy
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">test</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">LoadBalancer</span>
+  <span style="color:#f92672">loadBalancerIP</span>: <span style="color:#ae81ff">192.168.101.32</span>
+  <span style="color:#f92672">ports</span>:
+  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">http</span>
+    <span style="color:#f92672">port</span>: <span style="color:#ae81ff">80</span>
+    <span style="color:#f92672">protocol</span>: <span style="color:#ae81ff">TCP</span>
+    <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">4002</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">proxy</span>
 </code></pre></div><p>例えばこのような定義を書きます。 <code>loadBalancerIP</code> で新しいアドレスのレンジ内を指定するのがポイントです。</p>
 <p>このyamlをapplyすればUSG側から広報された経路を見ることができるはずです。</p>
 <pre><code>admin@SecurityGateway:~$ show ip bgp

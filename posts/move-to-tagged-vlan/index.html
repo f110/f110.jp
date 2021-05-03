@@ -13,7 +13,7 @@
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
-  <meta name="generator" content="Hugo 0.69.0-DEV" />
+  <meta name="generator" content="Hugo 0.76.5" />
   <meta name="Hatena::Bookmark" content="nocomment" />
 
   <link rel="stylesheet" href="https://f110.jp/css/style.css" />
@@ -69,22 +69,22 @@
 <h2 id="1-cloud-init-のネットワーク設定の生成を止める">1. cloud-init のネットワーク設定の生成を止める</h2>
 <p>実際はvlanの設定で上書きするので止まってなくても問題ないが生成されても使わないのだから止めてしまう。生成していると無駄にファイルが増えて後から見た時のメンテナンス性が下がるだけである。</p>
 <h2 id="2-netplan-を設定する">2. netplan を設定する</h2>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">network</span>:
-  <span style="color:#66d9ef">version</span>: <span style="color:#ae81ff">2</span>
-  <span style="color:#66d9ef">ethernets</span>:
-    <span style="color:#66d9ef">eno1</span>:
-      <span style="color:#66d9ef">dhcp4</span>: <span style="color:#66d9ef">false</span>
-      <span style="color:#66d9ef">dhcp6</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#66d9ef">vlans</span>:
-    <span style="color:#66d9ef">eno1.1000</span>:
-      <span style="color:#66d9ef">id</span>: <span style="color:#ae81ff">1000</span>
-      <span style="color:#66d9ef">link</span>: eno1
-      <span style="color:#66d9ef">dhcp4</span>: <span style="color:#66d9ef">false</span>
-      <span style="color:#66d9ef">dhcp6</span>: <span style="color:#66d9ef">false</span>
-      <span style="color:#66d9ef">addresses</span>: [<span style="color:#e6db74">&#34;192.168.10.2/24&#34;</span>]
-      <span style="color:#66d9ef">gateway4</span>: <span style="color:#ae81ff">192.168.10.1</span>
-      <span style="color:#66d9ef">nameservers</span>:
-        <span style="color:#66d9ef">addresses</span>: [<span style="color:#e6db74">&#34;192.168.10.1&#34;</span>]
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">network</span>:
+  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">2</span>
+  <span style="color:#f92672">ethernets</span>:
+    <span style="color:#f92672">eno1</span>:
+      <span style="color:#f92672">dhcp4</span>: <span style="color:#66d9ef">false</span>
+      <span style="color:#f92672">dhcp6</span>: <span style="color:#66d9ef">false</span>
+  <span style="color:#f92672">vlans</span>:
+    <span style="color:#f92672">eno1.1000</span>:
+      <span style="color:#f92672">id</span>: <span style="color:#ae81ff">1000</span>
+      <span style="color:#f92672">link</span>: <span style="color:#ae81ff">eno1</span>
+      <span style="color:#f92672">dhcp4</span>: <span style="color:#66d9ef">false</span>
+      <span style="color:#f92672">dhcp6</span>: <span style="color:#66d9ef">false</span>
+      <span style="color:#f92672">addresses</span>: [<span style="color:#e6db74">&#34;192.168.10.2/24&#34;</span>]
+      <span style="color:#f92672">gateway4</span>: <span style="color:#ae81ff">192.168.10.1</span>
+      <span style="color:#f92672">nameservers</span>:
+        <span style="color:#f92672">addresses</span>: [<span style="color:#e6db74">&#34;192.168.10.1&#34;</span>]
 </code></pre></div><ul>
 <li>DHCPをやめて</li>
 <li>vlanタグを設定し</li>

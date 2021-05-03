@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 30 Jan 2021 14:41:00 +0900</lastBuildDate>
-    
-	<atom:link href="https://f110.jp/tags/grpc/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sat, 30 Jan 2021 14:41:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/grpc/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Go moduleはマイナーバージョンで互換性を壊してはいけない</title>
       <link>https://f110.jp/posts/do-not-break-compatibility-in-the-minor-version/</link>

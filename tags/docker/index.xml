@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Wed, 01 Apr 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://f110.jp/tags/docker/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Wed, 01 Apr 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://f110.jp/tags/docker/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Dockerを避ける</title>
       <link>https://f110.jp/posts/avoid-docker/</link>

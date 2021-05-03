@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Wed, 03 Mar 2021 12:56:00 +0900</lastBuildDate>
-    
-	<atom:link href="https://f110.jp/tags/unifi/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Wed, 03 Mar 2021 12:56:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/unifi/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>UniFi Dream Machine Proのファームウェアをアップデートした</title>
       <link>https://f110.jp/posts/update-firmware-v1.9.0-on-unifi-dream-machine-pro/</link>
