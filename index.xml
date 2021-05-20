@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 20 May 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 20 May 2021 18:48:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Public betaになったNotion APIを使ってみる</title>
+      <link>https://f110.jp/posts/test-notion-api/</link>
+      <pubDate>Thu, 20 May 2021 18:48:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/test-notion-api/</guid>
+      <description>Public beta になった Notion API を試してみることにした。 Notion は自分用として様々な使い方をしつつ、ブログエディタとしても使っている。 これまでは Notion に API がなかったの</description>
+    </item>
+    
     <item>
       <title>メンターとメンティー</title>
       <link>https://f110.jp/posts/mentoring-rookies/</link>
