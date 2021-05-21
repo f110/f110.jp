@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 20 May 2021 18:48:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 21 May 2021 23:26:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tour de France</title>
+      <link>https://f110.jp/tags/tour-de-france/</link>
+      <pubDate>Fri, 21 May 2021 23:26:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/tour-de-france/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Go</title>
       <link>https://f110.jp/tags/go/</link>
@@ -95,15 +104,6 @@
       <pubDate>Sat, 10 Oct 2020 17:47:04 +0900</pubDate>
       
       <guid>https://f110.jp/tags/bazel/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Tour de France</title>
-      <link>https://f110.jp/tags/tour-de-france/</link>
-      <pubDate>Sun, 30 Aug 2020 19:40:20 +0900</pubDate>
-      
-      <guid>https://f110.jp/tags/tour-de-france/</guid>
       <description></description>
     </item>
     

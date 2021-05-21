@@ -4,16 +4,31 @@
   
   <url>
     <loc>https://f110.jp/</loc>
-    <lastmod>2021-05-20T18:48:00+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/go/</loc>
-    <lastmod>2021-05-20T18:48:00+09:00</lastmod>
+    <lastmod>2021-05-21T23:26:00+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/posts/</loc>
+    <lastmod>2021-05-21T23:26:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/</loc>
+    <lastmod>2021-05-21T23:26:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/tour-de-france/</loc>
+    <lastmod>2021-05-21T23:26:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/posts/tdf-2021-calendar/</loc>
+    <lastmod>2021-05-21T23:26:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/go/</loc>
     <lastmod>2021-05-20T18:48:00+09:00</lastmod>
   </url>
   
@@ -24,11 +39,6 @@
   
   <url>
     <loc>https://f110.jp/posts/test-notion-api/</loc>
-    <lastmod>2021-05-20T18:48:00+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/</loc>
     <lastmod>2021-05-20T18:48:00+09:00</lastmod>
   </url>
   
@@ -155,11 +165,6 @@
   <url>
     <loc>https://f110.jp/posts/gocon-20-sendai/</loc>
     <lastmod>2020-10-10T17:47:04+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/tour-de-france/</loc>
-    <lastmod>2020-08-30T19:40:20+09:00</lastmod>
   </url>
   
   <url>

@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 20 May 2021 18:48:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 21 May 2021 23:26:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ツール・ド・フランス2021放送スケジュール</title>
+      <link>https://f110.jp/posts/tdf-2021-calendar/</link>
+      <pubDate>Fri, 21 May 2021 23:26:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/tdf-2021-calendar/</guid>
+      <description>昨年 と同じように今年もツール・ド・フランスの放送スケジュールを Google Calendar で作った。 カレンダーの表示・購読は次のリンクからできる。 https://calendar.google.com/calendar/embed?src=o6sioj47ebi4h41h938cs9vp4c%40group.calendar.google.com&amp;amp;ctz=Asia%2FTokyo 今年のスクリプト</description>
+    </item>
+    
     <item>
       <title>Public betaになったNotion APIを使ってみる</title>
       <link>https://f110.jp/posts/test-notion-api/</link>
