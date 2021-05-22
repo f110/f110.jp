@@ -7,7 +7,25 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Wed, 27 Jan 2021 13:05:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/home-network/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 22 May 2021 04:45:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/home-network/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>UniFi Dream MachineでWireGuardをカーネルで動かすプロジェクト</title>
+      <link>https://f110.jp/posts/kernel-module-of-wireguard-on-udm/</link>
+      <pubDate>Sat, 22 May 2021 04:45:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/kernel-module-of-wireguard-on-udm/</guid>
+      <description>UniFi Security Gateway の時は WireGuard をカーネルモジュールとして動かしていた。 UniFi Dream Machine Pro では OS が新しくなっておりこのモジュールが使えないため、ユーザーランドで動かして</description>
+    </item>
+    
+    <item>
+      <title>UniFi Dream Machineのカーネルがアップデートされそう</title>
+      <link>https://f110.jp/posts/new-kernel-for-udm/</link>
+      <pubDate>Sat, 22 May 2021 04:44:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/new-kernel-for-udm/</guid>
+      <description>UniFi Dream Machine/Pro のファームウェアのカーネルは長らく 4.1 で変わることはなかった。 この Linux 4.1 は個人的に結構曲者でアップデートされるのを首を長くして待っていたの</description>
+    </item>
+    
     <item>
       <title>UniFi Dream Machine Proを買った</title>
       <link>https://f110.jp/posts/i-bought-unifi-dream-machine-pro/</link>
