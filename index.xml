@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 22 May 2021 04:45:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 27 May 2021 17:15:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>iPad Pro 12.9 にした</title>
+      <link>https://f110.jp/posts/bye-ipad-air4-hello-ipad-pro/</link>
+      <pubDate>Thu, 27 May 2021 17:15:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/bye-ipad-air4-hello-ipad-pro/</guid>
+      <description>iPad Air4を 去年の11月に買っていた が 5/21 に発売された M1 iPad Pro に買い替えた。 買い替えた主な理由は iPad Air4 の画面サイズ（10.9インチ）だと雑誌の電子</description>
+    </item>
+    
     <item>
       <title>UniFi Dream MachineでWireGuardをカーネルで動かすプロジェクト</title>
       <link>https://f110.jp/posts/kernel-module-of-wireguard-on-udm/</link>
