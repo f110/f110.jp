@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Mon, 23 Nov 2020 17:47:04 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/homecluster/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 24 Jun 2021 17:12:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/homecluster/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes v1.21 にアップデートした</title>
+      <link>https://f110.jp/posts/update-kubernetes-to-1.21/</link>
+      <pubDate>Thu, 24 Jun 2021 17:12:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/update-kubernetes-to-1.21/</guid>
+      <description>Kubernetes を 1.21.2 にアップデートした。 少し前に 1.21 系にアップデートしようと思っていたが 1.21.1 にリグレッション があり、すぐに次のパッチバージョンがリリースされる</description>
+    </item>
+    
     <item>
       <title>タグVLANに移行した</title>
       <link>https://f110.jp/posts/move-to-tagged-vlan/</link>
