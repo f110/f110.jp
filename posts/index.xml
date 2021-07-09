@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 24 Jun 2021 17:12:00 +0900</lastBuildDate><atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 09 Jul 2021 21:59:00 +0900</lastBuildDate><atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>UnifiOS Dream Machines 1.10.0</title>
+      <link>https://f110.jp/posts/release-new-firmware-110.0-for-dream-machine/</link>
+      <pubDate>Fri, 09 Jul 2021 21:59:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/release-new-firmware-110.0-for-dream-machine/</guid>
+      <description>Dream Machine の新しいファームウェア 1.10.0 が リリース された。 このファームウェアでは Dream Machine 発売以来初めてカーネルがアップデートされた。 アップデートされても4系</description>
+    </item>
+    
     <item>
       <title>Kubernetes v1.21 にアップデートした</title>
       <link>https://f110.jp/posts/update-kubernetes-to-1.21/</link>
