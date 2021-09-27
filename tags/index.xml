@@ -7,7 +7,25 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sun, 08 Aug 2021 18:41:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 27 Sep 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go</title>
+      <link>https://f110.jp/tags/go/</link>
+      <pubDate>Mon, 27 Sep 2021 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/go/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Productivity</title>
+      <link>https://f110.jp/tags/productivity/</link>
+      <pubDate>Mon, 27 Sep 2021 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/productivity/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Home Network</title>
       <link>https://f110.jp/tags/home-network/</link>
@@ -50,24 +68,6 @@
       <pubDate>Fri, 21 May 2021 23:26:00 +0900</pubDate>
       
       <guid>https://f110.jp/tags/tour-de-france/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Go</title>
-      <link>https://f110.jp/tags/go/</link>
-      <pubDate>Thu, 20 May 2021 18:48:00 +0900</pubDate>
-      
-      <guid>https://f110.jp/tags/go/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Productivity</title>
-      <link>https://f110.jp/tags/productivity/</link>
-      <pubDate>Thu, 20 May 2021 18:48:00 +0900</pubDate>
-      
-      <guid>https://f110.jp/tags/productivity/</guid>
       <description></description>
     </item>
     

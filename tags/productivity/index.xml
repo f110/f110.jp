@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 20 May 2021 18:48:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/productivity/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 27 Sep 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/productivity/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>自分用コード検索</title>
+      <link>https://f110.jp/posts/code-search-for-myself/</link>
+      <pubDate>Mon, 27 Sep 2021 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/code-search-for-myself/</guid>
+      <description>最近、自分用のコード検索を構築して運用しているがこれが意外に良い。 大きなコードベースに触るときは全体を素早く検索できる方法があるととても捗る</description>
+    </item>
+    
     <item>
       <title>Public betaになったNotion APIを使ってみる</title>
       <link>https://f110.jp/posts/test-notion-api/</link>
