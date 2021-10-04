@@ -14,7 +14,7 @@
       <pubDate>Mon, 04 Oct 2021 09:00:00 +0900</pubDate>
       
       <guid>https://f110.jp/posts/container-image-for-bazel/</guid>
-      <description>Bazel のコンテナイメージは公式のドキュメントでは [l.gcr.io/google/bazel](http://l.gcr.io/google/bazel) のものが使われている。 しかしこのイメージは更新が止まっており 3.5.0 以降更新されていない。 更に良くな</description>
+      <description>Bazel のコンテナイメージは公式のドキュメントでは l.gcr.io/google/bazel のものが使われている。 しかしこのイメージは更新が止まっており 3.5.0 以降更新されていない。 更に良くな</description>
     </item>
     
     <item>
