@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <title>自分用コード検索</title>
-  <meta property="og:title" content="自分用コード検索" />
-  <meta name="twitter:title" content="自分用コード検索" />
+  <title>Bazel のコンテナを作った</title>
+  <meta property="og:title" content="Bazel のコンテナを作った" />
+  <meta name="twitter:title" content="Bazel のコンテナを作った" />
 
   <meta name="author" content="Fumihiro Ito"/>
   <meta property="og:site_name" content="f110&#39;s weblog" />
-  <meta property="og:url" content="https://f110.jp/posts/code-search-for-myself/" />
+  <meta property="og:url" content="https://f110.jp/posts/container-image-for-bazel/" />
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
@@ -42,66 +42,33 @@
 
 <article class="p-article">
   <header>
-    <h1>自分用コード検索</h1>
+    <h1>Bazel のコンテナを作った</h1>
     <div>
       <div class="c-time">
         Posted on
-        <time datetime="2021-09-27T09:00:00&#43;09:00">
-          2021/09/27
+        <time datetime="2021-10-04T09:00:00&#43;09:00">
+          2021/10/04
         </time>
       </div>
       
-      <a href="https://f110.jp/tags/go" class="c-tag">Go</a>
+      <a href="https://f110.jp/tags/bazel" class="c-tag">Bazel</a>
       
-      <a href="https://f110.jp/tags/productivity" class="c-tag">Productivity</a>
+      <a href="https://f110.jp/tags/docker" class="c-tag">Docker</a>
       
     </div>
   </header>
   
   
   <section id="js-article" class="p-article__body">
-    <p>最近、自分用のコード検索を構築して運用しているがこれが意外に良い。</p>
-<p>大きなコードベースに触るときは全体を素早く検索できる方法があるととても捗る。
-だいぶ昔、大きなコードベースに触りだした頃には <a href="https://metacpan.org/pod/App::Ack">ack</a> を使っていた。これはその時触っていたコードベースが巨大な Perl のアプリケーションだったというのもあり会社の人から教えてもらった。</p>
-<p>今は ack の代わりに <a href="https://github.com/ggreer/the_silver_searcher">the_silver_searcher</a> を使うことが多い。
-自分では使ってないが git grep も十分に目的を達成することができると思う。</p>
-<p>the_silver_searcher は気に入ってかなり使っているが不満点もある。</p>
-<p>例えばブランチをまたいだ検索ができない、都度対象のファイルをすべて走査することになるのであまり効率がよくない（それでも十分速いが）などがある。</p>
-<p>これらを解決するには <a href="https://about.sourcegraph.com">Sourcegraph</a> を自分用にデプロイすれば良いかなと思っていたが、コンポーネントも多く自分用に運用していくのは少し大変だなと思って1年くらい放置をしていた。</p>
-<h1 id="zoekt">zoekt</h1>
-<p><a href="https://github.com/google/zoekt">zoekt</a> というコード検索エンジンがありこれを自分用に運用することにした。
-Sourcegraph よりコンポーネントも少なく必要最低限であり運用しやすいかなと思ったのが採用理由。</p>
-<p>インデックスの作成をする CLI ツールもプロジェクトの一部として含まれているのだが、結果的にその部分は自作した。
-なので実際に使っているのはブラウザから検索する部分とインデックス作成のライブラリ部分だけである。</p>
-<h2 id="インデックス作成">インデックス作成</h2>
-<p>プロジェクトには GitHub からリポジトリを持ってきてインデックスを作成できるツール（ <code>zoekt-mirror-github</code> と <code>zoekt-repo-index</code> ）があるのだがこれだとやりたいことがすべてできなかった。</p>
-<p>Go のライブラリから返ってきた error は最終的に文字列として出力されることがほとんどだと思う。その際にその文字列で発生源を探すべくコード検索をするのだが、依存の深いところにある場合などを考えるとかなり広範囲なプロジェクトをインデックスしなければいけない。</p>
-<p>リポジトリごとに同じライブラリを使っているがバージョンが違うといったことも考えられるので、トップにあるリポジトリからすべて辿れる、もしくは検索対象を絞れるようにしたい。</p>
-<p>幸いなことに Go modules には vendor する機能があるので、これを利用してインデックスする前にプログラム全体の <strong>動作に必要な範囲の</strong> ソースコードを手に入れそれを基にインデックスを作成すれば良い。</p>
-<p>そんなインデックス作成は zoekt プロジェクトではサポートしていないのでこれは自作しなければいけない。</p>
-<p>ということで作った。
-自宅の Kubernetes クラスタで動かすので PersistentVolume を直接扱わなくてもいいようにした。
-最初は Indexer と Web が一つの Pod になっており PersistentVolume でディスクを共有しつつ永続化していたがやはり直接ディスクを扱わないほうがいいだろうということで以下の形に作り変えた。</p>
-<p><img src="zoekt-indexer-9145dab8-f85b-40e5-b4a6-7f540b4bf1f1.svg" alt=""></p>
-<p>リポジトリを Clone しインデックスを作成する Indexer はスケジューラ（cron）の機能も持っている。定期的にインデックスを作成しそれをオブジェクトストレージへアップロードする。</p>
-<p>アップロードしたことを nats-server に通知して Indexer の役目は終了となる。</p>
-<p>zoekt-webserver はインデックスファイルが必要なのでオブジェクトストレージからインデックスファイルを取得してくるコンテナが webserver の隣にいる。
-この Updater は nats-server を介して Indexer からの通知を受け取るので Indexer がインデックスの更新を完了すればすぐに反映されるようになっている。</p>
-<p>これにより webserver が複数 Pod あっても問題なく動作するので webserver の Graceful な入れ替えも可能になっている。</p>
-<h2 id="ctags">ctags</h2>
-<p>zoekt は ctags を <a href="https://github.com/google/zoekt/blob/fcc0c9ab67c5e237fa886ef7a105d96c1b264d27/doc/ctags.md">サポートしており</a> インデックス作成時に利用できれば言語なども検索条件に含めることができる。</p>
-<p>ローカルでインデックスを作成する分には universal-ctags にパスを通しておけば良いのでそれほど難しくないのだが、 Kubernetes 上で動作する Indexer で ctags を使おうと思うと少し面倒だった。</p>
-<p>結局 universal-ctags のコードを自分のリポジトリに持ってきてそこに Bazel のビルドファイルを追加した。</p>
-<p>ctags をビルドする際は静的リンクし、バイナリをコンテナに含めれば良いだけという状態にする。
-これは Indexer のコンテナが distroless ベースになっているというのもあるし、 distroless 以外を使う気がないというのもある。</p>
-<p>ctags のビルドには <a href="https://github.com/bazelbuild/rules_foreign_cc">rules_foreign_cc</a> を使って configure &amp;&amp; make を使っているし静的リンクするライブラリはホスト側のものなので Bazel の良さは少し失われているがビルドはできるので良いだろう。</p>
-<h2 id="go-mod-vendor">go mod vendor</h2>
-<p>依存モジュールを vendoring するのも少しハックが必要だった。</p>
-<p>vendoring するには <code>go mod vendor</code> を実行する必要があるのだが、これは internal パッケージになっていてライブラリとして別のプログラムから利用することができない。
-なので <code>go</code> コマンドを実行する必要があるのだが、前述の通りコンテナのベースが distroless なのでなんとかして distroless コンテナの中でコマンドを動かさないといけない。</p>
-<p><a href="https://hub.docker.com/_/golang">go のコンテナ</a> をベースにするという手もあるが alpine ベースは使いたくない。</p>
-<p>そこで Indexer のコンテナには公式が配布している tar を展開して含めることにした。</p>
-<p><code>http_archive</code> で tar を取得してきてそこへ取り出したいファイルを<a href="https://github.com/f110/mono/blob/e5228cb1816ad6d2203a45de5ad972c7640325c4/WORKSPACE#L193-L206">定義したビルドファイルを適用</a>、コンテナにする前に再度 tar で固めて最終的に <a href="https://github.com/f110/mono/blob/e5228cb1816ad6d2203a45de5ad972c7640325c4/containers/zoekt-indexer/BUILD.bazel#L19-L33">1つのレイヤとしてまとめて</a> ある。</p>
+    <p>Bazel のコンテナイメージは公式のドキュメントでは <code>[l.gcr.io/google/bazel](http://l.gcr.io/google/bazel)</code> のものが使われている。</p>
+<p>しかしこのイメージは更新が止まっており 3.5.0 以降更新されていない。</p>
+<p>更に良くないことにこのイメージは Ubuntu 16.04 をベースにしており、Let&rsquo;s Encrypt の CA 切り替えの影響を受け証明書の検証が失敗するようになってしまった。</p>
+<p>元々 <code>[l.gcr.io/google/bazel](http://l.gcr.io/google/bazel)</code> は <a href="https://github.com/GoogleCloudPlatform/container-definitions/blob/12508ac50e5a1f18ddb88c3dd70f5aa6de7ab3a7/ubuntu1604_bazel/BUILD#L52-L57">Google Cloud の人たちがメンテナンス</a> していたようで Bazel のチームが直接メンテしていたわけではない様子。
+今は <a href="https://github.com/bazelbuild/continuous-integration/issues/1060">Bazel のチームがメンテしようとしている</a> ようだがそれほど進展がなく特に新しいコンテナがリリースされているわけでもない。</p>
+<p>自分用の CI などで Bazel のコンテナイメージに依存しているのでこの状況は好ましくなく、自分でコントロールすべく Bazel のコンテナイメージを作った。</p>
+<p><a href="https://github.com/f110/bazel-container">https://github.com/f110/bazel-container</a></p>
+<p>いずれ Bazel からコンテナイメージが出てくるだろうと思われるので長いこと使ったりすることはあまり考えておらず、主に自分用のコンテナイメージとなっている。</p>
+<p>コンテナイメージ自体は GHCR で公開をしているので誰でも利用することができるし、なにか不具合の報告があれば対応するつもりではいる。</p>
 
   </section>
   <footer>
@@ -110,31 +77,16 @@ Sourcegraph よりコンポーネントも少なく必要最低限であり運�
       <div class="c-pagination__ctrl">
         <div class="c-pagination__newer">
           
-          <a href="https://f110.jp/posts/container-image-for-bazel/">Newer</a>
           
         </div>
         <div class="c-pagination__older">
           
-          <a href="https://f110.jp/posts/i-bought-access-point-wifi6-long-range/">Older</a>
+          <a href="https://f110.jp/posts/code-search-for-myself/">Older</a>
           
         </div>
       </div>
     </nav>
     
-
-<section class="p-related">
-  <h3>See Also</h3>
-  <ul id="slider" class="p-related__list">
-    
-    <li class="p-related__item js-related__item">
-      <a href="/posts/test-notion-api/"
-        >
-        <span>Public betaになったNotion APIを使ってみる</span>
-      </a>
-    </li>
-    
-  </ul>
-</section>
 
 
     

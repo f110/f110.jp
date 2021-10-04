@@ -7,7 +7,25 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Mon, 27 Sep 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 04 Oct 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bazel</title>
+      <link>https://f110.jp/tags/bazel/</link>
+      <pubDate>Mon, 04 Oct 2021 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/bazel/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Docker</title>
+      <link>https://f110.jp/tags/docker/</link>
+      <pubDate>Mon, 04 Oct 2021 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/docker/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Go</title>
       <link>https://f110.jp/tags/go/</link>
@@ -108,15 +126,6 @@
     </item>
     
     <item>
-      <title>Bazel</title>
-      <link>https://f110.jp/tags/bazel/</link>
-      <pubDate>Sat, 10 Oct 2020 17:47:04 +0900</pubDate>
-      
-      <guid>https://f110.jp/tags/bazel/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Kubernetes</title>
       <link>https://f110.jp/tags/kubernetes/</link>
       <pubDate>Sun, 23 Aug 2020 00:55:44 +0900</pubDate>
@@ -185,15 +194,6 @@
       <pubDate>Wed, 01 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://f110.jp/tags/containerd/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Docker</title>
-      <link>https://f110.jp/tags/docker/</link>
-      <pubDate>Wed, 01 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://f110.jp/tags/docker/</guid>
       <description></description>
     </item>
     

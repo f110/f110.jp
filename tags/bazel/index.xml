@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 10 Oct 2020 17:47:04 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/bazel/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 04 Oct 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/bazel/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bazel のコンテナを作った</title>
+      <link>https://f110.jp/posts/container-image-for-bazel/</link>
+      <pubDate>Mon, 04 Oct 2021 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/container-image-for-bazel/</guid>
+      <description>Bazel のコンテナイメージは公式のドキュメントでは [l.gcr.io/google/bazel](http://l.gcr.io/google/bazel) のものが使われている。 しかしこのイメージは更新が止まっており 3.5.0 以降更新されていない。 更に良くな</description>
+    </item>
+    
     <item>
       <title>Go Conference&#39;20 in Autumn SENDAI</title>
       <link>https://f110.jp/posts/gocon-20-sendai/</link>
