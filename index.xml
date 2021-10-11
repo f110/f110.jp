@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Mon, 04 Oct 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 11 Oct 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Yubikey を挿しっぱなしにしない</title>
+      <link>https://f110.jp/posts/dont-leave-the-yubikey-plugged-in/</link>
+      <pubDate>Mon, 11 Oct 2021 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/dont-leave-the-yubikey-plugged-in/</guid>
+      <description>GitHub の SSH 認証は Yubikey を使っている。 1本の Yubikey があれば複数台のマシンで同じ鍵を使えるので便利かつセキュアな状態になっている。 しかし仕事用の PC とプライベ</description>
+    </item>
+    
     <item>
       <title>Bazel のコンテナを作った</title>
       <link>https://f110.jp/posts/container-image-for-bazel/</link>
