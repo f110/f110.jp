@@ -4,21 +4,36 @@
   
   <url>
     <loc>https://f110.jp/</loc>
-    <lastmod>2021-10-11T09:00:00+09:00</lastmod>
+    <lastmod>2021-10-23T01:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/posts/api-for-ios-shortcuts/</loc>
+    <lastmod>2021-10-23T01:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/notion/</loc>
+    <lastmod>2021-10-23T01:00:00+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/posts/</loc>
-    <lastmod>2021-10-11T09:00:00+09:00</lastmod>
+    <lastmod>2021-10-23T01:00:00+09:00</lastmod>
   </url>
   
   <url>
-    <loc>https://f110.jp/tags/security/</loc>
-    <lastmod>2021-10-11T09:00:00+09:00</lastmod>
+    <loc>https://f110.jp/tags/productivity/</loc>
+    <lastmod>2021-10-23T01:00:00+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://f110.jp/tags/</loc>
+    <lastmod>2021-10-23T01:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://f110.jp/tags/security/</loc>
     <lastmod>2021-10-11T09:00:00+09:00</lastmod>
   </url>
   
@@ -44,11 +59,6 @@
   
   <url>
     <loc>https://f110.jp/tags/go/</loc>
-    <lastmod>2021-09-27T09:00:00+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://f110.jp/tags/productivity/</loc>
     <lastmod>2021-09-27T09:00:00+09:00</lastmod>
   </url>
   

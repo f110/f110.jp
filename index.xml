@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Mon, 11 Oct 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 22 Oct 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>iOS ショートカット用に API を作る</title>
+      <link>https://f110.jp/posts/api-for-ios-shortcuts/</link>
+      <pubDate>Fri, 22 Oct 2021 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/api-for-ios-shortcuts/</guid>
+      <description>Notion に買い物リストというデータベースを作って買わないといけないものなどをそこで一括して管理してる。 そこには日用品からそうではないものまでとにか</description>
+    </item>
+    
     <item>
       <title>Yubikey を挿しっぱなしにしない</title>
       <link>https://f110.jp/posts/dont-leave-the-yubikey-plugged-in/</link>
