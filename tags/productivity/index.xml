@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Fri, 22 Oct 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/productivity/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 30 Oct 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/productivity/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>開発体験のために</title>
+      <link>https://f110.jp/posts/for-developer-experience/</link>
+      <pubDate>Sat, 30 Oct 2021 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/for-developer-experience/</guid>
+      <description>開発体験が良いプロジェクトは開発してて楽しい。一方、開発体験が悪いプロジェクトは小さいストレスが溜まっていきあまり気持ちのいいものではないし</description>
+    </item>
+    
     <item>
       <title>iOS ショートカット用に API を作る</title>
       <link>https://f110.jp/posts/api-for-ios-shortcuts/</link>
