@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 30 Oct 2021 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/productivity/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 12 Nov 2021 20:58:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/productivity/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Colorful Darcula</title>
+      <link>https://f110.jp/posts/colorful-darcula/</link>
+      <pubDate>Fri, 12 Nov 2021 20:58:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/colorful-darcula/</guid>
+      <description>IntelliJ IDEA のカラースキーマは長いこと Colorful Darcula を愛用している。 基本的に IDEA と GoLand （ただ、最近は GoLand をインストールすることは少ないが）では Colorful Darcula を使っていて、一時</description>
+    </item>
+    
     <item>
       <title>開発体験のために</title>
       <link>https://f110.jp/posts/for-developer-experience/</link>
