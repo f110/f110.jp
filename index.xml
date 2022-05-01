@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Mon, 27 Dec 2021 14:08:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 30 Apr 2022 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GitHub スターとクオリティ</title>
+      <link>https://f110.jp/posts/relationship-between-the-star-and-quality-in-github-repository/</link>
+      <pubDate>Sat, 30 Apr 2022 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/relationship-between-the-star-and-quality-in-github-repository/</guid>
+      <description>なにかのライブラリを探すときに GitHub リポジトリのスターも一つの基準にすることはよくあると思う。実際自分もリポジトリを見つけたらスターの数は見てし</description>
+    </item>
+    
     <item>
       <title>生産性を改善する</title>
       <link>https://f110.jp/posts/regain-productivity/</link>
