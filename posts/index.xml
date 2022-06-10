@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 30 Apr 2022 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 10 Jun 2022 21:20:00 +0900</lastBuildDate><atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ツール・ド・フランス2022放送スケジュール</title>
+      <link>https://f110.jp/posts/tdf-2022-calendar/</link>
+      <pubDate>Fri, 10 Jun 2022 21:20:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/tdf-2022-calendar/</guid>
+      <description>今年もツール・ド・フランスのJスポーツオンデマンドでの放送スケジュールカレンダーを作った。 特に個人情報もないのでいつものように公開する。 https://calendar.google.com/calendar/embed?src=5cs8jfc3ft38v66umqdcs5tdc0%40group.calendar.google.com&amp;amp;ctz=Asia%2FTokyo も</description>
+    </item>
+    
     <item>
       <title>GitHub スターとクオリティ</title>
       <link>https://f110.jp/posts/relationship-between-the-star-and-quality-in-github-repository/</link>
