@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Fri, 10 Jun 2022 21:20:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 17 Jul 2022 20:23:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>homecluster</title>
+      <link>https://f110.jp/tags/homecluster/</link>
+      <pubDate>Sun, 17 Jul 2022 20:23:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/homecluster/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Tour de France</title>
       <link>https://f110.jp/tags/tour-de-france/</link>
@@ -86,15 +95,6 @@
       <pubDate>Sun, 08 Aug 2021 18:41:00 +0900</pubDate>
       
       <guid>https://f110.jp/tags/unifi/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>homecluster</title>
-      <link>https://f110.jp/tags/homecluster/</link>
-      <pubDate>Thu, 24 Jun 2021 17:12:00 +0900</pubDate>
-      
-      <guid>https://f110.jp/tags/homecluster/</guid>
       <description></description>
     </item>
     

@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 24 Jun 2021 17:12:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/homecluster/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 17 Jul 2022 20:23:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/homecluster/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes v1.24.3にアップデートした</title>
+      <link>https://f110.jp/posts/update-to-kubernetes-v1.24.3-and-ubuntu-22.04/</link>
+      <pubDate>Sun, 17 Jul 2022 20:23:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/update-to-kubernetes-v1.24.3-and-ubuntu-22.04/</guid>
+      <description>大体いつも Kubernetes のリリースはいくつかパッチリリースがされてからアップデートしているので今回は v1.24.3 で自宅クラスタのアップデートをすることにした。 手順</description>
+    </item>
+    
     <item>
       <title>Kubernetes v1.21 にアップデートした</title>
       <link>https://f110.jp/posts/update-kubernetes-to-1.21/</link>

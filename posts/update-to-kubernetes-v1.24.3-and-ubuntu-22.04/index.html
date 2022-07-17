@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <title>iOS ショートカット用に API を作る</title>
-  <meta property="og:title" content="iOS ショートカット用に API を作る" />
-  <meta name="twitter:title" content="iOS ショートカット用に API を作る" />
+  <title>Kubernetes v1.24.3にアップデートした</title>
+  <meta property="og:title" content="Kubernetes v1.24.3にアップデートした" />
+  <meta name="twitter:title" content="Kubernetes v1.24.3にアップデートした" />
 
   <meta name="author" content="Fumihiro Ito"/>
   <meta property="og:site_name" content="f110&#39;s weblog" />
-  <meta property="og:url" content="https://f110.jp/posts/api-for-ios-shortcuts/" />
+  <meta property="og:url" content="https://f110.jp/posts/update-to-kubernetes-v1.24.3-and-ubuntu-22.04/" />
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
@@ -43,57 +43,31 @@
 
 <article class="p-article">
   <header>
-    <h1>iOS ショートカット用に API を作る</h1>
+    <h1>Kubernetes v1.24.3にアップデートした</h1>
     <div>
       <div class="c-time">
         Posted on
-        <time datetime="2021-10-22T09:00:00&#43;09:00">
-          2021/10/22
-        </time>
-        Last edited on
-        <time datetime="2021-10-23T01:00:00&#43;09:00">
-          2021/10/23 01:00:00
+        <time datetime="2022-07-17T20:23:00&#43;09:00">
+          2022/07/17
         </time>
       </div>
       
-      <a href="https://f110.jp/tags/productivity" class="c-tag">Productivity</a>
-      
-      <a href="https://f110.jp/tags/notion" class="c-tag">Notion</a>
+      <a href="https://f110.jp/tags/homecluster" class="c-tag">Homecluster</a>
       
     </div>
   </header>
   
   
   <section id="js-article" class="p-article__body">
-    <p>Notion に買い物リストというデータベースを作って買わないといけないものなどをそこで一括して管理してる。
-そこには日用品からそうではないものまでとにかく買いたいと思ったもの・買うと決めたものを入れてる。</p>
-<p>しかしこのデータベースの運用には少し課題があり、特に日用品は「あ、シャンプーの詰め替えがなくなったな、買っておこう」と思っても実際にこのデータベースにページを作るまでに忘れて思い出すことが必要になってしまうことがよくあった。</p>
-<p>買いたいと思ったとき手元にスマホがないので取りに行く間になにか別のことをすると忘れてしまうのだが、それ以外にもスマホのロックを解除してNotionを起動して…とやっている間に忘れてしまうことがあった。
-ロック解除、Notion起動、買い物リストのデータベースへ遷移（2タップ）、新規ページ作成、とタップ数が多いので忘れてしまうことがある。</p>
-<p>理想としてはアイコンをタップしたらテキストフィールドにフォーカスがあたっていて、入力したらそれだけでページが作られるくらい簡単になるといい。</p>
-<p>これを実現するために iOS のショートカットとそれ用に API を作った。</p>
-<h2 id="api-サーバー">API サーバー</h2>
-<p>ショートカットから Notion の API を直接呼び出すことも可能ではあると思うが、UI でリクエストボディの JSON を作るのが面倒だったので間に自作の API サーバーを挟むことにした。</p>
-<p>API がやることは非常に単純で、いくつかのパラメータがついてくるのでそれを基に Notion の API を叩くだけである。</p>
-<p>ショートカット側に色々持つのが面倒なのと API トークンはサーバーで持っておきたいのでショートカットと API の間はまた別の識別子を使っている。
-その識別子がページ作成先のデータベースなどの情報と紐付いているといった作りになっている。</p>
-<h2 id="ショートカット">ショートカット</h2>
-<p>今までショートカットを使ったことがなかったのだが、使ってみると結構便利である。</p>
-<p>今回は理想とするフローを再現することができた。</p>
-<p>UI で一連の流れを作れるので誰でも触れるというメリットはある。
-しかしソフトウェアを作ることに慣れている人の場合はショートカットをコードで表現したくなるかもしれない。
-UI で一つずつパーツを組み合わせたり変数を利用したりするのが面倒なのである。</p>
-<p>なのでこの部分を簡単にするために API サーバーを用意しているとも言える。</p>
-<h3 id="ショートカットの-http-クライアント">ショートカットの HTTP クライアント</h3>
-<p>自宅のクラスタで動かしているサービスの類は基本的にすべてプロキシの後ろに隠してあり、ほぼすべてが認証を通るようになっている。（一部例外はある）</p>
-<p>しかしショートカット内蔵の HTTP クライアントでは残念ながらこの認証を通ることができない。</p>
-<p>プロキシの認証を通るには OpenID Connect で認証しプロキシ自体のクッキーを食うか、クライアント証明書認証が必要である。</p>
-<p>ショートカットのワークフローではクッキーを食べることはできないし、当然 Safari とその部分は共有されていない。
-またクライアント証明書も提出することはできないようである。</p>
-<p>プロキシのクライアント証明書認証は TLS のハンドシェイク時に提出を求める証明書の Issuer の Fingerprint をクライアントに送るようになっている。
-なので場合によってはクライアント証明書を一意に決定することができ、ユーザーに選択させる必要がないという状況を作ることはできるのだが、ショートカットの HTTP クライアントはそういう状況であったとしてもクライアント証明書を提出してこなかった。</p>
-<p>これは実際に試す前から予想できた挙動ではある。</p>
-<p>ひとまず現在は API サーバーの場合はプロキシの認証を切っているが、いずれ認証付きで API リクエストを発行できるようにしたい。</p>
+    <p>大体いつも Kubernetes のリリースはいくつかパッチリリースがされてからアップデートしているので今回は v1.24.3 で自宅クラスタのアップデートをすることにした。</p>
+<p>手順はいつもと同じで特に問題なかった。</p>
+<p>しかし今回は OS のアップデートも一緒に行うことにしたのでこちらの方でトラブルがあった。</p>
+<p>コントロールプレーンには Raspberry Pi を使っていてこれの OS も Ubuntu を使っているのだが Ubuntu 22.04 のラズパイ向けカーネルでは少しパッケージングが変わってしまい、カーネルモジュールの <code>8021q</code> が <code>linux-module-extras</code> に移動してしまった。</p>
+<p>自宅クラスタのネットワークではタグ VLAN を使っているのでこのモジュールが必要だった。
+しかしこのモジュールのパッケージングが <code>linux-modules</code> から <code>linux-module-extras</code> に移動したことで <code>do-release-upgrade</code> をして再起動すると疎通しなくなってしまう。</p>
+<p>ラズパイの画面を表示する機材を用意してないので疎通しなくなってしまった場合はクリーンインストールするしかない。</p>
+<p>なおこの問題は次のカーネル（<code>5.15.0-1012.14</code>）で修正される予定になっている。</p>
+<p>なのでこの問題に遭遇してしまった1台はクリーンインストールした上で <code>linux-module-extras</code> をインストールして問題を解決した。残りの2台は OS のアップデートをペンディングしているので次のカーネルが updates リポジトリに入ったらアップデートを行いたい。</p>
 
   </section>
   <footer>
@@ -102,12 +76,11 @@ UI で一つずつパーツを組み合わせたり変数を利用したりす�
       <div class="c-pagination__ctrl">
         <div class="c-pagination__newer">
           
-          <a href="https://f110.jp/posts/for-developer-experience/">Newer</a>
           
         </div>
         <div class="c-pagination__older">
           
-          <a href="https://f110.jp/posts/dont-leave-the-yubikey-plugged-in/">Older</a>
+          <a href="https://f110.jp/posts/tdf-2022-calendar/">Older</a>
           
         </div>
       </div>
