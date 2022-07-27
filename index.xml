@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sun, 17 Jul 2022 20:23:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 27 Jul 2022 22:50:00 +0900</lastBuildDate><atom:link href="https://f110.jp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>車のリコール</title>
+      <link>https://f110.jp/posts/subaru-recalls-wrx-sti-due-to-problem-of-reverse-light-switch/</link>
+      <pubDate>Wed, 27 Jul 2022 22:50:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/subaru-recalls-wrx-sti-due-to-problem-of-reverse-light-switch/</guid>
+      <description>スバルが VAB 型 WRX STI 全車のリコールを発表 した。 ここで対象になっている VAB 型に乗って6年目になるが、不具合によるリコールは初めての経験。 （完成検査の</description>
+    </item>
+    
     <item>
       <title>Kubernetes v1.24.3にアップデートした</title>
       <link>https://f110.jp/posts/update-to-kubernetes-v1.24.3-and-ubuntu-22.04/</link>
