@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 25 Aug 2022 21:07:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 27 Aug 2022 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GitOpsでシークレットを扱う</title>
+      <link>https://f110.jp/posts/how-to-deal-with-the-secret-in-gitops/</link>
+      <pubDate>Sat, 27 Aug 2022 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/how-to-deal-with-the-secret-in-gitops/</guid>
+      <description>自宅の Kubernetes クラスタは GitOps をしている。マニフェストを git で管理するのであれば GitOps をするようにしておいた方が良い。 GitOps をせずに手動での適用で運用しようと思</description>
+    </item>
+    
     <item>
       <title>KubernetesのCRDをProtocol Buffersで定義する</title>
       <link>https://f110.jp/posts/define-the-kubernetes-api-by-protocol-buffers/</link>

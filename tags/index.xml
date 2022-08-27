@@ -7,11 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Thu, 25 Aug 2022 21:07:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 27 Aug 2022 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>homecluster</title>
+      <link>https://f110.jp/tags/homecluster/</link>
+      <pubDate>Sat, 27 Aug 2022 09:00:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/homecluster/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Kubernetes</title>
       <link>https://f110.jp/tags/kubernetes/</link>
-      <pubDate>Thu, 25 Aug 2022 21:07:00 +0900</pubDate>
+      <pubDate>Sat, 27 Aug 2022 09:00:00 +0900</pubDate>
       
       <guid>https://f110.jp/tags/kubernetes/</guid>
       <description></description>
@@ -23,15 +32,6 @@
       <pubDate>Wed, 27 Jul 2022 22:50:00 +0900</pubDate>
       
       <guid>https://f110.jp/tags/wrx-sti/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>homecluster</title>
-      <link>https://f110.jp/tags/homecluster/</link>
-      <pubDate>Sun, 17 Jul 2022 20:23:00 +0900</pubDate>
-      
-      <guid>https://f110.jp/tags/homecluster/</guid>
       <description></description>
     </item>
     
