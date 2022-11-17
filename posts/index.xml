@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 27 Aug 2022 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 17 Nov 2022 16:23:00 +0900</lastBuildDate><atom:link href="https://f110.jp/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>facebook/saplingをビルドする</title>
+      <link>https://f110.jp/posts/building-sapling-on-macports/</link>
+      <pubDate>Thu, 17 Nov 2022 16:23:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/posts/building-sapling-on-macports/</guid>
+      <description>Meta が社内で使っている Version Control System の一部（？）を公開してドキュメントなどが整備されたので早速試してみた。 試してみるといってもコンパイルからで、ドキュ</description>
+    </item>
+    
     <item>
       <title>GitOpsでシークレットを扱う</title>
       <link>https://f110.jp/posts/how-to-deal-with-the-secret-in-gitops/</link>

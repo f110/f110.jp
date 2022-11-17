@@ -7,7 +7,25 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2020 Fumihiro Ito</copyright>
-    <lastBuildDate>Sat, 27 Aug 2022 09:00:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 17 Nov 2022 16:23:00 +0900</lastBuildDate><atom:link href="https://f110.jp/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Monorepo</title>
+      <link>https://f110.jp/tags/monorepo/</link>
+      <pubDate>Thu, 17 Nov 2022 16:23:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/monorepo/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Productivity</title>
+      <link>https://f110.jp/tags/productivity/</link>
+      <pubDate>Thu, 17 Nov 2022 16:23:00 +0900</pubDate>
+      
+      <guid>https://f110.jp/tags/productivity/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>homecluster</title>
       <link>https://f110.jp/tags/homecluster/</link>
@@ -50,15 +68,6 @@
       <pubDate>Mon, 27 Dec 2021 14:08:00 +0900</pubDate>
       
       <guid>https://f110.jp/tags/notion/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Productivity</title>
-      <link>https://f110.jp/tags/productivity/</link>
-      <pubDate>Mon, 27 Dec 2021 14:08:00 +0900</pubDate>
-      
-      <guid>https://f110.jp/tags/productivity/</guid>
       <description></description>
     </item>
     
@@ -131,15 +140,6 @@
       <pubDate>Thu, 29 Apr 2021 13:17:00 +0900</pubDate>
       
       <guid>https://f110.jp/tags/gentoo/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Monorepo</title>
-      <link>https://f110.jp/tags/monorepo/</link>
-      <pubDate>Thu, 11 Mar 2021 22:04:00 +0900</pubDate>
-      
-      <guid>https://f110.jp/tags/monorepo/</guid>
       <description></description>
     </item>
     

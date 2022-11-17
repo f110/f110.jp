@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <title>BigSurにアップデートした</title>
-  <meta property="og:title" content="BigSurにアップデートした" />
-  <meta name="twitter:title" content="BigSurにアップデートした" />
+  <title>facebook/saplingをビルドする</title>
+  <meta property="og:title" content="facebook/saplingをビルドする" />
+  <meta name="twitter:title" content="facebook/saplingをビルドする" />
 
   <meta name="author" content="Fumihiro Ito"/>
   <meta property="og:site_name" content="f110&#39;s weblog" />
-  <meta property="og:url" content="https://f110.jp/posts/upgrade-macos-to-bigsur/" />
+  <meta property="og:url" content="https://f110.jp/posts/building-sapling-on-macports/" />
   <meta name="twitter:card" content="summary" />
   <meta property="og:type" content="article" />
   
@@ -43,42 +43,67 @@
 
 <article class="p-article">
   <header>
-    <h1>BigSurにアップデートした</h1>
+    <h1>facebook/saplingをビルドする</h1>
     <div>
       <div class="c-time">
         Posted on
-        <time datetime="2021-03-22T02:34:00&#43;09:00">
-          2021/03/22
+        <time datetime="2022-11-17T16:23:00&#43;09:00">
+          2022/11/17
         </time>
       </div>
+      
+      <a href="https://f110.jp/tags/productivity" class="c-tag">Productivity</a>
+      
+      <a href="https://f110.jp/tags/monorepo" class="c-tag">Monorepo</a>
       
     </div>
   </header>
   
   
   <section id="js-article" class="p-article__body">
-    <p>そろそろ良いだろうということで BigSur にアップデートをした。
-大体いつも macOS のアップデートは半年から一年程寝かせてから適用しているので、大体いつものスケジュール通り。</p>
-<p>なぜか macOS をインストールできる端末が家に何台もあるので個人のメイン端末からではなく別の端末を先にアップデートし、その後にメインの端末を上げた。</p>
-<h2 id="メニューバーが変わった">メニューバーが変わった</h2>
-<p>BigSur になって色々変わって特に Catalina と同じままだとダメだったのがメニューバー。</p>
-<p>macOS は世代が進むごとにあらゆる余白が増えていっている気がするのだが、今回は特にメニューバーの余白が増えて、今までのようにアイコンが並ばなくなったので <a href="https://www.macbartender.com">Bartender 4</a> を導入した。
-本来は有料だが、今はパブリックベータなので無料で使える。</p>
-<p>Bartender 4 は BigSur を使うにあたって必須のアプリなのでベータ期間が終わり有料になったら購入したい。購入するとしても $15 程度なのでお安いアプリである。</p>
-<h2 id="起動音が復活した">起動音が復活した</h2>
-<p>ジャーン</p>
-<p>すぐ消した。</p>
-<h2 id="bigsur-になってよくなったところ">BigSur になってよくなったところ</h2>
-<p>iOS のようなコントロールセンターが導入された。これは結構良さそう。</p>
-<p>とはいえ使う機会はそんなにない。</p>
-<h2 id="まだ不便なところ">まだ不便なところ</h2>
-<p>Notification Center の挙動が変わっており、まだこれには慣れない。
-例えば Slack のスレッドにリプライが付いた時、今まではバナーが出ていたが BigSur の Notification Center だとバナーが出ない。</p>
-<p>これは何かの設定でバナーが出るようにできるのだろうか？</p>
-<h2 id="総じて">総じて</h2>
-<p>Catalina と BigSur を平行して使う期間というのがあったが二つの UI の違いで結構違和感を感じ当初想定していたよりも早く Catalina を BigSur にアップデートした。
-つまり、 BigSur の UI の方が良いと直感的に感じたのかもしれない。</p>
-<p>BigSur にこれがあってよかったわ〜というものがいまのところ特にはないのですごくいいというわけではないが、アップデートに対して違和感がないという点を考えれば十分に良いアップデートだったのではないだろうか。</p>
+    <p>Meta が社内で使っている Version Control System の一部（？）を公開してドキュメントなどが整備されたので早速試してみた。
+試してみるといってもコンパイルからで、ドキュメントに沿ってコマンドを実行すればビルドが成功するものではなかったのでビルド方法を記事にする。</p>
+<p>なお Homebrew を使っている人は <a href="https://sapling-scm.com/docs/introduction/installation#macos">公式のドキュメント</a> に従った方が良いと思われる。
+自分の環境は MacPorts なのでソースコードからコンパイルするしかないが Homebrew を使っていればもっと簡単に利用できるはずである。</p>
+<p>ソースコードの入手についてはどんな方法で行っても構わない。</p>
+<h2 id="ビルドに必要なソフトウェアをインストールする">ビルドに必要なソフトウェアをインストールする</h2>
+<p>yarn や Rust、Python が必要なのでインストールする。</p>
+<pre><code>$ port install yarn
+</code></pre>
+<p>Rust については MacPorts でインストールしない。これは現時点で MacPorts でインストールされる Rust が古くて sapling をコンパイルできないからである。
+<a href="https://www.rust-lang.org/learn/get-started">Rustの公式のドキュメント</a> を参考にインストールし、 <code>rustc</code> と <code>cargo</code> にパスを通しておく。</p>
+<p>Python についてはインストール済みということにする。</p>
+<h2 id="buildrs-を修正する">build.rs を修正する</h2>
+<p>MacPorts で libiconv がインストールされているとそちらへリンクしようとしてしまう。</p>
+<p>MacPorts の libiconv はシンボルが変更されており OS のものとコンフリクトしないようになっている。したがって MacPorts の libiconv とリンクしようとしてしまうとリンクで失敗する。</p>
+<p>そこで次のような変更をしてシステムに入っている libiconv とリンクするようにする。</p>
+<pre><code>diff --git a/eden/scm/exec/hgmain/build.rs b/eden/scm/exec/hgmain/build.rs
+index f0e5d0a570..db562c9456 100644
+--- a/eden/scm/exec/hgmain/build.rs
++++ b/eden/scm/exec/hgmain/build.rs
+@@ -8,6 +8,7 @@
+ use std::env;
+
+ fn main() {
++    println!(&quot;cargo:rustc-link-search=/usr/lib&quot;);
+     println!(&quot;cargo:rerun-if-changed=build.rs&quot;);
+     if let Some(lib_dirs) = env::var_os(&quot;LIB_DIRS&quot;) {
+         for lib_dir in std::env::split_paths(&amp;lib_dirs) {
+</code></pre>
+<h2 id="ビルド">ビルド</h2>
+<p>以下は <code>$HOME/local/sapling</code> にインストールする例である。</p>
+<pre><code>$ CARGO_NET_GIT_FETCH_WITH_CLI=true make install-oss PREFIX=$HOME/local/sapling
+</code></pre>
+<p>まだまだ変更が入っていきそうなので他と混じらないように全く別のディレクトリを PREFIX にしている。</p>
+<h2 id="実行スクリプト">実行スクリプト</h2>
+<p>上記のコマンドでビルドしていれば <code>$HOME/local/sapling/bin/sl</code> に実行ファイルができているがこれをそのまま実行することができなかった。</p>
+<p>これを実行するためにラッパースクリプトを用意してそれを経由して実行している。</p>
+<pre><code>#!/usr/bin/env bash
+
+export PYTHONPATH=$HOME/local/sapling/lib/python3.10/site-packages
+exec $HOME/local/sapling/bin/sl
+</code></pre>
+<p>もっといい方法があるのかもしれないがこれで動くのでとりあえずは満足している。</p>
 
   </section>
   <footer>
@@ -87,12 +112,11 @@
       <div class="c-pagination__ctrl">
         <div class="c-pagination__newer">
           
-          <a href="https://f110.jp/posts/move-to-gentoo-linux/">Newer</a>
           
         </div>
         <div class="c-pagination__older">
           
-          <a href="https://f110.jp/posts/how-to-organize-mono-repository/">Older</a>
+          <a href="https://f110.jp/posts/how-to-deal-with-the-secret-in-gitops/">Older</a>
           
         </div>
       </div>
